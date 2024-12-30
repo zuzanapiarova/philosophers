@@ -8,7 +8,8 @@ HEADERS := -I ./include
 SRCS := srcs/actions.c \
 		srcs/input_val.c \
 		srcs/philo.c \
-		srcs/utils_libft.c
+		srcs/utils_libft.c \
+		srcs/utils.c \
 
 OBJS := ${SRCS:.c=.o}
 
