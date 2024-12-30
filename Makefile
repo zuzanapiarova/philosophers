@@ -5,8 +5,11 @@ AR = ar rcs
 NAME = philo
 HEADERS := -I ./include
 
-SRCS := srcs/philo.c \
+SRCS := srcs/actions.c \
+		srcs/input_val.c \
+		srcs/philo.c \
 		srcs/utils_libft.c
+
 OBJS := ${SRCS:.c=.o}
 
 all: $(NAME)

@@ -6,7 +6,7 @@
 /*   By: zuzanapiarova <zuzanapiarova@student.42    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/25 20:52:39 by zuzanapiaro       #+#    #+#             */
-/*   Updated: 2024/12/25 21:56:03 by zuzanapiaro      ###   ########.fr       */
+/*   Updated: 2024/12/29 18:31:52 by zuzanapiaro      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,4 +107,25 @@ size_t	ft_strlen(const char *s)
 	while (s[i])
 		i++;
 	return (i);
+}
+
+void	ft_putchar(char c)
+{
+	write(1, &c, 1);
+}
+
+void	ft_putnbr(long long nb)
+{
+	if (nb < 0)
+	{
+		ft_putchar('-');
+		nb = -nb;
+	}
+	if (nb >= 10)
+	{
+		ft_putnbr(nb / 10);
+		nb = nb % 10;
+	}
+	if (nb < 10)
+		ft_putchar(nb + 48);
 }

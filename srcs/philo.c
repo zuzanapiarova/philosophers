@@ -6,40 +6,44 @@
 /*   By: zuzanapiarova <zuzanapiarova@student.42    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/25 15:30:20 by zuzanapiaro       #+#    #+#             */
-/*   Updated: 2024/12/28 08:36:37 by zuzanapiaro      ###   ########.fr       */
+/*   Updated: 2024/12/30 00:43:41 by zuzanapiaro      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/philosophers.h"
 
-// use mutex to lock access to terminal while one log msg is being printed out from another thread wanting to print a msg
-void log_msg(t_info *info, int id, t_action action)
+long long get_time_in_ms(void)
 {
-	struct timeval tv;
-	char *id_str;
+	struct timeval	tv;
 
-	(void)action;
-	(void)info;
-	(void)id;
 	if (gettimeofday(&tv, NULL) == 0)
-	{
-		printf("time: %d\n", tv.tv_usec / 1000);
-		// write(1, ..., ...);
-	}
-	write (1, " ", 1);
-	id_str = ft_utoa(id);
-	write(1, id_str, ft_strlen(id_str));
-	free(id_str);
+		return (tv.tv_sec * 1000) + (tv.tv_usec / 1000);
+	return (ERROR);
+}
+
+// use mutex to lock access to terminal while one log msg is being printed out from another thread wanting to print a msg
+int	log_msg(t_info *info, t_philo *philo, t_action action)
+{
+	(void)info;
+	ft_putnbr(get_time_in_ms());
+	write(1, " ", 1);
+	ft_putnbr(philo->id);
+	write(1, " ", 1);
 	if (action == FORK)
 		write(1, " has taken a fork\n", 18);
 	else if (action == EATS)
-		write(1, " is eating\n", 11);
+	{
+		write(1, " is eating ", 11);
+		ft_putnbr(philo->times_eaten);
+		write(1, ". time\n", 7);
+	}
 	else if (action == THINKS)
-		write (1, " is thinking\n", 13);
+		write(1, " is thinking\n", 13);
 	else if (action == SLEEPS)
 		write(1, " is sleeping\n", 13);
-    else if (action == DEATH)
+	else if (action == DEATH)
 		write(1, " died\n", 6);
+	return (0);
 }
 
 void init_info(t_info *info, int argc, char **argv)
@@ -50,104 +54,127 @@ void init_info(t_info *info, int argc, char **argv)
 	info->sleep = ft_atou(argv[4]);
 	if (argc == 6)
 		info->times_to_eat = ft_atou(argv[5]);
-}
-
-int handle_error_input(int argc, char **argv)
-{
-	int i;
-	int flag;
-	int val;
-
-	if (argc != 5 && argc != 6)
-	{
-		write(1, "Program expects arguments. Please call ./philo with:\n", 53);
-		write(1, "\tnumber_of_philosophers\n", 24);
-		write(1, "\ttime_to_die (ms)\n", 18);
-		write(1, "\ttime_to_eat (ms)\n", 18);
-		write(1, "\ttime_to_sleep (ms)\n", 20);
-		write(1, "\toptional [number_of_times_each_philosopher_must_eat] (ms)\n", 60);
-		return (1);
-	}
-	// TODO: protect against numbers bigger than MAX_INT*2 and the addition of ms arguments to current time being bigger than max int *2, aleo against numbers smaller than 0
-	// watch video on unsigned int
-	i = 1;
-	flag = 0;
-	while (argv[i])
-	{
-		val = ft_atou(argv[i]);
-		//printf("argv: %s, val: %u\n", argv[i], val);
-		if (ft_atou(argv[i]) < 0 || ft_strncmp(argv[i], ft_utoa(val), ft_strlen(argv[i])))
-		{
-			if (flag == 0)
-			{
-				write(1, "Arguments to program must be positive integer values.\n", 54);
-				flag = 1;
-			}
-			write(1, "--> change argument:\t", 22);
-			write(1, argv[i], ft_strlen(argv[i]));
-			write(1, "\n", 1);
-		}
-		if (flag == 0 && i == 1 && val < 1)
-			return (write(1, "Number of philosophers must be at least 1.\n", 43), 1);
-		i++;
-	}
-	if (flag == 1)
-		return (1);
-	// TODO: protect argumets against being zero ?
-	return (0);
-}
-
-void *routine()
-{
-	printf("hi\n");
-	sleep(2);
-	return (NULL);
+	else
+		info->times_to_eat = -1;
+	info->death = false;
+	info->forks = NULL;
+	info->philos = NULL;
 }
 
 t_philo *init_philo(t_info *info, int id)
 {
-	t_philo *philo;
+	t_philo			*philo;
 
-	(void)info;
-	philo = NULL;
+	philo = (t_philo *)malloc(sizeof(t_philo));
 	philo->id = id;
-	if (pthread_create(&philo->thread, NULL, &routine, NULL) == 0)
+	if (pthread_create(&philo->thread, NULL, &routine, (void *)info) != 0)
 		return (NULL);
 	philo->dead = 0;
 	philo->thinks = 0;
 	philo->sleeps = 0;
 	philo->eats = 0;
+	philo->times_eaten = 0;
+	philo->last_eaten = get_time_in_ms();
+	philo->lock = (pthread_mutex_t *)malloc(info->total * sizeof(pthread_mutex_t));
 	return (philo);
 }
 
-int start_simulation(t_info *info)
-{
-	int i;
-	t_philo **philos;
-	pthread_mutex_t* forks;
+void *monitoring(void *arg) {
+    t_info *info = (t_info *)arg;
 
+    while (1)
+	{
+        for (int i = 0; i < info->total; i++) {
+            pthread_mutex_lock(info->philos[i]->lock); // Lock philosopher data
+            long current_time = get_time_in_ms();
+            if (current_time - info->philos[i]->last_eaten > info->die) {
+                log_msg(info, info->philos[i], DEATH);
+                pthread_mutex_unlock(info->philos[i]->lock);
+                return (NULL); // Exit the monitor thread
+            }
+            pthread_mutex_unlock(info->philos[i]->lock);
+        }
+        usleep(1000); // Sleep for a short period to avoid excessive CPU usage
+    }
+}
+
+void *routine(void *arg)
+{
+	t_philo	*philo;
+	t_info	*info;
+
+	info = (t_info *)arg;
+	philo = info->philos[1]; // TODO: replace 1 with the current thread//philo// from the philos array
+	sleep(2);
+	while ((int)philo->times_eaten < info->times_to_eat)
+	{
+	// maybe do this in a while loop? condition could be while info->death != true
+	// some algorithm for deciding for when to eat and which philosopher should eat
+	// check if right and left fork are free
+	// if yes grab them and lock them
+		take_fork(info, philo);
+	// start eating
+		p_eat(info, philo);
+	// if we have number_of_times_to_eat we decrease it
+	// unlock forks/mutexes
+		leave_forks(info, philo);
+	// start sleeping
+		p_sleep(info, philo);
+	// start thinking
+	// make sure the time without eating has not surpassed its limit
+	// if it has, set info->death to true and then loop should not run
+	}
+	return (NULL);
+}
+
+// TODO: add protections of the functions pthread and mutex fail
+int	start_simulation(t_info *info)
+{
+	int			i;
+	pthread_t	*monitor;
+
+	// start the monitoring thread and its mutex "philo->lock"
+	monitor = (pthread_t *)malloc(sizeof(pthread_t) * info->total);
+	if (pthread_create(monitor, NULL, &monitoring, (void *)info) != 0)
+		return (ERROR);
 	i = 0;
-	forks = malloc(info->total * sizeof(pthread_mutex_t));
+	info->forks = (pthread_mutex_t *)malloc(info->total * sizeof(pthread_mutex_t));
 	while (i < info->total)
 	{
-		pthread_mutex_init(&forks[i], NULL);
+		pthread_mutex_init(&info->forks[i], NULL);
 		i++;
 	}
-	philos = (t_philo *)malloc(sizeof(t_philo *) * info->total);
-	if (!philos)
+	info->philos = (t_philo **)malloc(sizeof(t_philo *) * info->total);
+	if (!info->philos)
 		return (1);
 	i = 0;
 	while (i < info->total)
 	{
-		philos[i] = init_philo(info, i + 1); // i + 1 because they are numbered from one to n
-		if (!philos[i])
-			return (1); // TODO: free the array both before and after the wrong el
+		info->philos[i] = init_philo(info, i + 1); // i + 1 because they are numbered from one to n
+		if (!info->philos[i])
+		{
+			while (i - 1 > 0)
+			{
+				pthread_join(info->philos[i]->thread, NULL); // Wait for threads to finish
+				free(info->philos[i]); // Free philosopher memory
+				i--;
+			}
+			free(info->philos); // Free the array
+			return (ERROR);
+		}
+		printf("created thread %d\n", info->philos[i]->id);
+		i++;
 	}
-	printf("philo id: %d\n", philos[3]->id);
+	i = 0;
+	while (i < info->total)
+	{
+		pthread_join(info->philos[i]->thread, NULL);
+		free(info->philos[i]); // Free philosopher memory
+		i++;
+	}
+	free(info->philos); // Free the array
 	return (0);
 }
-
-
 
 int main(int argc, char **argv)
 {
@@ -159,6 +186,5 @@ int main(int argc, char **argv)
 	printf("total: %d\n", info.total);
 	if (start_simulation(&info) == 1)
 		return (1);
-	//log_msg(&info, 2, FORK);
 	return (0);
 }
