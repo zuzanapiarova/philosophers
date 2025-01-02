@@ -6,13 +6,13 @@
 /*   By: zuzanapiarova <zuzanapiarova@student.42    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/30 12:41:01 by zuzanapiaro       #+#    #+#             */
-/*   Updated: 2024/12/30 14:52:26 by zuzanapiaro      ###   ########.fr       */
+/*   Updated: 2025/01/02 20:30:41 by zuzanapiaro      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/philosophers.h"
 
-long long get_time_in_ms(void)
+long long	get_time_in_ms(void)
 {
 	struct timeval	tv;
 
@@ -28,8 +28,10 @@ int	log_msg(t_philo *philo, t_action action)
 	write(1, " ", 1);
 	ft_putnbr(philo->id);
 	write(1, " ", 1);
-	if (action == FORK)
-		write(1, " has taken a fork\n", 18);
+	if (action == FORK_L)
+		write(1, " has taken left fork\n", 21);
+	else if (action == FORK_R)
+		write(1, " has taken right fork\n", 22);
 	else if (action == EATS)
 	{
 		write(1, " is eating for ", 15);

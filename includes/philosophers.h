@@ -13,7 +13,8 @@
 
 typedef enum	e_action
 {
-	FORK, // TOOK FORK
+	FORK_L, // TOOK LEFT FORK
+	FORK_R, // TOOK RIGHT FORK
 	EATS, // STARTED EATING
 	SLEEPS, // STARTED SLEEPING
 	THINKS, // STARTED THINKING
@@ -30,36 +31,33 @@ typedef struct		s_philo
 	unsigned int	sleep;
 	unsigned int	die;
 	int				times_to_eat; // is int because can be -1 if not assigned
-	bool			death;
+	bool			dead;
 	bool			eats;
 	bool			sleeps;
 	bool			thinks;
-	bool			dead;
 	unsigned int	times_eaten;
 	suseconds_t		last_eaten; // !! watch out because it is in microseconds, when needed to use, do /1000
-	pthread_mutex_t	*lock;
+	pthread_mutex_t	lock;
+	pthread_mutex_t	msg_lock;
 }					t_philo;
-
-typedef struct		s_info
-{
-	t_philo			**philos;
-
-} 					t_info;
 
 /* actions.c */
 int				p_eat(t_philo *philo);
 int				p_sleep(t_philo *philo);
-int				take_fork(t_philo *philo);
+int				take_forks(t_philo *philo);
 int				leave_forks(t_philo *philo);
 
 /* philo.c */
 //void			init_info(t_info *info, int argc, char **argv);
-int				log_msg(t_philo *philo, t_action action);
 void			*routine(void *arg);
-long long get_time_in_ms(void);
+
 
 /* input_val.c */
 int				handle_error_input(int argc, char **argv);
+
+/* utils.c */
+int				log_msg(t_philo *philo, t_action action);
+long long		get_time_in_ms(void);
 
 /* utils_libft.c */
 unsigned int	ft_atou(const char *nptr);

@@ -6,7 +6,7 @@
 /*   By: zuzanapiarova <zuzanapiarova@student.42    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 16:39:39 by zuzanapiaro       #+#    #+#             */
-/*   Updated: 2024/12/29 17:28:48 by zuzanapiaro      ###   ########.fr       */
+/*   Updated: 2024/12/30 17:26:24 by zuzanapiaro      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ int handle_error_input(int argc, char **argv)
 		write(1, "\ttime_to_eat (ms)\n", 18);
 		write(1, "\ttime_to_sleep (ms)\n", 20);
 		write(1, "\toptional [number_of_times_each_philosopher_must_eat] (ms)\n", 60);
-		return (1);
+		return (ERROR);
 	}
 	// TODO: protect against numbers bigger than MAX_INT*2 and the addition of ms arguments to current time being bigger than max int *2, aleo against numbers smaller than 0
 	i = 1;
