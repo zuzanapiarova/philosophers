@@ -10,6 +10,9 @@
 
 #define ERROR 1
 #define SUCCESS 0
+#ifndef TIMEZONE_MS
+# define TIMEZONE_MS 3600000	
+#endif 
 
 typedef enum	e_action
 {
@@ -38,17 +41,18 @@ typedef struct		s_philo
 	unsigned int	times_eaten;
 	suseconds_t		last_eaten; // !! watch out because it is in microseconds, when needed to use, do /1000
 	pthread_mutex_t	lock;
-	pthread_mutex_t	msg_lock;
+	pthread_mutex_t	*msg_lock;
 }					t_philo;
 
 /* actions.c */
+void			*monitoring(void *arg);
 int				p_eat(t_philo *philo);
 int				p_sleep(t_philo *philo);
 int				take_forks(t_philo *philo);
 int				leave_forks(t_philo *philo);
 
 /* philo.c */
-//void			init_info(t_info *info, int argc, char **argv);
+int				init_philo(t_philo *philo, int i, char **argv, pthread_mutex_t **forks, pthread_mutex_t *msg_lock);
 void			*routine(void *arg);
 
 

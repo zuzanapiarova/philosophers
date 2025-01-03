@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zuzanapiarova <zuzanapiarova@student.42    +#+  +:+       +#+        */
+/*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/30 12:41:01 by zuzanapiaro       #+#    #+#             */
-/*   Updated: 2025/01/02 20:30:41 by zuzanapiaro      ###   ########.fr       */
+/*   Updated: 2025/01/03 19:16:40 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,13 +17,14 @@ long long	get_time_in_ms(void)
 	struct timeval	tv;
 
 	if (gettimeofday(&tv, NULL) == 0)
-		return (tv.tv_sec * 1000) + (tv.tv_usec / 1000);
+		return ((tv.tv_sec * 1000) + (tv.tv_usec / 1000) + TIMEZONE_MS);
 	return (ERROR);
 }
 
 // use mutex to lock access to terminal while one log msg is being printed out from another thread wanting to print a msg
 int	log_msg(t_philo *philo, t_action action)
 {
+	pthread_mutex_lock(philo->msg_lock);
 	ft_putnbr(get_time_in_ms());
 	write(1, " ", 1);
 	ft_putnbr(philo->id);
@@ -44,5 +45,7 @@ int	log_msg(t_philo *philo, t_action action)
 		write(1, " is sleeping\n", 13);
 	else if (action == DEATH)
 		write(1, " died\n", 6);
+	pthread_mutex_unlock(philo->msg_lock);
 	return (0);
 }
+

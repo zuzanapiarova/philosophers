@@ -3,28 +3,53 @@
 /*                                                        :::      ::::::::   */
 /*   actions.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zuzanapiarova <zuzanapiarova@student.42    +#+  +:+       +#+        */
+/*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 16:41:14 by zuzanapiaro       #+#    #+#             */
-/*   Updated: 2025/01/02 20:28:29 by zuzanapiaro      ###   ########.fr       */
+/*   Updated: 2025/01/03 20:24:26 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/philosophers.h"
 
+void *monitoring(void *arg)
+{
+	int		i;
+    t_philo *philos;
+
+	philos = (t_philo *)arg;
+    while (1)
+	{
+		i = 0;
+        while (i < philos[i].total)
+		{
+            pthread_mutex_lock(&philos[i].lock); // Lock philosopher data
+			if ((int)philos[i].times_eaten == philos[i].times_to_eat)
+				return (NULL);
+            long current_time = get_time_in_ms();
+            if (current_time - philos[i].last_eaten > philos[i].die)
+			{
+                log_msg(&philos[i], DEATH);
+				pthread_mutex_unlock(&philos[i].lock);
+				return (NULL); // Exit the monitor thread
+            }
+            pthread_mutex_unlock(&philos[i].lock);
+			if (philos[i].die < 8000)
+				usleep(philos[i].die / 2);
+			else
+				usleep(8000); // Sleep for a short period to avoid excessive CPU usage
+			i++;
+        }
+    }
+}
+
 int p_eat(t_philo *philo)
 {
-	long long	time;
-
-	time = get_time_in_ms();
-	philo->last_eaten = time;
-	log_msg(philo, EATS);
-	write(1, "time of last meal: ", 19);
-	ft_putnbr(time);
-	write(1, "\n", 1);
-	usleep(philo->eat * 1000); // TODO: check if *1000 is correct - what data type does usleep expect?
+	philo->last_eaten = get_time_in_ms();
 	if ((int)philo->times_eaten > -1)
 		philo->times_eaten++;
+	log_msg(philo, EATS);
+	usleep(philo->eat * 1000);
 	return (0);
 }
 
@@ -35,23 +60,31 @@ int p_sleep(t_philo *philo)
 	return (0);
 }
 
+// every philo takes fork on its id and the one before it
+// last one takes the fork on id - 1 and on forks[0]
+// for even philos, first lock R, then l fork
+// for odd philos, lock first L, then R fork
+// for last philo, 
 int take_forks(t_philo *philo)
 {
 	if (philo->id % 2 == 0)
 	{
-		// lock fork on right
-		pthread_mutex_lock(&philo->forks[philo->id]);
+		if (philo->id == philo->total)
+			pthread_mutex_lock(&philo->forks[0]);
+		else
+			pthread_mutex_lock(&philo->forks[philo->id]);
 		log_msg(philo, FORK_R);
-		// lock fork on left
-		pthread_mutex_lock(&philo->forks[philo->id - 2]);
-		log_msg(philo, FORK_L); // maybe implement FORK_LEFT and FORK_RIGHT ???
+		pthread_mutex_lock(&philo->forks[philo->id - 1]);
+		log_msg(philo, FORK_L);
 	}
 	else
 	{
-		pthread_mutex_lock(&(philo->forks[philo->id - 2]));
-		log_msg(philo, FORK_L); // maybe implement FORK_LEFT and FORK_RIGHT ???
-		// lock fork on right
-		pthread_mutex_lock(&philo->forks[philo->id]);
+		pthread_mutex_lock(&philo->forks[philo->id - 1]);
+		log_msg(philo, FORK_L);
+		if (philo->id == philo->total)
+			pthread_mutex_lock(&philo->forks[0]);
+		else
+			pthread_mutex_lock(&philo->forks[philo->id]);
 		log_msg(philo, FORK_R);
 	}
 	return (0);
@@ -59,7 +92,12 @@ int take_forks(t_philo *philo)
 
 int leave_forks(t_philo *philo)
 {
-	pthread_mutex_unlock(&philo->forks[philo->id - 2]);
-	pthread_mutex_unlock(&philo->forks[philo->id]);
+	// unlock left fork
+	pthread_mutex_unlock(&philo->forks[philo->id - 1]);
+	// unlock right fork
+	if (philo->id == philo->total)
+			pthread_mutex_unlock(&philo->forks[0]);
+		else
+			pthread_mutex_unlock(&philo->forks[philo->id]);
 	return (0);
 }

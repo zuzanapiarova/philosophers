@@ -3,71 +3,25 @@
 /*                                                        :::      ::::::::   */
 /*   philo.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zuzanapiarova <zuzanapiarova@student.42    +#+  +:+       +#+        */
+/*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/25 15:30:20 by zuzanapiaro       #+#    #+#             */
-/*   Updated: 2025/01/02 20:50:39 by zuzanapiaro      ###   ########.fr       */
+/*   Updated: 2025/01/03 20:21:50 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "../includes/philosophers.h"
+
+// !!! TODO: 1 always dies the last time before eating for the last time 
 // TODO: implement mutexes oroperly, now they allow two resources access to the shared mutex - fork
 // TODO: implement better monitoring
 // TODO: implement stopping as soon as one dies
-#include "../includes/philosophers.h"
-
-int init_philo(t_philo *philo, int i, char **argv, pthread_mutex_t **forks)
-{
-	philo->id = i + 1;
-	philo->total = ft_atou(argv[1]);
-	philo->die = ft_atou(argv[2]);
-	philo->eat = ft_atou(argv[3]);
-	philo->sleep = ft_atou(argv[4]);
-	if (argv[5])//(argc == 6)
-		philo->times_to_eat = ft_atou(argv[5]);
-	else
-		philo->times_to_eat = -1;
-	philo->dead = false;
-	philo->forks = *forks;
-	philo->thinks = 0;
-	philo->sleeps = 0;
-	philo->eats = 0;
-	philo->times_eaten = 0;
-	philo->last_eaten = get_time_in_ms();
-	pthread_mutex_init(&philo->lock, NULL);
-	pthread_mutex_init(&philo->msg_lock, NULL);
-	// philo->lock = (pthread_mutex_t *)malloc(philo->total * sizeof(pthread_mutex_t));
-	// philo->msg_lock = (pthread_mutex_t *)malloc(philo->total * sizeof(pthread_mutex_t));
-	if (pthread_create(&philo->thread, NULL, &routine, (void *)philo) != 0)
-		return (ERROR);
-	return (SUCCESS);
-}
-
-void *monitoring(void *arg)
-{
-    t_philo *philo;
-	int		i;
-
-	philo = (t_philo *)arg;
-	i  = 0;
-    while (1)
-	{
-        while (i < philo->total)
-		{
-            pthread_mutex_lock(&philo->lock); // Lock philosopher data
-            long current_time = get_time_in_ms();
-            if (current_time - philo->last_eaten > philo->die)
-			{
-                log_msg(philo, DEATH);
-				pthread_mutex_unlock(&philo->lock);
-				return (NULL); // Exit the monitor thread
-            }
-            pthread_mutex_unlock(&philo->lock);
-        }
-        usleep(1000); // Sleep for a short period to avoid excessive CPU usage
-		i++;
-    }
-}
-
+// TODO: the time is probably not in or timezone but the UTC- fix!
+// TODO: now we do actions functions but there is not lock between their loc, so it can happpen that the thread can do one line like start to eat, and then not print the msg straight forward but only after a while - implement another lock?
+// Q&A: What is the starting state for a philosopher?
+// Q&A: Does the philospher stop eating-let forks-start sleeping right after each other?
+// Q&A: How long does each philosopher have to think? Can they stop sleeping, start thinking and then take forks and start eating right away, having thinked for no time ???
+// Q&A: When the philo eats for the last time, does its thread wait until the others finish before joining or it can go straight to joining straight away? Even though this is not it its routine? So it returns and then what? It continues in the calling function?
 void *routine(void *arg)
 {
 	t_philo *philo;
@@ -78,51 +32,52 @@ void *routine(void *arg)
 	// some algorithm for deciding for when to eat and which philosopher should eat
 	// check if right and left fork are free
 	// if yes grab them and lock them
-	take_forks(philo);
+		take_forks(philo);
 	// start eating
 		p_eat(philo);
 	// unlock forks/mutexes
 		leave_forks(philo);
 	// start sleeping
-	//	p_sleep(philo);
+		p_sleep(philo);
 	// start thinking
+		log_msg(philo, THINKS);
 	// make sure the time without eating has not surpassed its limit
 	// if it has, set info->death to true and then loop should not run
 	}
+	printf("finished loop in thread %d\n", philo->id);
 	return (NULL);
 }
 
-// TODO: add protections of the functions pthread and mutex fail
+// TODO: add protections if the functions pthread and mutex fail
 int	start_simulation(int argc, char **argv, int total)
 {
 	int				i;
 	t_philo			*philos;
 	pthread_mutex_t *forks;
+	pthread_t		monitor;
+	pthread_mutex_t	msg_lock;
 
 	(void)argc;
-	// start the monitoring thread and its mutex "philo->lock"
-	/* pthread_t	*monitor;
-	monitor = (pthread_t *)malloc(sizeof(pthread_t) * info->total);
-	if (pthread_create(monitor, NULL, &monitoring, (void *)info) != 0)
-		return (ERROR); */
+	// creating forks
 	i = 0;
 	forks = (pthread_mutex_t *)malloc(total * sizeof(pthread_mutex_t));
 	while (i < total)
 	{
-		printf("created fork %d\n", i);
 		pthread_mutex_init(&forks[i], NULL);
 		i++;
 	}
+	// creating shared central lock for stdout when printing a message 
+	pthread_mutex_init(&msg_lock, NULL);
+	// creating philos
 	philos = (t_philo *)malloc(sizeof(t_philo) * total);
 	if (!philos)
 		return (ERROR);
 	i = 0;
 	while (i < total)
 	{
-		printf("created thread %d\n", philos[i].id);
-		if (init_philo(&philos[i], i, argv, &forks) == ERROR)
+		//printf("created thread %d\n", philos[i].id);
+		if (init_philo(&philos[i], i, argv, &forks, &msg_lock) == ERROR)
 		{
-			printf("hi\n");
 			i--;
 			while (i > 0)
 			{
@@ -135,15 +90,23 @@ int	start_simulation(int argc, char **argv, int total)
 		i++;
 	}
 	printf("finished creation\n");
+	// start monitoring thread
+	if (pthread_create(&monitor, NULL, &monitoring, (void *)philos) != 0)
+		return (ERROR);
+	printf("started monitoring thread\n");
 	i = 0;
 	while (i < total)
 	{
 		pthread_join(philos[i].thread, NULL);
-		//pthread_mutex_destroy(&forks[i]);
-		// pthread_mutex_destroy(philos[i].lock);
-		// pthread_mutex_destroy(philos[i].fork_lock);
+		pthread_mutex_destroy(&forks[i]);
+		pthread_mutex_destroy(&philos[i].lock);
 		i++;
 	}
+	printf("joined philo threads\n");
+	pthread_mutex_destroy(&msg_lock);
+	printf("destroyed msg mutex\n");
+	pthread_join(monitor, NULL);
+	printf("joined monitor thread\n");
 	free(philos);
 	return (0);
 }
