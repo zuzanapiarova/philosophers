@@ -3,16 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   philo.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
+/*   By: zuzanapiarova <zuzanapiarova@student.42    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/25 15:30:20 by zuzanapiaro       #+#    #+#             */
-/*   Updated: 2025/01/03 20:21:50 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/04 20:59:28 by zuzanapiaro      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/philosophers.h"
 
-// !!! TODO: 1 always dies the last time before eating for the last time 
 // TODO: implement mutexes oroperly, now they allow two resources access to the shared mutex - fork
 // TODO: implement better monitoring
 // TODO: implement stopping as soon as one dies
@@ -24,25 +23,38 @@
 // Q&A: When the philo eats for the last time, does its thread wait until the others finish before joining or it can go straight to joining straight away? Even though this is not it its routine? So it returns and then what? It continues in the calling function?
 void *routine(void *arg)
 {
-	t_philo *philo;
+	t_philo	*philo;
 
 	philo = (t_philo *)arg;
-	while (philo->times_to_eat == -1 || (int)philo->times_eaten < philo->times_to_eat) // if there is no times_to_eat defined, it will be -1 and never increased so condition will be always true
+	while (1) // if there is no times_to_eat defined, it will be -1 and never increased so condition will be always true
 	{
-	// some algorithm for deciding for when to eat and which philosopher should eat
-	// check if right and left fork are free
-	// if yes grab them and lock them
+		// some algorithm for deciding for when to eat and which philosopher should eat
+		// check if right and left fork are free
+		if (check_stop_sim(philo))
+			break ;
+		// if yes grab them and lock them
 		take_forks(philo);
-	// start eating
+		if (check_stop_sim(philo))
+		{
+			leave_forks(philo);
+			break ;
+		}
+		// start eating
 		p_eat(philo);
-	// unlock forks/mutexes
+		// unlock forks/mutexes
 		leave_forks(philo);
-	// start sleeping
+		if ((int)philo->times_eaten >= philo->times_to_eat) // change this - add philo->times_to_eat != -1 && current condition
+			break ;
+		if (check_stop_sim(philo))
+			break ;
+		// start sleeping
 		p_sleep(philo);
-	// start thinking
-		log_msg(philo, THINKS);
-	// make sure the time without eating has not surpassed its limit
-	// if it has, set info->death to true and then loop should not run
+		// start thinking
+		if (check_stop_sim(philo))
+			break ;
+		p_think(philo);
+		// make sure the time without eating has not surpassed its limit
+		// if it has, set info->death to true and then loop should not run
 	}
 	printf("finished loop in thread %d\n", philo->id);
 	return (NULL);
@@ -56,18 +68,22 @@ int	start_simulation(int argc, char **argv, int total)
 	pthread_mutex_t *forks;
 	pthread_t		monitor;
 	pthread_mutex_t	msg_lock;
+	pthread_mutex_t	stop_lock;
+	bool			stop_simulation; // !!!
 
 	(void)argc;
 	// creating forks
 	i = 0;
+	stop_simulation = false;
 	forks = (pthread_mutex_t *)malloc(total * sizeof(pthread_mutex_t));
 	while (i < total)
 	{
 		pthread_mutex_init(&forks[i], NULL);
 		i++;
 	}
-	// creating shared central lock for stdout when printing a message 
+	// creating shared central lock for stdout when printing a message
 	pthread_mutex_init(&msg_lock, NULL);
+	pthread_mutex_init(&stop_lock, NULL);
 	// creating philos
 	philos = (t_philo *)malloc(sizeof(t_philo) * total);
 	if (!philos)
@@ -76,7 +92,7 @@ int	start_simulation(int argc, char **argv, int total)
 	while (i < total)
 	{
 		//printf("created thread %d\n", philos[i].id);
-		if (init_philo(&philos[i], i, argv, &forks, &msg_lock) == ERROR)
+		if (init_philo(&philos[i], i, argv, &forks, &msg_lock, &stop_lock, &stop_simulation) == ERROR)
 		{
 			i--;
 			while (i > 0)
@@ -89,7 +105,6 @@ int	start_simulation(int argc, char **argv, int total)
 		}
 		i++;
 	}
-	printf("finished creation\n");
 	// start monitoring thread
 	if (pthread_create(&monitor, NULL, &monitoring, (void *)philos) != 0)
 		return (ERROR);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
+/*   By: zuzanapiarova <zuzanapiarova@student.42    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/30 12:41:01 by zuzanapiaro       #+#    #+#             */
-/*   Updated: 2025/01/03 19:16:40 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/04 20:49:41 by zuzanapiaro      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,3 +49,14 @@ int	log_msg(t_philo *philo, t_action action)
 	return (0);
 }
 
+bool	check_stop_sim(t_philo *philo)
+{
+	pthread_mutex_lock(philo->stop_lock);
+	if (*(philo->stop_simulation) == true)
+	{
+		pthread_mutex_unlock(philo->stop_lock);
+		return (true);
+	}
+	pthread_mutex_unlock(philo->stop_lock);
+	return (false);
+}

@@ -11,8 +11,8 @@
 #define ERROR 1
 #define SUCCESS 0
 #ifndef TIMEZONE_MS
-# define TIMEZONE_MS 3600000	
-#endif 
+# define TIMEZONE_MS 3600000
+#endif
 
 typedef enum	e_action
 {
@@ -34,25 +34,24 @@ typedef struct		s_philo
 	unsigned int	sleep;
 	unsigned int	die;
 	int				times_to_eat; // is int because can be -1 if not assigned
-	bool			dead;
-	bool			eats;
-	bool			sleeps;
-	bool			thinks;
 	unsigned int	times_eaten;
-	suseconds_t		last_eaten; // !! watch out because it is in microseconds, when needed to use, do /1000
+	long long		last_eaten;
 	pthread_mutex_t	lock;
 	pthread_mutex_t	*msg_lock;
+	pthread_mutex_t	*stop_lock;
+	bool			*stop_simulation;
 }					t_philo;
 
 /* actions.c */
 void			*monitoring(void *arg);
 int				p_eat(t_philo *philo);
 int				p_sleep(t_philo *philo);
+int				p_think(t_philo *philo);
 int				take_forks(t_philo *philo);
 int				leave_forks(t_philo *philo);
 
 /* philo.c */
-int				init_philo(t_philo *philo, int i, char **argv, pthread_mutex_t **forks, pthread_mutex_t *msg_lock);
+int				init_philo(t_philo *philo, int i, char **argv, pthread_mutex_t **forks, pthread_mutex_t *msg_lock, pthread_mutex_t *stop_lock, bool *stop_simulation);
 void			*routine(void *arg);
 
 
@@ -62,6 +61,7 @@ int				handle_error_input(int argc, char **argv);
 /* utils.c */
 int				log_msg(t_philo *philo, t_action action);
 long long		get_time_in_ms(void);
+bool			check_stop_sim(t_philo *philo);
 
 /* utils_libft.c */
 unsigned int	ft_atou(const char *nptr);
