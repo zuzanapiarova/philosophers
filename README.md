@@ -10,9 +10,15 @@ Bonus part: philo_bonus/ - each philosopher is a process, forks are placed in th
 - simulation halts when there is only one philo and he dies - he tries to access right fork but it goes to forks[0] which is already locked and it dies while waiting for the resource to be unlocked - what to do now? - this can be solved by other functions of the pthread library unfortunatelly we cannot use these 
 
 ## possible algorithm for scheduling:
-- implement a priority variable that changes based on time_left, eg with values 1, 2, 3, 3 being most critical
+1. implement a priority variable that changes based on time_left, eg with values 1, 2, 3, 3 being most critical
 - at start of every routine / before taking the forks check this priority variable
 - if priority is low, sleep for a while, if more critical, sleep for just a bit, if critical, execute 
+priority = philo->die - (get_time_in_ms() - philo->last_eaten);
+if (priority < 0)
+    priority = 0; // Ensure no negative priorities
+if (priority > 100)
+    usleep(priority * 100); // Sleep proportional to priority
+2. another solution would be to change each fork from mutex to struct with variable "available", being changed each time the fork is/isnt available, and based on this, each philo could pick up the forks only if they are both available - check before taking them if available, if not continue to another loop iteration and so on until both of them are available - but has to do this in a mutex because the state of the forks may change 
 
 ### important
 // TODO: implement stopping as soon as one dies
