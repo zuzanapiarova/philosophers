@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 08:40:37 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/06 11:23:52 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/06 11:46:29 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ int	log_msg(t_philo *philo, t_action action)
 	write(1, msg, ft_strlen(msg));
 	if (action == EATS)
 	{
-		ft_putnbr(philo->times_eaten);
+		ft_putnbr(philo->times_eaten + 1);
 		write(1, ". time\n", 7);
 	}
 	pthread_mutex_unlock(philo->msg_lock);

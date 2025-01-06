@@ -6,11 +6,14 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 08:40:25 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/06 11:15:00 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/06 11:53:52 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/philosophers.h"
+
+// TODO: have to figure out how to stop mmonitoring thread after all of them have eaten  
+
 int init_philo(t_philo *philo, int i, char **argv, pthread_mutex_t **forks, pthread_mutex_t *msg_lock, pthread_mutex_t *stop_lock, bool *stop_simulation)
 {
     philo->id = i + 1;
@@ -125,6 +128,8 @@ int start_simulation(int argc, char **argv, int total)
 		pthread_mutex_destroy(&forks[i]);
 		i++;
 	}
+    // now that all threads are joined we now all of them finished eating and we can set stop_simulation t true so monitoring thread can exit 
+    *(philos[0].stop_simulation) = true;
     free(forks);
 	printf("joined philo threads and destroyed forks\n");
 	pthread_mutex_destroy(&msg_lock);

@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 10:00:49 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/06 11:26:23 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/06 11:54:59 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,8 @@ void    *routine(void *arg)
             break ;
         if (philo->times_to_eat != -1 && (int)philo->times_eaten >= philo->times_to_eat)
         {
-            *(philo->stop_simulation) = true;
+           // cannnot be here because only one will have finished eating ad it will stop 
+           // - *(philo->stop_simulation) = true;
             break ;
         }
         if (p_sleep(philo) == ERROR)
@@ -56,7 +57,7 @@ void    *monitoring(void *arg)
         while (i < total)
         {
             pthread_mutex_lock(&philos[i].lock);
-            if (get_time_in_ms() - philos[i].last_eaten > philos[i].die)
+            if (get_time_in_ms() - philos[i].last_eaten > philos[i].die || *(philos[i].stop_simulation) == true)
             {
                 log_msg(&philos[i], DEATH);
                 *(philos[i].stop_simulation) = true;

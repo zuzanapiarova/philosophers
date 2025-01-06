@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 09:28:58 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/06 11:18:39 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/06 11:59:39 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,8 @@ int p_think(t_philo *philo)
 {
     if (log_msg(philo, THINKS)) // maybe add this after each iteration
 		return (ERROR);
-	//usleep(philo->sleep * 1000);
+    //if ((get_time_in_ms() - philo->last_eaten) > ((philo->die - philo->eat - philo->sleep) / 2))
+	usleep(((philo->die - philo->eat - philo->sleep) / 2)* 1000);
 	return (0);
 }
 
