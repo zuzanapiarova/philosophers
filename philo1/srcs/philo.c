@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zuzanapiarova <zuzanapiarova@student.42    +#+  +:+       +#+        */
+/*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/25 15:30:20 by zuzanapiaro       #+#    #+#             */
-/*   Updated: 2025/01/04 20:59:28 by zuzanapiaro      ###   ########.fr       */
+/*   Updated: 2025/01/06 10:06:07 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,8 +53,6 @@ void *routine(void *arg)
 		if (check_stop_sim(philo))
 			break ;
 		p_think(philo);
-		// make sure the time without eating has not surpassed its limit
-		// if it has, set info->death to true and then loop should not run
 	}
 	printf("finished loop in thread %d\n", philo->id);
 	return (NULL);

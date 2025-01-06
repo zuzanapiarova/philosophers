@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   actions.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zuzanapiarova <zuzanapiarova@student.42    +#+  +:+       +#+        */
+/*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 16:41:14 by zuzanapiaro       #+#    #+#             */
-/*   Updated: 2025/01/04 21:01:09 by zuzanapiaro      ###   ########.fr       */
+/*   Updated: 2025/01/06 10:22:29 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,9 @@ void *monitoring(void *arg)
 			if ((get_time_in_ms() - philos[i].last_eaten) > philos[i].die)
 			{
 				log_msg(&philos[i], DEATH);
-				*(philos[i].stop_simulation) = true;
+				 pthread_mutex_lock(philos[i].stop_lock);
+                *(philos[i].stop_simulation) = true;
+                pthread_mutex_unlock(philos[i].stop_lock);
 				pthread_mutex_unlock(&philos[i].lock);
 				return (NULL); // Exit the monitor thread
 			}
