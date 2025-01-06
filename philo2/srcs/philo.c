@@ -6,13 +6,14 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 08:40:25 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/06 11:53:52 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/06 14:01:46 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/philosophers.h"
 
 // TODO: have to figure out how to stop mmonitoring thread after all of them have eaten  
+// TODO: when we have just one, he dies but does not terminate 
 
 int init_philo(t_philo *philo, int i, char **argv, pthread_mutex_t **forks, pthread_mutex_t *msg_lock, pthread_mutex_t *stop_lock, bool *stop_simulation)
 {

@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 08:40:37 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/06 11:46:29 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/06 13:49:44 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,8 +26,8 @@ int	log_msg(t_philo *philo, t_action action)
 {
 	char	*msg;
 	
-	if (check_stop_sim(philo) && action != DEATH)
-		return (ERROR);
+	// *if (check_stop_sim(philo) && action != DEATH)
+	// *return (ERROR);
 	if (action == FORK_L)
 		msg = " has taken left fork\n";
 	else if (action == FORK_R)

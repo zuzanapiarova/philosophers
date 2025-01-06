@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 10:00:49 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/06 11:54:59 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/06 14:27:29 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,8 @@ void    *routine(void *arg)
     t_philo *philo;
 
     philo = (t_philo *)arg;
+    if (philo->id % 2 == 0) // & made the even sleep for usleep(10) so the others can take their forks and not wait - WORKS WITH ODD NUMBER OF PHILOS 
+        usleep(1);
     while (1)
     {
         if (take_forks(philo) == ERROR)
@@ -29,11 +31,7 @@ void    *routine(void *arg)
         if (leave_forks(philo) == ERROR)
             break ;
         if (philo->times_to_eat != -1 && (int)philo->times_eaten >= philo->times_to_eat)
-        {
-           // cannnot be here because only one will have finished eating ad it will stop 
-           // - *(philo->stop_simulation) = true;
             break ;
-        }
         if (p_sleep(philo) == ERROR)
             break ;
         if (p_think(philo) == ERROR)
