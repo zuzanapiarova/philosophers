@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 10:00:49 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/06 14:27:29 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/06 17:56:28 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,10 @@ void    *routine(void *arg)
 
     philo = (t_philo *)arg;
     if (philo->id % 2 == 0) // & made the even sleep for usleep(10) so the others can take their forks and not wait - WORKS WITH ODD NUMBER OF PHILOS 
+    {
+       // printf("true %d\n", philo->id);
         usleep(1);
+    }
     while (1)
     {
         if (take_forks(philo) == ERROR)

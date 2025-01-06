@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 09:28:58 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/06 14:22:15 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/06 17:42:50 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,46 +19,53 @@
 // for last philo,
 int take_forks(t_philo *philo)
 {
-	pthread_mutex_t left_fork;
-	pthread_mutex_t right_fork;
+	pthread_mutex_t *left_fork;
+	pthread_mutex_t *right_fork;
 	
-	left_fork = philo->forks[philo->id - 1];
+	left_fork = &philo->forks[philo->id - 1];
 	if (philo->id == philo->total)
-		right_fork = philo->forks[0];
+		right_fork = &philo->forks[0];
 	else
-		right_fork = philo->forks[philo->id];
+		right_fork = &philo->forks[philo->id];
     if (check_stop_sim(philo))
 		return (ERROR);
 	if (philo->id % 2 == 0)
 	{
-		pthread_mutex_lock(&right_fork);
+		pthread_mutex_lock(right_fork);
 		if (check_stop_sim(philo))
 		{
-			pthread_mutex_unlock(&right_fork);
+			pthread_mutex_unlock(right_fork);
 			return (ERROR);
 		}
 		log_msg(philo, FORK_R);
-		pthread_mutex_lock(&left_fork);
+		pthread_mutex_lock(left_fork);
 		if (check_stop_sim(philo))
 		{
-			pthread_mutex_unlock(&left_fork);
+			pthread_mutex_unlock(left_fork);
+			pthread_mutex_unlock(right_fork);
 			return (ERROR);
 		}
 		log_msg(philo, FORK_L);
 	}
 	else
 	{
-		pthread_mutex_lock(&left_fork);
+		pthread_mutex_lock(left_fork);
 		if (check_stop_sim(philo))
 		{
-			pthread_mutex_unlock(&left_fork);	
+			pthread_mutex_unlock(left_fork);	
 			return (ERROR);
 		}
 		log_msg(philo, FORK_L);
-		pthread_mutex_lock(&right_fork);
+		if (philo->total == 1) // quick and dirty but do not know how else to do it since we cannot use other pthread functions 
+		{
+			usleep(philo->die * 1000);
+			return (ERROR);
+		}
+		pthread_mutex_lock(right_fork);
 		if (check_stop_sim(philo))
 		{
-			pthread_mutex_unlock(&right_fork);
+			pthread_mutex_unlock(right_fork);
+			pthread_mutex_unlock(left_fork);
 			return (ERROR);
 		}
 		log_msg(philo, FORK_R);
@@ -104,12 +111,22 @@ int p_sleep(t_philo *philo)
 
 int p_think(t_philo *philo)
 {
+	long long	time_passed;
+	long long	time_left;
+	long long	time_for_thinking;
+	
 	if (check_stop_sim(philo))
 		return (ERROR);
 	log_msg(philo, THINKS);
+	time_passed = get_time_in_ms() - philo->last_eaten;
+	time_left = philo->die - time_passed;
+	time_for_thinking = philo->die - philo->eat - philo->sleep;
     // TODO: algo to make them think for a bit so others do not have to die - but how when we do not have access to other philo data ?
-    //if ((get_time_in_ms() - philo->last_eaten) > ((philo->die - philo->eat - philo->sleep) / 2))
-	usleep(((philo->die - philo->eat - philo->sleep) / 2) * 1000);
-    //usleep((get_time_in_ms() - philo->last_eaten) / 2);
+	// if (time_left / 10 >= time_for_thinking)
+	// {
+	// 	printf("true %d\n", philo->id);
+	// 	usleep(time_left / 10 * 1000);
+	// }
+	usleep(10);
 	return (0);
 }

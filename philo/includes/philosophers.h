@@ -36,12 +36,14 @@ typedef struct		s_philo
 	int				times_to_eat; // is int because can be -1 if not assigned
 	unsigned int	times_eaten;
 	long long		last_eaten;
+	int				priority;
 	pthread_mutex_t	lock;
 	pthread_mutex_t	*msg_lock;
 	pthread_mutex_t	*stop_lock;
-	bool			*stop_simulation;
+	bool			*stop_simulation; // we must store it as pointer that always stores that one memory address and always dereference it in code when we want the value stored there
 }					t_philo;
 
+// !!!
 /* actions.c */
 void			*monitoring(void *arg);
 int				p_eat(t_philo *philo);
@@ -54,6 +56,7 @@ int				leave_forks(t_philo *philo);
 int				init_philo(t_philo *philo, int i, char **argv, pthread_mutex_t **forks, pthread_mutex_t *msg_lock, pthread_mutex_t *stop_lock, bool *stop_simulation);
 void			*routine(void *arg);
 
+// !!!
 
 /* input_val.c */
 int				handle_error_input(int argc, char **argv);
