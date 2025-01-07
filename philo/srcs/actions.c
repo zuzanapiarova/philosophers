@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 09:28:58 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/06 17:42:50 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/07 11:22:02 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,8 @@
 // for last philo,
 int take_forks(t_philo *philo)
 {
-	pthread_mutex_t *left_fork;
-	pthread_mutex_t *right_fork;
+	t_fork	*left_fork;
+	t_fork	*right_fork;
 	
 	left_fork = &philo->forks[philo->id - 1];
 	if (philo->id == philo->total)
@@ -29,47 +29,101 @@ int take_forks(t_philo *philo)
 		right_fork = &philo->forks[philo->id];
     if (check_stop_sim(philo))
 		return (ERROR);
-	if (philo->id % 2 == 0)
+	while (1)
 	{
-		pthread_mutex_lock(right_fork);
-		if (check_stop_sim(philo))
+		pthread_mutex_lock(&left_fork->data_lock); ///
+		pthread_mutex_lock(&right_fork->data_lock); ///
+		if (!right_fork->locked && !right_fork->locked)
 		{
-			pthread_mutex_unlock(right_fork);
-			return (ERROR);
+			pthread_mutex_unlock(&left_fork->data_lock); ///
+			pthread_mutex_unlock(&right_fork->data_lock); ///
+			break ;
 		}
-		log_msg(philo, FORK_R);
-		pthread_mutex_lock(left_fork);
-		if (check_stop_sim(philo))
+		else 
 		{
-			pthread_mutex_unlock(left_fork);
-			pthread_mutex_unlock(right_fork);
-			return (ERROR);
+			//usleep(5);
+			pthread_mutex_unlock(&left_fork->data_lock); ///
+			pthread_mutex_unlock(&right_fork->data_lock); ///	
 		}
-		log_msg(philo, FORK_L);
 	}
-	else
-	{
-		pthread_mutex_lock(left_fork);
-		if (check_stop_sim(philo))
+	// while (1)
+	// {
+		if (philo->id % 2 == 0)
 		{
-			pthread_mutex_unlock(left_fork);	
-			return (ERROR);
+			pthread_mutex_lock(&right_fork->data_lock); ///
+			pthread_mutex_lock(&right_fork->fork);
+			right_fork->locked = true;
+			pthread_mutex_unlock(&right_fork->data_lock); ///
+			if (check_stop_sim(philo))
+			{
+				pthread_mutex_lock(&right_fork->data_lock); ///
+				pthread_mutex_unlock(&right_fork->fork);
+				right_fork->locked = false;
+				pthread_mutex_unlock(&right_fork->data_lock); ///
+				return (ERROR);
+			}
+			log_msg(philo, FORK_R);
+			pthread_mutex_lock(&left_fork->data_lock); /// 
+			pthread_mutex_lock(&left_fork->fork);
+			left_fork->locked = true;
+			pthread_mutex_unlock(&left_fork->data_lock); /// 
+			if (check_stop_sim(philo))
+			{
+				pthread_mutex_lock(&left_fork->data_lock); /// 
+				pthread_mutex_unlock(&left_fork->fork);
+				left_fork->locked = false;
+				pthread_mutex_unlock(&left_fork->data_lock);///
+				pthread_mutex_lock(&right_fork->data_lock); ///
+				pthread_mutex_unlock(&right_fork->fork);
+				right_fork->locked = false;
+				pthread_mutex_unlock(&right_fork->data_lock); ///
+				return (ERROR);
+			}
+			log_msg(philo, FORK_L);
 		}
-		log_msg(philo, FORK_L);
-		if (philo->total == 1) // quick and dirty but do not know how else to do it since we cannot use other pthread functions 
+		else
 		{
-			usleep(philo->die * 1000);
-			return (ERROR);
+			pthread_mutex_lock(&left_fork->data_lock); ///
+			pthread_mutex_lock(&left_fork->fork);
+			left_fork->locked = true;
+			pthread_mutex_unlock(&left_fork->data_lock); ///
+			if (check_stop_sim(philo))
+			{
+				pthread_mutex_lock(&left_fork->data_lock); ///
+				pthread_mutex_unlock(&left_fork->fork);
+				left_fork->locked = false;
+				pthread_mutex_unlock(&left_fork->data_lock); ///	
+				return (ERROR);
+			}
+			log_msg(philo, FORK_L);
+			if (philo->total == 1) // quick and dirty but do not know how else to do it since we cannot use other pthread functions 
+			{
+				pthread_mutex_lock(&left_fork->data_lock); ///
+				pthread_mutex_unlock(&left_fork->fork);
+				left_fork->locked = false;
+				pthread_mutex_unlock(&left_fork->data_lock); ///
+				usleep(philo->die * 1000);
+				return (ERROR);
+			}
+			pthread_mutex_lock(&right_fork->data_lock); ///
+			pthread_mutex_lock(&right_fork->fork);
+			right_fork->locked = true;
+			pthread_mutex_unlock(&right_fork->data_lock); ///
+			if (check_stop_sim(philo))
+			{
+				pthread_mutex_lock(&right_fork->data_lock); ///
+				pthread_mutex_unlock(&right_fork->fork);
+				right_fork->locked = false;
+				pthread_mutex_unlock(&right_fork->data_lock); ///
+				pthread_mutex_lock(&left_fork->data_lock);///
+				pthread_mutex_unlock(&left_fork->fork);
+				left_fork->locked = false;
+				pthread_mutex_unlock(&left_fork->data_lock); ///
+				return (ERROR);
+			}
+			log_msg(philo, FORK_R);
 		}
-		pthread_mutex_lock(right_fork);
-		if (check_stop_sim(philo))
-		{
-			pthread_mutex_unlock(right_fork);
-			pthread_mutex_unlock(left_fork);
-			return (ERROR);
-		}
-		log_msg(philo, FORK_R);
-	}
+//	}
 	return (0);
 }
 
@@ -87,13 +141,24 @@ int p_eat(t_philo *philo)
 
 int leave_forks(t_philo *philo)
 {
-	// unlock left fork
-	pthread_mutex_unlock(&philo->forks[philo->id - 1]);
-	// unlock right fork
+	t_fork	*left_fork;
+	t_fork	*right_fork;
+	
+	left_fork = &philo->forks[philo->id - 1];
 	if (philo->id == philo->total)
-		pthread_mutex_unlock(&philo->forks[0]);
+		right_fork = &philo->forks[0];
 	else
-		pthread_mutex_unlock(&philo->forks[philo->id]);
+		right_fork = &philo->forks[philo->id];	
+	// unlock left fork
+	pthread_mutex_lock(&left_fork->data_lock); ///
+	pthread_mutex_unlock(&left_fork->fork);
+	left_fork->locked = false;
+	pthread_mutex_unlock(&left_fork->data_lock); ///
+	// unlock right fork
+	pthread_mutex_lock(&right_fork->data_lock); ///
+	pthread_mutex_unlock(&right_fork->fork);
+	right_fork->locked = false;
+	pthread_mutex_unlock(&right_fork->data_lock); ///
     if (check_stop_sim(philo))
         return (ERROR);
     else
@@ -122,11 +187,8 @@ int p_think(t_philo *philo)
 	time_left = philo->die - time_passed;
 	time_for_thinking = philo->die - philo->eat - philo->sleep;
     // TODO: algo to make them think for a bit so others do not have to die - but how when we do not have access to other philo data ?
-	// if (time_left / 10 >= time_for_thinking)
-	// {
-	// 	printf("true %d\n", philo->id);
-	// 	usleep(time_left / 10 * 1000);
-	// }
+	if (time_left >= time_for_thinking / 2)
+		usleep(time_for_thinking / 4 * 1000);
 	usleep(10);
 	return (0);
 }

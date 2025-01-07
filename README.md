@@ -6,8 +6,8 @@ Bonus part: philo_bonus/ - each philosopher is a process, forks are placed in th
 
 # working on
 - threads and philos are set up correctly, finding proper slgorithm to make them not die
-- implement some algorithm in p_think function that makes them think only if they have enough time - there is one now, not sure if optimal
-- simulation halts when there is only one philo and he dies - he tries to access right fork but it goes to forks[0] which is already locked and it dies while waiting for the resource to be unlocked - what to do now? - this can be solved by other functions of the pthread library unfortunatelly we cannot use these 
+- implement some algorithm in p_think function that makes them think only if they have enough time - there is one now, not optimal
+- simulation halts when there is only one philo and he dies - he tries to access right fork but it goes to forks[0] which is already locked and it dies while waiting for the resource to be unlocked - what to do now? - did quick&dirty solution, can be solved by other functions of the pthread library unfortunatelly we cannot use these 
 
 ## possible algorithm for scheduling:
 1. implement a priority variable that changes based on time_left, eg with values 1, 2, 3, 3 being most critical

@@ -24,11 +24,19 @@ typedef enum	e_action
 	DEATH // DIED
 }				t_action;
 
+typedef struct		s_fork
+{
+	int				id;
+	pthread_mutex_t	fork;
+	bool			locked;
+	pthread_mutex_t	data_lock;
+}					t_fork;
+
 typedef struct		s_philo
 {
 	int				id;
 	pthread_t		thread;
-	pthread_mutex_t	*forks;
+	t_fork			*forks;
 	int				total;
 	unsigned int	eat;
 	unsigned int	sleep;
@@ -36,7 +44,6 @@ typedef struct		s_philo
 	int				times_to_eat; // is int because can be -1 if not assigned
 	unsigned int	times_eaten;
 	long long		last_eaten;
-	int				priority;
 	pthread_mutex_t	lock;
 	pthread_mutex_t	*msg_lock;
 	pthread_mutex_t	*stop_lock;
@@ -53,7 +60,7 @@ int				take_forks(t_philo *philo);
 int				leave_forks(t_philo *philo);
 
 /* philo.c */
-int				init_philo(t_philo *philo, int i, char **argv, pthread_mutex_t **forks, pthread_mutex_t *msg_lock, pthread_mutex_t *stop_lock, bool *stop_simulation);
+int				init_philo(t_philo *philo, int i, char **argv, t_fork **forks, pthread_mutex_t *msg_lock, pthread_mutex_t *stop_lock, bool *stop_simulation);
 void			*routine(void *arg);
 
 // !!!

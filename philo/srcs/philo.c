@@ -6,13 +6,13 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 08:40:25 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/06 17:45:58 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/07 10:50:36 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/philosophers.h"
 
-int init_philo(t_philo *philo, int i, char **argv, pthread_mutex_t **forks, pthread_mutex_t *msg_lock, pthread_mutex_t *stop_lock, bool *stop_simulation)
+int init_philo(t_philo *philo, int i, char **argv, t_fork **forks, pthread_mutex_t *msg_lock, pthread_mutex_t *stop_lock, bool *stop_simulation)
 {
     philo->id = i + 1;
 	philo->total = ft_atou(argv[1]);
@@ -26,7 +26,6 @@ int init_philo(t_philo *philo, int i, char **argv, pthread_mutex_t **forks, pthr
     philo->forks = *forks;
 	philo->times_eaten = 0;
 	philo->last_eaten = get_time_in_ms();
-    philo->priority = 1;
     pthread_mutex_init(&philo->lock, NULL);
 	philo->msg_lock = msg_lock;
 	philo->stop_lock = stop_lock;
@@ -43,7 +42,7 @@ int start_simulation(int argc, char **argv, int total)
     pthread_t       monitor;
     // shared resources - will be passed by address to function
     bool            stop_simulation;
-    pthread_mutex_t *forks;
+    t_fork          *forks;
     pthread_mutex_t msg_lock;
     pthread_mutex_t stop_lock;
     (void)argc;
@@ -51,12 +50,16 @@ int start_simulation(int argc, char **argv, int total)
     i = 0;
     stop_simulation = false;
     // init forks and other mutexes
-    forks = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t) * total);
+    //forks = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t) * total);
+    forks = (t_fork *)malloc(sizeof(t_fork) * total);
     if (!forks)
         return (ERROR);
     while (i < total)
     {
-        pthread_mutex_init(&forks[i], NULL);
+        forks[i].id = i + 1;
+        forks[i].locked = false;
+        pthread_mutex_init(&(forks[i].fork), NULL);
+        pthread_mutex_init(&(forks[i].data_lock), NULL);
         i++;
     }
     pthread_mutex_init(&msg_lock, NULL);
@@ -68,7 +71,8 @@ int start_simulation(int argc, char **argv, int total)
     {
         while (i < total)
         {
-            pthread_mutex_destroy(&forks[i]);
+            pthread_mutex_destroy(&forks[i].fork);
+            pthread_mutex_destroy(&forks[i].data_lock);
             i++;
         }
         pthread_mutex_destroy(&msg_lock);
@@ -90,7 +94,8 @@ int start_simulation(int argc, char **argv, int total)
             i = 0;
             while (i < total)
             {
-                pthread_mutex_destroy(&forks[i]);
+                pthread_mutex_destroy(&forks[i].fork);
+                pthread_mutex_destroy(&forks[i].data_lock);
                 i++;
             }
             free(forks);
@@ -108,7 +113,8 @@ int start_simulation(int argc, char **argv, int total)
         while (i < total)
         {
             pthread_join(philos[i].thread, NULL);
-            pthread_mutex_destroy(&forks[i]);
+            pthread_mutex_destroy(&forks[i].fork);
+            pthread_mutex_destroy(&forks[i].data_lock);
             pthread_mutex_destroy(&philos[i].lock);
             i++;
         }
@@ -124,7 +130,8 @@ int start_simulation(int argc, char **argv, int total)
 	{
 		pthread_mutex_destroy(&philos[i].lock);
 		pthread_join(philos[i].thread, NULL);
-		pthread_mutex_destroy(&forks[i]);
+		pthread_mutex_destroy(&forks[i].fork);
+        pthread_mutex_destroy(&forks[i].data_lock);
 		i++;
 	}
     // now that all threads are joined we now all of them finished eating and we can set stop_simulation t true so monitoring thread can exit 
