@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
+/*   By: zuzanapiarova <zuzanapiarova@student.42    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 08:40:37 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/07 15:57:44 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/07 21:05:39 by zuzanapiaro      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ long long	get_time_in_ms(void)
 	struct timeval	tv;
 
 	if (gettimeofday(&tv, NULL) == 0)
-		return ((tv.tv_sec * 1000) + (tv.tv_usec / 1000) + TIMEZONE_MS);
+		return ((tv.tv_sec * 1000) + (tv.tv_usec / 1000) + TIMEZONE_MILI);
 	return (ERROR);
 }
 
@@ -26,7 +26,7 @@ long long	get_time_in_micros(void)
 	struct timeval	tv;
 
 	if (gettimeofday(&tv, NULL) == 0)
-		return ((tv.tv_sec * 1000000) + (tv.tv_usec) + TIMEZONE_MS);
+		return ((tv.tv_sec * 1000000) + (tv.tv_usec) + TIMEZONE_MICRO);
 	return (ERROR);
 }
 
@@ -34,9 +34,7 @@ long long	get_time_in_micros(void)
 int	log_msg(t_philo *philo, t_action action)
 {
 	char	*msg;
-	
-	// *if (check_stop_sim(philo) && action != DEATH)
-	// *return (ERROR);
+
 	if (action == FORK_L)
 		msg = "has taken left fork\n";
 	else if (action == FORK_R)
@@ -68,12 +66,10 @@ int	log_msg(t_philo *philo, t_action action)
 
 bool	check_stop_sim(t_philo *philo)
 {
-	pthread_mutex_lock(philo->stop_lock);
-	if (*(philo->stop_simulation) == true)
-	{
-		pthread_mutex_unlock(philo->stop_lock);
-		return (true);
-	}
-	pthread_mutex_unlock(philo->stop_lock);
-	return (false);
+    bool	stopped;
+
+    pthread_mutex_lock(philo->stop_lock);
+    stopped = *(philo->stop_simulation);
+    pthread_mutex_unlock(philo->stop_lock);
+    return (stopped);
 }

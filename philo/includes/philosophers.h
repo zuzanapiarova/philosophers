@@ -10,8 +10,11 @@
 
 #define ERROR 1
 #define SUCCESS 0
-#ifndef TIMEZONE_MS
-# define TIMEZONE_MS 3600000
+#ifndef TIMEZONE_MILI
+# define TIMEZONE_MILI 3600000
+#endif
+#ifndef TIMEZONE_MICRO
+# define TIMEZONE_MICRO 3600000000
 #endif
 
 typedef enum	e_action

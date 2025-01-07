@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
+/*   By: zuzanapiarova <zuzanapiarova@student.42    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 08:40:25 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/07 15:57:55 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/07 21:14:21 by zuzanapiaro      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,6 @@ int init_philo(t_philo *philo, int i, char **argv, pthread_mutex_t **forks, pthr
 		philo->times_to_eat = -1;
     philo->forks = *forks;
 	philo->times_eaten = 0;
-	philo->last_eaten = get_time_in_micros();
     philo->stopped = false;
     pthread_mutex_init(&philo->lock, NULL);
 	philo->msg_lock = msg_lock;
@@ -33,6 +32,7 @@ int init_philo(t_philo *philo, int i, char **argv, pthread_mutex_t **forks, pthr
     philo->stop_simulation = stop_simulation;
 	if (pthread_create(&philo->thread, NULL, &routine, (void *)philo) != 0)
 		return (ERROR);
+	philo->last_eaten = get_time_in_micros();
 	return (SUCCESS);
 }
 
@@ -116,7 +116,7 @@ int start_simulation(int argc, char **argv, int total)
         pthread_mutex_destroy(&msg_lock);
         pthread_mutex_destroy(&stop_lock);
         free(philos);
-        return (ERROR);        
+        return (ERROR);
     }
     // properly end program and free resources
     i = 0;
@@ -127,8 +127,8 @@ int start_simulation(int argc, char **argv, int total)
 		pthread_mutex_destroy(&forks[i]);
 		i++;
 	}
-    // now that all threads are joined we now all of them finished eating and we can set stop_simulation t true so monitoring thread can exit 
-    printf("set stop siulaiton as true\n");
+    // now that all threads are joined we now all of them finished eating and we can set stop_simulation t true so monitoring thread can exit
+    printf("set stop simulation to true\n");
     *(philos[0].stop_simulation) = true;
     free(forks);
 	//printf("joined philo threads and destroyed forks\n");
