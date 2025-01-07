@@ -21,7 +21,8 @@ typedef enum	e_action
 	EATS, // STARTED EATING
 	SLEEPS, // STARTED SLEEPING
 	THINKS, // STARTED THINKING
-	DEATH // DIED
+	DEATH, // DIED
+	TEST // testing message
 }				t_action;
 
 typedef struct		s_fork
@@ -72,6 +73,7 @@ int				handle_error_input(int argc, char **argv);
 int				log_msg(t_philo *philo, t_action action);
 long long		get_time_in_ms(void);
 bool			check_stop_sim(t_philo *philo);
+void test_log(t_philo *philo, t_fork *left, t_fork *right);
 
 /* utils_libft.c */
 unsigned int	ft_atou(const char *nptr);

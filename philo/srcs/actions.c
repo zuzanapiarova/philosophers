@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 09:28:58 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/07 11:22:02 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/07 12:41:02 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,20 +31,19 @@ int take_forks(t_philo *philo)
 		return (ERROR);
 	while (1)
 	{
-		pthread_mutex_lock(&left_fork->data_lock); ///
-		pthread_mutex_lock(&right_fork->data_lock); ///
-		if (!right_fork->locked && !right_fork->locked)
+		pthread_mutex_lock(&left_fork->data_lock);
+		pthread_mutex_lock(&right_fork->data_lock);
+		if (!left_fork->locked && !right_fork->locked)
 		{
-			pthread_mutex_unlock(&left_fork->data_lock); ///
-			pthread_mutex_unlock(&right_fork->data_lock); ///
+			pthread_mutex_unlock(&left_fork->data_lock);
+			pthread_mutex_unlock(&right_fork->data_lock);
+		//	printf("both unlocked in %d\n", philo->id);
 			break ;
 		}
-		else 
-		{
-			//usleep(5);
-			pthread_mutex_unlock(&left_fork->data_lock); ///
-			pthread_mutex_unlock(&right_fork->data_lock); ///	
-		}
+		//printf("at least one locked in %d\n", philo->id);
+		pthread_mutex_unlock(&left_fork->data_lock);
+		pthread_mutex_unlock(&right_fork->data_lock);
+		usleep(1000);
 	}
 	// while (1)
 	// {
@@ -126,6 +125,77 @@ int take_forks(t_philo *philo)
 //	}
 	return (0);
 }
+/* 
+int take_forks(t_philo *philo)
+{
+	t_fork	*left_fork;
+	t_fork	*right_fork;
+	
+	left_fork = &philo->forks[philo->id - 1];
+	if (philo->id == philo->total)
+		right_fork = &philo->forks[0];
+	else
+		right_fork = &philo->forks[philo->id];
+    if (check_stop_sim(philo))
+		return (ERROR);
+	while (1)
+	{
+		pthread_mutex_lock(&left_fork->data_lock);
+		pthread_mutex_lock(&right_fork->data_lock);
+		if (!left_fork->locked && !right_fork->locked)
+		{
+			pthread_mutex_unlock(&left_fork->data_lock);
+			pthread_mutex_unlock(&right_fork->data_lock);
+			break ;
+		}
+		printf("both locked in %d\n", philo->id);
+		pthread_mutex_unlock(&left_fork->data_lock);
+		pthread_mutex_unlock(&right_fork->data_lock);
+	}
+		
+	if (philo->id % 2 == 0)
+	{
+		pthread_mutex_lock(&right_fork->fork);
+		if (check_stop_sim(philo))
+		{
+			pthread_mutex_unlock(&right_fork->fork);
+			return (ERROR);
+		}
+		log_msg(philo, FORK_R);
+		pthread_mutex_lock(&left_fork->fork);
+		if (check_stop_sim(philo))
+		{
+			pthread_mutex_unlock(&left_fork->fork);
+			pthread_mutex_unlock(&right_fork->fork);
+			return (ERROR);
+		}
+		log_msg(philo, FORK_L);
+	}
+	else
+	{
+		pthread_mutex_lock(&left_fork->fork);
+		if (check_stop_sim(philo))
+		{
+			pthread_mutex_unlock(&left_fork->fork);	
+			return (ERROR);
+		}
+		log_msg(philo, FORK_L);
+		if (philo->total == 1) // quick and dirty but do not know how else to do it since we cannot use other pthread functions 
+		{
+			usleep(philo->die * 1000);
+			return (ERROR);
+		}
+		pthread_mutex_lock(&right_fork->fork);
+		if (check_stop_sim(philo))
+		{
+			pthread_mutex_unlock(&right_fork->fork);
+			pthread_mutex_unlock(&left_fork->fork);
+			return (ERROR);
+		}
+		log_msg(philo, FORK_R);
+	}
+	return (0);
+} */
 
 int p_eat(t_philo *philo)
 {
@@ -139,7 +209,7 @@ int p_eat(t_philo *philo)
 	return (0);
 }
 
-int leave_forks(t_philo *philo)
+/* int leave_forks(t_philo *philo)
 {
 	t_fork	*left_fork;
 	t_fork	*right_fork;
@@ -159,6 +229,24 @@ int leave_forks(t_philo *philo)
 	pthread_mutex_unlock(&right_fork->fork);
 	right_fork->locked = false;
 	pthread_mutex_unlock(&right_fork->data_lock); ///
+    if (check_stop_sim(philo))
+        return (ERROR);
+    else
+	    return (0);
+} */
+
+int leave_forks(t_philo *philo)
+{
+	t_fork	*left_fork;
+	t_fork	*right_fork;
+	
+	left_fork = &philo->forks[philo->id - 1];
+	if (philo->id == philo->total)
+		right_fork = &philo->forks[0];
+	else
+		right_fork = &philo->forks[philo->id];	
+	pthread_mutex_unlock(&left_fork->fork);
+	pthread_mutex_unlock(&right_fork->fork);
     if (check_stop_sim(philo))
         return (ERROR);
     else
