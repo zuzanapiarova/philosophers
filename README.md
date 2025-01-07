@@ -5,9 +5,12 @@ Mandatory part: philo/ - each philosopher is a thread, forks are placed between 
 Bonus part: philo_bonus/ - each philosopher is a process, forks are placed in the middle of the table represented by a semaphore
 
 # working on
-- threads and philos are set up correctly, finding proper slgorithm to make them not die
-- implement some algorithm in p_think function that makes them think only if they have enough time - there is one now, not sure if optimal
-- simulation halts when there is only one philo and he dies - he tries to access right fork but it goes to forks[0] which is already locked and it dies while waiting for the resource to be unlocked - what to do now? - this can be solved by other functions of the pthread library unfortunatelly we cannot use these 
+- once one of them eats for the last time, its thread should set stopped flag to true and monitor should not consider this thread anymore - DONE
+- somtimes they die when they should not die - eg sometimes in ./philo 5 800 200 200 
+- currently may not wait for everyone to finish the last meal and does not print finished last meal message
+- sometimes it prints something else after a philo dies - sometimes even for the same hpilo !! change this 
+- curently working on counting all in microseconds and just outputting it in miliseconds 
+
 
 ## possible algorithm for scheduling:
 1. implement a priority variable that changes based on time_left, eg with values 1, 2, 3, 3 being most critical
@@ -26,6 +29,7 @@ if (priority > 100)
 // Q&A: What is the starting state for a philosopher?
 // Q&A: Does the philospher stop eating-let forks-start sleeping right after each other?
 // Q&A: How long does each philosopher have to think? Can they stop sleeping, start thinking and then take forks and start eating right away, having thinked for no time ???
+- simulation halts when there is only one philo and he dies - he tries to access right fork but it goes to forks[0] which is already locked and it dies while waiting for the resource to be unlocked - what to do now? - this can be solved by other functions of the pthread library unfortunatelly we cannot use these 
 
 ## TEST CASES
 ### --- wrong input - check parsing ---

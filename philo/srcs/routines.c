@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 10:00:49 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/07 11:54:23 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/07 16:00:06 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ void    *routine(void *arg)
 
     philo = (t_philo *)arg;
     if (philo->id % 2 == 0) // & made the even sleep for usleep(10) so the others can take their forks and not wait - WORKS WITH ODD NUMBER OF PHILOS 
-        usleep(10);
+        usleep(1);
     while (1)
     {
         if (take_forks(philo) == ERROR)
@@ -30,14 +30,22 @@ void    *routine(void *arg)
         }
         if (leave_forks(philo) == ERROR)
             break ;
+        pthread_mutex_lock(&philo->lock);  
         if (philo->times_to_eat != -1 && (int)philo->times_eaten >= philo->times_to_eat)
+        {
+            usleep(1);
+            philo->stopped = true;
+            log_msg(philo, FINISH);
+            pthread_mutex_unlock(&philo->lock); 
             break ;
+        }
+        pthread_mutex_unlock(&philo->lock); 
         if (p_sleep(philo) == ERROR)
             break ;
         if (p_think(philo) == ERROR)
             break ;
     }
-    printf("finished loop in thread %d\n", philo->id);
+    //printf("finished loop in thread %d\n", philo->id);
     return (NULL);
 }
 
@@ -55,9 +63,11 @@ void    *monitoring(void *arg)
         while (i < total)
         {
             pthread_mutex_lock(&philos[i].lock);
-            if (get_time_in_ms() - philos[i].last_eaten > philos[i].die || *(philos[i].stop_simulation) == true)
+            if (get_time_in_micros() - philos[i].last_eaten > (philos[i].die * 1000) || *(philos[i].stop_simulation) == true)
             {
-                log_msg(&philos[i], DEATH);
+                if (!philos[i].stopped)
+                    log_msg(&philos[i], DEATH);
+                philos[i].stopped = true;
                 *(philos[i].stop_simulation) = true;
                 pthread_mutex_unlock(&philos[i].lock);
                 return (NULL);

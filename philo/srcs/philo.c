@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 08:40:25 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/06 17:45:58 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/07 15:57:55 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,8 +25,8 @@ int init_philo(t_philo *philo, int i, char **argv, pthread_mutex_t **forks, pthr
 		philo->times_to_eat = -1;
     philo->forks = *forks;
 	philo->times_eaten = 0;
-	philo->last_eaten = get_time_in_ms();
-    philo->priority = 1;
+	philo->last_eaten = get_time_in_micros();
+    philo->stopped = false;
     pthread_mutex_init(&philo->lock, NULL);
 	philo->msg_lock = msg_lock;
 	philo->stop_lock = stop_lock;
@@ -128,14 +128,15 @@ int start_simulation(int argc, char **argv, int total)
 		i++;
 	}
     // now that all threads are joined we now all of them finished eating and we can set stop_simulation t true so monitoring thread can exit 
+    printf("set stop siulaiton as true\n");
     *(philos[0].stop_simulation) = true;
     free(forks);
-	printf("joined philo threads and destroyed forks\n");
+	//printf("joined philo threads and destroyed forks\n");
 	pthread_mutex_destroy(&msg_lock);
     pthread_mutex_destroy(&stop_lock);
-	printf("destroyed shared mutexes\n");
+	//printf("destroyed shared mutexes\n");
 	pthread_join(monitor, NULL);
-	printf("joined monitor thread\n");
+	//printf("joined monitor thread\n");
 	free(philos);
 	return (0);
 }

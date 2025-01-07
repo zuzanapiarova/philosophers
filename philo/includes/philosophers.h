@@ -21,7 +21,8 @@ typedef enum	e_action
 	EATS, // STARTED EATING
 	SLEEPS, // STARTED SLEEPING
 	THINKS, // STARTED THINKING
-	DEATH // DIED
+	DEATH, // DIED
+	FINISH
 }				t_action;
 
 typedef struct		s_philo
@@ -36,7 +37,7 @@ typedef struct		s_philo
 	int				times_to_eat; // is int because can be -1 if not assigned
 	unsigned int	times_eaten;
 	long long		last_eaten;
-	int				priority;
+	bool			stopped;
 	pthread_mutex_t	lock;
 	pthread_mutex_t	*msg_lock;
 	pthread_mutex_t	*stop_lock;
@@ -64,6 +65,7 @@ int				handle_error_input(int argc, char **argv);
 /* utils.c */
 int				log_msg(t_philo *philo, t_action action);
 long long		get_time_in_ms(void);
+long long		get_time_in_micros(void);
 bool			check_stop_sim(t_philo *philo);
 
 /* utils_libft.c */

@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 09:28:58 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/06 17:42:50 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/07 15:56:52 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,10 +77,10 @@ int p_eat(t_philo *philo)
 {
  	if (check_stop_sim(philo))
 		return (ERROR);
-	log_msg(philo, EATS);
-	philo->last_eaten = get_time_in_ms();
 	if ((int)philo->times_eaten > -1)
 		philo->times_eaten++;
+	log_msg(philo, EATS);
+	philo->last_eaten = get_time_in_micros();
 	usleep(philo->eat * 1000);
 	return (0);
 }
@@ -118,15 +118,13 @@ int p_think(t_philo *philo)
 	if (check_stop_sim(philo))
 		return (ERROR);
 	log_msg(philo, THINKS);
-	time_passed = get_time_in_ms() - philo->last_eaten;
-	time_left = philo->die - time_passed;
-	time_for_thinking = philo->die - philo->eat - philo->sleep;
-    // TODO: algo to make them think for a bit so others do not have to die - but how when we do not have access to other philo data ?
-	// if (time_left / 10 >= time_for_thinking)
-	// {
-	// 	printf("true %d\n", philo->id);
-	// 	usleep(time_left / 10 * 1000);
-	// }
-	usleep(10);
+	// maybe lock it here ??? 
+	time_passed = get_time_in_micros() - philo->last_eaten;
+	time_left = (philo->die * 1000) - time_passed;
+	time_for_thinking = (philo->die - philo->eat - philo->sleep) * 1000;
+	if (time_left >= time_for_thinking / 2)
+		usleep(time_left / 4);
+	else if (time_left > 100)
+		usleep(10);
 	return (0);
 }
