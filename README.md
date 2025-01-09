@@ -42,9 +42,15 @@ if (priority > 100)
 
 ### --- good input - check functionality ---
 1. ./philo 4 500 200 100 - best case scenario with even number - should run infinitely
-2. ./philo 5 500 200 100 - second best case scenario with odd number - should run infinitely
-3. ./philo 5 500 200 100 10 - all should eat 10 times and then quit nicely
-4. ./philo 5 400 200 199 - all should run infinitely
+2. ./philo 5 800 200 100 - second best case scenario with odd number - should run infinitely
+3. ./philo 5 800 200 100 10 - all should eat 10 times and then quit nicely
+4. ./philo 5 410 200 200 - all should run infinitely
 5. ./philo 5 400 300 200 - should end before first thread finishes sleeping
-6. ./philo 5 800 200 200 0 - each must each 0 times
+6. ./philo 5 800 200 200 0 - they do not eat
+7. ./philo 5 0 200 100 - must die instantly or not start at all
 
+### --- check in code ---
+1. ... that each thread does not access other philo data
+2. ... that last_eaten is updated at start of the meal, not after
+3. ... that death is logged not more than 10ms after it happened
+4. ... that when one thread eats for times_to_eat times, monitoring thread must wait until they all finish, not exit straight away, as some philos may die in the meantime

@@ -7,6 +7,7 @@
 #include <sys/time.h>
 #include <pthread.h>
 #include <stdbool.h>
+#include <string.h>
 
 #define ERROR 1
 #define SUCCESS 0
@@ -30,18 +31,21 @@ typedef enum	e_action
 
 typedef struct		s_philo
 {
+	// variables from user input that are static
 	int				id;
-	pthread_t		thread;
-	pthread_mutex_t	*forks;
 	int				total;
 	unsigned int	eat;
 	unsigned int	sleep;
 	unsigned int	die;
 	int				times_to_eat; // is int because can be -1 if not assigned
+	pthread_t		thread;
+	// variables that change but are only available to single thread at all times
 	unsigned int	times_eaten;
 	long long		last_eaten;
 	bool			stopped;
 	pthread_mutex_t	lock;
+	// only shared resources - others are manipulated by single thread at all times for both read/write
+	pthread_mutex_t	*forks;
 	pthread_mutex_t	*msg_lock;
 	pthread_mutex_t	*stop_lock;
 	bool			*stop_simulation; // we must store it as pointer that always stores that one memory address and always dereference it in code when we want the value stored there
@@ -74,9 +78,9 @@ bool			check_stop_sim(t_philo *philo);
 /* utils_libft.c */
 unsigned int	ft_atou(const char *nptr);
 int				ft_strncmp(const char *s1, const char *s2, size_t n);
-char			*ft_utoa(unsigned int n);
+char			*ft_utoa(unsigned long n);
 size_t			ft_strlen(const char *s);
-size_t			get_uint_size(unsigned int n);
+size_t			get_uint_size(unsigned long n);
 void			ft_putnbr(long long nb);
 
 #endif

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   input_val.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
+/*   By: zuzanapiarova <zuzanapiarova@student.42    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 08:42:15 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/06 08:42:29 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/09 10:47:47 by zuzanapiaro      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ int handle_error_input(int argc, char **argv)
 	while (argv[i])
 	{
 		val = ft_atou(argv[i]);
-		str = ft_utoa(val);
+		str = ft_utoa((long long)val);
 		//printf("argv: %s, val: %u\n", argv[i], val);
 		if (val < 0 || ft_strncmp(argv[i], str, ft_strlen(argv[i])))
 		{
@@ -57,7 +57,7 @@ int handle_error_input(int argc, char **argv)
 		free(str);
 		str = NULL;
 		if (flag == 0 && i == 1 && val < 1)
-			return (write(1, "Number of philosophers must be at least 1.\n", 43), 1);
+			return (write(1, "Number of philosophers must be at least 1 for program to start.\n", 43), 1);
 		i++;
 	}
 	if (flag == 1)

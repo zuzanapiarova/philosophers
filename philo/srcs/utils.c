@@ -6,7 +6,7 @@
 /*   By: zuzanapiarova <zuzanapiarova@student.42    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 08:40:37 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/07 21:05:39 by zuzanapiaro      ###   ########.fr       */
+/*   Updated: 2025/01/09 10:49:55 by zuzanapiaro      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,8 +49,10 @@ int	log_msg(t_philo *philo, t_action action)
 		msg = "died\n";
 	else if (action == FINISH)
 		msg = "finished last meal\n";
+	char *str = ft_utoa((get_time_in_micros() / 1000));
 	pthread_mutex_lock(philo->msg_lock);
-	ft_putnbr(get_time_in_ms());
+	//ft_putnbr(get_time_in_micros() / 1000);
+	write(1, str, ft_strlen(str));
 	write(1, " ", 1);
 	ft_putnbr(philo->id);
 	write(1, " ", 1);
@@ -61,6 +63,7 @@ int	log_msg(t_philo *philo, t_action action)
 		write(1, ". time\n", 7);
 	}
 	pthread_mutex_unlock(philo->msg_lock);
+	free(str);
 	return (0);
 }
 
@@ -71,5 +74,7 @@ bool	check_stop_sim(t_philo *philo)
     pthread_mutex_lock(philo->stop_lock);
     stopped = *(philo->stop_simulation);
     pthread_mutex_unlock(philo->stop_lock);
+	if (stopped == false)
+		stopped = philo->stopped;
     return (stopped);
 }

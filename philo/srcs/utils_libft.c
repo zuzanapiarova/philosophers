@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils_libft.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
+/*   By: zuzanapiarova <zuzanapiarova@student.42    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 08:40:42 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/06 08:41:38 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/09 10:47:23 by zuzanapiaro      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ int	ft_strncmp(const char *s1, const char *s2, size_t n)
 	return (ds1[i] - ds2[i]);
 }
 
-size_t	get_uint_size(unsigned int n)
+size_t	get_uint_size(unsigned long n)
 {
 	size_t	size;
 
@@ -72,13 +72,13 @@ size_t	get_uint_size(unsigned int n)
 	return (size);
 }
 
-char	*ft_utoa(unsigned int n)
+char	*ft_utoa(unsigned long n)
 {
-	int				size;
-	char			*result;
-	unsigned long	num;
+	int					size;
+	char				*result;
+	unsigned long long	num;
 
-	size = get_uint_size(n);
+	size = get_uint_size((unsigned long long)n);
 	result = (char *)malloc((size + 1) * sizeof(char));
 	if (!result)
 		return (NULL);
