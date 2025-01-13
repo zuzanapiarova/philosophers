@@ -7,10 +7,12 @@ HEADERS := -I ./include
 
 SRCS := srcs/actions.c \
 		srcs/input_val.c \
+		srcs/logging.c \
 		srcs/philo.c \
 		srcs/routines.c \
-		srcs/utils_libft.c \
 		srcs/utils.c \
+		srcs/num_utils.c \
+		srcs/str_utils.c \
 
 OBJS := ${SRCS:.c=.o}
 

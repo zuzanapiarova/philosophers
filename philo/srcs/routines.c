@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 10:00:49 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/13 14:12:26 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/13 15:39:50 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,6 @@ void    *routine(void *arg)
     t_philo *philo;
 
     philo = (t_philo *)arg;
-    // maybe make them wait untill they are all created and just then start - create strat constant and each adds 1 to it when it is created, when it is equal to total, it will start 
     if (philo->id % 2 == 0)
         usleep(10); // maybe wait for time_to_die - time_to_eat - time_to_sleep / 2 ms 
     while (1)
@@ -78,7 +77,7 @@ void    *monitoring(void *arg)
             }
             pthread_mutex_unlock(philos[i].stop_lock);// was stop_lock before
         }
-        usleep(8000);
+        usleep(5000);
     }
 }
 

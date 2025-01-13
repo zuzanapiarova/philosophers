@@ -38,8 +38,13 @@ if (priority > 100)
 1. even philos wait for a moment before grabbing forks
 2. odd philos grab first left, then right, odd grab first right, then left forks 
 
+# MECHANISMS TO AVOID DYING
+1. think time is calculated based on how much time they have left beofre dying, not static 
+2. after each action check if the monitoring thread did not find any death and set stop_simulation to true, if yes exit right away so we do not print any more information to the console
+3. start eating right away, the even a couple miliseconds later, because thinking or sleeping first would unneccessarily reduce their time_to_die limit
+
 # HOW WE CHECK FOR END OF SIMULATION (DEATH OR FINISHED EATING)
-- monitoring thread checks every 5 ms if the time since last meal did not surpass the time_to_die constant 
+- monitoring thread checks every 5-8 ms if the time since last meal did not surpass the time_to_die constant 
 - if it surpassed, it will set the stop_simulation to true and exit the monitoring thread
 - the philos after each action check if the stop_simulation is true with check_stop_sim function 
 - if stop_simulation is found to be true, they will exit the loop and the routine straight away
@@ -48,20 +53,21 @@ if (priority > 100)
 - after all threads finished eating, in the join caller we set stop_simulation to true so monitoring can stop and exit too
 
 ## TEST CASES
-### --- wrong input - check parsing ---
+### --- incorrect input - check parsing ---
 1. ./philo
 2. ./philo 100 200 300
 3. ./philo a b c 100
-4. ./philo 0 500 100 200
+4. ./philo 0 500 100 200 - 0 philosophers
 
-### --- good input - check functionality ---
+### --- correct input - check functionality ---
 1. ./philo 4 500 200 100 - best case scenario with even number - should run infinitely
 2. ./philo 5 800 200 100 - second best case scenario with odd number - should run infinitely
 3. ./philo 5 800 200 100 10 - all should eat 10 times and then quit nicely
-4. ./philo 5 410 200 200 - all should run infinitely
+4. ./philo 4 410 200 200 - its close but all should run infinitely
 5. ./philo 5 400 300 200 - should end before first thread finishes sleeping
 6. ./philo 5 800 200 200 0 - they do not eat
 7. ./philo 5 0 200 100 - must die instantly or not start at all
+8. ./philo 1 800 200 100 - only one philo - should die instantly/after time_to_die because does not have enough forks 
 
 ### --- check in code ---
 1. ... that each thread does not access other philo data

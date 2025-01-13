@@ -82,5 +82,6 @@ char			*ft_utoa(unsigned long n);
 size_t			ft_strlen(const char *s);
 size_t			get_uint_size(unsigned long n);
 void			ft_putnbr(long long nb);
+char			*ft_strjoin(char const *s1, char const *s2);
 
 #endif
