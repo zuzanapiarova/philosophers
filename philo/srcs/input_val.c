@@ -3,31 +3,21 @@
 /*                                                        :::      ::::::::   */
 /*   input_val.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zuzanapiarova <zuzanapiarova@student.42    +#+  +:+       +#+        */
+/*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 08:42:15 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/09 10:47:47 by zuzanapiaro      ###   ########.fr       */
+/*   Updated: 2025/01/13 18:25:11 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/philosophers.h"
 
 // validate not enough arguments
-
-// 1. validate input to be unsigned ints
-
-// 2. validate numbers to be not 0 if needed or other possible values
-
-int handle_error_input(int argc, char **argv)
+int	validate_num_of_arguments(int	argc)
 {
-	int i;
-	int flag;
-	int val;
-	char *str;
-
 	if (argc != 5 && argc != 6)
 	{
-		write(1, "Program expects 4 or 5 arguments. Please call ./philo with:\n", 60);
+		write(1, "Program expects 4 or 5 arguments. Run ./philo with: \n", 53);
 		write(1, "\tnumber_of_philosophers\n", 24);
 		write(1, "\ttime_to_die (ms)\n", 18);
 		write(1, "\ttime_to_eat (ms)\n", 18);
@@ -35,15 +25,26 @@ int handle_error_input(int argc, char **argv)
 		write(1, "\toptional [number_of_times_each_philosopher_must_eat] (ms)\n", 60);
 		return (ERROR);
 	}
-	// TODO: protect against numbers bigger than MAX_INT*2 and the addition of ms arguments to current time being bigger than max int *2, aleo against numbers smaller than 0
+	return(SUCCESS);
+}
+
+// 1. validate input to be unsigned ints
+// TODO: protect against numbers bigger than MAX_INT*2 and the addition of ms arguments to current time being bigger than max int *2, aleo against numbers smaller than 0
+int validate_arguments(int argc, char **argv)
+{
+	int	i;
+	int	val;
+	int	flag;
+	char *str; // TODO: change 
+	
+	(void)argc;
 	i = 1;
 	flag = 0;
 	while (argv[i])
 	{
 		val = ft_atou(argv[i]);
-		str = ft_utoa((long long)val);
-		//printf("argv: %s, val: %u\n", argv[i], val);
-		if (val < 0 || ft_strncmp(argv[i], str, ft_strlen(argv[i])))
+		str = ft_utoa((long long)val); // TODO: change 
+		if (val < 0 || ft_strncmp(argv[i], str, ft_strlen(argv[i]))) // TODO: change this too because now it takes 00 not as 0
 		{
 			if (flag == 0)
 			{
@@ -56,13 +57,43 @@ int handle_error_input(int argc, char **argv)
 		}
 		free(str);
 		str = NULL;
-		if (flag == 0 && i == 1 && val < 1)
-			return (write(1, "Number of philosophers must be at least 1 for program to start.\n", 43), 1);
 		i++;
 	}
 	if (flag == 1)
-		return (1);
-	// TODO: protect arguments against being zero ?
+		return (ERROR);
+	return (SUCCESS);
+}
+
+// TODO: validate numbers to not be 0 or any other possible logical value
+// handles logical errors like 0 or other logically wrong inputs
+int	handle_logical_errors(int argc, char **argv)
+{
+	int			i;
+	long long	val;
+	
+	(void)argc;
+	i = 0;
+	while (argv[i])
+	{
+		val = ft_atou(argv[i]);
+		if (i == 1 && val < 1)
+			return (write(1, "Number of philosophers must be at least 1 for program to start.\n", 64), ERROR);
+		if (i == 2 && val == 0)
+			return (write(1, "\033[31mThey all died instantly. :(\033[37m\n", 38), ERROR);
+		i++;
+	}
+	return (SUCCESS);
+}
+
+int handle_error_input(int argc, char **argv)
+{
+	if (validate_num_of_arguments(argc) == ERROR)
+		return (ERROR);
+	// valid arguments - (unsigned) int, (unsigned) long, (unsigned)long long - protect against characters and max int values 
+	if (validate_arguments(argc, argv) == ERROR)
+		return (ERROR);
+	if (handle_logical_errors(argc, argv))
+		return (ERROR);
 	// at least eat time because each philosopher must eat, as defined in subject
 	// protect agains one philo, with message "One philosopher means one fork. He could not eat without 2 forks. You sent him off for an assured death.:("
 	return (0);

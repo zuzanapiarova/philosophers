@@ -6,12 +6,11 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/13 16:52:30 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/13 16:53:42 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/13 16:59:00 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/philosophers.h"
-
 
 size_t	get_uint_size(unsigned long n)
 {

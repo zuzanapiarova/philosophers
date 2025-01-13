@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 08:40:37 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/13 16:51:45 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/13 17:36:39 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,17 +32,17 @@ long long	get_time_in_micros(void)
 	return (ERROR);
 }
 
-// checks if any of them dies thus stopped the simulation
-// or checks if the specific one finished eating
-// if any of those is true, returns true and caller will stop the thread 
+// checks if stop_simulation is true meaning one of them died
+// or checks if the specific philo finished eating
+// if either is true, returns true and caller will stop the specific thread
 bool	check_stop_sim(t_philo *philo)
 {
-    bool	stopped;
+	bool	stopped;
 
-    pthread_mutex_lock(&philo->lock);
-    stopped = *(philo->stop_simulation);
-    pthread_mutex_unlock(&philo->lock);
-	if (stopped || philo->finished) // if any died or this one finished eating
+	pthread_mutex_lock(&philo->lock);
+	stopped = *(philo->stop_simulation);
+	pthread_mutex_unlock(&philo->lock);
+	if (stopped || philo->finished)
 		return (true);
-    return (false);
+	return (false);
 }

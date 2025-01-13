@@ -6,12 +6,11 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/13 16:51:21 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/13 16:51:58 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/13 17:36:30 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/philosophers.h"
-
 
 // "\033[31m" red
 // "\033[33m" yellow
@@ -27,12 +26,12 @@
 // "\033[38;5;153m" - Pastel Blue
 // "\033[38;5;213m" - Pastel Magenta 
 // assigns collor to each action
-char *get_color(t_action action)
+char	*get_color(t_action action)
 {
 	char	*color;
 
 	if (action == FORK_L)
-		color = "\033[38;2;255;182;193m";	
+		color = "\033[38;2;255;182;193m";
 	else if (action == FORK_R)
 		color = "\033[38;2;255;182;193m";
 	else if (action == EATS)
@@ -44,17 +43,17 @@ char *get_color(t_action action)
 	else if (action == DEATH)
 		color = "\033[31m";
 	else if (action == FINISH)
-		color = "\033[37m";
-	else 
+		color = "\033[38;5;146m";
+	else
 		color = "\033[37m";
 	return (color);
 }
 
 // gets correcponding log msg based on action
-char    *get_msg(t_action action)
+char	*get_msg(t_action action)
 {
-	char *msg;
-	
+	char	*msg;
+
 	if (action == FORK_L)
 		msg = "has taken left fork\n";
 	else if (action == FORK_R)
@@ -74,8 +73,12 @@ char    *get_msg(t_action action)
 	return (msg);
 }
 
-// use mutex to lock access to terminal while one log msg is being printed out from another thread wanting to print a msg
-int log_msg(t_philo *philo, t_action action)
+// prints message to the console based on parameter action
+// in format: timestamp_in_ms id action
+// use mutex to lock access to terminal while one log msg is being printed out
+// prevents messages from being mixed up
+// & when testing, can change time to be in microseconds by removing / 1000
+int	log_msg(t_philo *philo, t_action action)
 {
 	char	*msg;
 	char	*time;
@@ -84,7 +87,7 @@ int log_msg(t_philo *philo, t_action action)
 
 	msg = get_msg(action);
 	color = get_color(action);
-	time = ft_utoa((get_time_in_micros() / 1000)); // print in ms
+	time = ft_utoa((get_time_in_micros() / 1000));
 	color_time = ft_strjoin(color, time);
 	free(time);
 	pthread_mutex_lock(philo->msg_lock);
@@ -100,5 +103,5 @@ int log_msg(t_philo *philo, t_action action)
 	}
 	pthread_mutex_unlock(philo->msg_lock);
 	free(color_time);
-	return (0);
+	return (SUCCESS);
 }

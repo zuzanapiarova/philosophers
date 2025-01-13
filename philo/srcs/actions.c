@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 09:28:58 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/13 13:20:04 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/13 17:41:46 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,17 +17,17 @@
 // for even philos, first lock R, then l fork
 // for odd philos, lock first L, then R fork
 // for last philo,
-int take_forks(t_philo *philo)
+int	take_forks(t_philo *philo)
 {
-	pthread_mutex_t *left_fork;
-	pthread_mutex_t *right_fork;
-	
+	pthread_mutex_t	*left_fork;
+	pthread_mutex_t	*right_fork;
+
 	left_fork = &philo->forks[philo->id - 1];
 	if (philo->id == philo->total)
 		right_fork = &philo->forks[0];
 	else
 		right_fork = &philo->forks[philo->id];
-    if (check_stop_sim(philo))
+	if (check_stop_sim(philo))
 		return (ERROR);
 	if (philo->id % 2 == 0)
 	{
@@ -52,11 +52,11 @@ int take_forks(t_philo *philo)
 		pthread_mutex_lock(left_fork);
 		if (check_stop_sim(philo))
 		{
-			pthread_mutex_unlock(left_fork);	
+			pthread_mutex_unlock(left_fork);
 			return (ERROR);
 		}
 		log_msg(philo, FORK_L);
-		if (philo->total == 1) // quick and dirty but do not know how else to do it since we cannot use other pthread functions 
+		if (philo->total == 1)
 		{
 			usleep(philo->die * 1000);
 			return (ERROR);
@@ -73,9 +73,9 @@ int take_forks(t_philo *philo)
 	return (0);
 }
 
-int p_eat(t_philo *philo)
+int	p_eat(t_philo *philo)
 {
- 	if (check_stop_sim(philo))
+	if (check_stop_sim(philo))
 		return (ERROR);
 	pthread_mutex_lock(&philo->lock);
 	if ((int)philo->times_eaten > -1)
@@ -87,22 +87,20 @@ int p_eat(t_philo *philo)
 	return (0);
 }
 
-int leave_forks(t_philo *philo)
+int	leave_forks(t_philo *philo)
 {
-	// unlock left fork
 	pthread_mutex_unlock(&philo->forks[philo->id - 1]);
-	// unlock right fork
 	if (philo->id == philo->total)
 		pthread_mutex_unlock(&philo->forks[0]);
 	else
 		pthread_mutex_unlock(&philo->forks[philo->id]);
-    if (check_stop_sim(philo))
-        return (ERROR);
-    else
-	    return (0);
+	if (check_stop_sim(philo))
+		return (ERROR);
+	else
+		return (0);
 }
 
-int p_sleep(t_philo *philo)
+int	p_sleep(t_philo *philo)
 {
 	if (check_stop_sim(philo))
 		return (ERROR);
@@ -113,17 +111,16 @@ int p_sleep(t_philo *philo)
 	return (0);
 }
 
-int p_think(t_philo *philo)
+int	p_think(t_philo *philo)
 {
 	long long	time_passed;
 	long long	time_left;
 	long long	time_for_thinking;
-	
+
 	if (check_stop_sim(philo))
 		return (ERROR);
 	pthread_mutex_lock(&philo->lock);
 	log_msg(philo, THINKS);
-	// maybe lock it here ??? 
 	time_passed = get_time_in_micros() - philo->last_eaten;
 	time_left = (philo->die * 1000) - time_passed;
 	time_for_thinking = (philo->die - philo->eat - philo->sleep) * 1000;
