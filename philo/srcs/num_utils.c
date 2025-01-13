@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/13 16:52:30 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/13 16:59:00 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/13 20:44:36 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,4 +68,20 @@ void	ft_putnbr(long long nb)
 	}
 	if (nb < 10)
 		ft_putchar(nb + 48);
+}
+
+int	check_arg(char *val)
+{
+	int	i;
+
+	i = 0;
+	while (val[i] == '+')
+		i++;
+	while(val[i])
+	{
+		if (val[i] < '0' || val[i] > '9')
+			return (ERROR);
+		i++;
+	}
+	return (SUCCESS);
 }

@@ -6,17 +6,62 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 09:28:58 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/13 17:41:46 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/13 19:43:41 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/philosophers.h"
 
+int	right(t_philo *philo, pthread_mutex_t *right_fork, pthread_mutex_t *left_fork)
+{
+	pthread_mutex_lock(right_fork);
+	if (check_stop_sim(philo))
+	{
+		pthread_mutex_unlock(right_fork);
+		return (ERROR);
+	}
+	log_msg(philo, FORK_R);
+	pthread_mutex_lock(left_fork);
+	if (check_stop_sim(philo))
+	{
+		pthread_mutex_unlock(left_fork);
+		pthread_mutex_unlock(right_fork);
+		return (ERROR);
+	}
+	log_msg(philo, FORK_L);
+	return (SUCCESS);
+}
+
+int	left(t_philo *philo, pthread_mutex_t *left_fork, pthread_mutex_t *right_fork)
+{
+	pthread_mutex_lock(left_fork);
+	if (check_stop_sim(philo))
+	{
+		pthread_mutex_unlock(left_fork);
+		return (ERROR);
+	}
+	log_msg(philo, FORK_L);
+	if (philo->total == 1)
+	{
+		usleep(philo->die * 1000);
+		return (ERROR);
+	}
+	pthread_mutex_lock(right_fork);
+	if (check_stop_sim(philo))
+	{
+		pthread_mutex_unlock(right_fork);
+		pthread_mutex_unlock(left_fork);
+		return (ERROR);
+	}
+	log_msg(philo, FORK_R);
+	return (SUCCESS);
+}
+
 // every philo takes fork on its id and the one before it
 // last one takes the fork on id - 1 and on forks[0]
 // for even philos, first lock R, then l fork
 // for odd philos, lock first L, then R fork
-// for last philo,
+// for last philo, take fork[id] as left and fork[0] as right fork
 int	take_forks(t_philo *philo)
 {
 	pthread_mutex_t	*left_fork;
@@ -31,46 +76,15 @@ int	take_forks(t_philo *philo)
 		return (ERROR);
 	if (philo->id % 2 == 0)
 	{
-		pthread_mutex_lock(right_fork);
-		if (check_stop_sim(philo))
-		{
-			pthread_mutex_unlock(right_fork);
-			return (ERROR);
-		}
-		log_msg(philo, FORK_R);
-		pthread_mutex_lock(left_fork);
-		if (check_stop_sim(philo))
-		{
-			pthread_mutex_unlock(left_fork);
-			pthread_mutex_unlock(right_fork);
-			return (ERROR);
-		}
-		log_msg(philo, FORK_L);
-	}
+		if (right(philo, right_fork, left_fork) == ERROR)
+		return (ERROR);
+	} 
 	else
 	{
-		pthread_mutex_lock(left_fork);
-		if (check_stop_sim(philo))
-		{
-			pthread_mutex_unlock(left_fork);
-			return (ERROR);
-		}
-		log_msg(philo, FORK_L);
-		if (philo->total == 1)
-		{
-			usleep(philo->die * 1000);
-			return (ERROR);
-		}
-		pthread_mutex_lock(right_fork);
-		if (check_stop_sim(philo))
-		{
-			pthread_mutex_unlock(right_fork);
-			pthread_mutex_unlock(left_fork);
-			return (ERROR);
-		}
-		log_msg(philo, FORK_R);
+		if (left(philo, left_fork, right_fork) == ERROR)
+		return (ERROR);
 	}
-	return (0);
+	return (SUCCESS);
 }
 
 int	p_eat(t_philo *philo)
@@ -106,7 +120,10 @@ int	p_sleep(t_philo *philo)
 		return (ERROR);
 	pthread_mutex_lock(&philo->lock);
 	log_msg(philo, SLEEPS);
-	usleep(philo->sleep * 1000);
+	if (philo->sleep != 0)
+		usleep(philo->sleep * 1000);
+	else
+		usleep(2000);
 	pthread_mutex_unlock(&philo->lock);
 	return (0);
 }

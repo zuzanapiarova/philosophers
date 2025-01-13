@@ -54,7 +54,7 @@ if (priority > 100)
 1. ./philo
 2. ./philo 100 200 300
 3. ./philo a b c 100
-4. ./philo 0 500 100 200 - 0 philosophers
+4. ./philo 0 500 100 200 - zero philosophers
 
 ### --- correct input - check functionality ---
 1. ./philo 4 500 200 100 - best case scenario with even number - should run infinitely
@@ -66,6 +66,8 @@ if (priority > 100)
 6. ./philo 5 800 200 200 0 - they do not eat
 7. ./philo 5 0 200 100 - must die instantly or not start at all
 8. ./philo 1 800 200 100 - only one philo - should die instantly/after time_to_die because does not have enough forks 
+9. ./philo 5 800 200 0 - 0 time to sleep - cannot die, as they take resources right away
+
 
 ### --- check in code ---
 1. ... that each thread does not access other philo data

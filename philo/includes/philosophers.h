@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/13 17:26:55 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/13 17:28:14 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/13 20:36:51 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,5 +93,6 @@ size_t			get_uint_size(unsigned long n);
 void			ft_putnbr(long long nb);
 char			*ft_strjoin(char const *s1, char const *s2);
 void			ft_putchar(char c);
+int				check_arg(char *val);
 
 #endif
