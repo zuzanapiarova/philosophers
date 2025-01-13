@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   input_val.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
+/*   By: zuzanapiarova <zuzanapiarova@student.42    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 08:42:15 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/13 20:45:38 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/13 23:32:00 by zuzanapiaro      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,23 +33,21 @@ int	validate_num_of_arguments(int argc)
 
 // validates if input is one of accepted number types
 // TODO: protect against numbers bigger than MAX_INT*2 and the addition of ms arguments to current time being bigger than max int *2, aleo against numbers smaller than 0
-int validate_arguments(int argc, char **argv)
+int validate_arguments(char **argv)
 {
 	int	i;
-	int	val;
 	int	flag;
-	
-	(void)argc;
+
 	i = 1;
 	flag = 0;
 	while (argv[i])
 	{
-		val = ft_atou(argv[i]);
 		if (check_arg(argv[i]) == ERROR) // TODO: change this too because now it takes 00 not as 0
 		{
 			if (flag == 0)
 			{
-				write(1, "\033[31mArguments to program must be positive integer values.\033[31m\n", 64);
+				write(1, "\033[31mArguments to program", 27);
+				write(1, "must be positive integer values.\033[31m\n", 67);
 				flag = 1;
 			}
 			write(1, "\033[38;2;255;182;193m--> change argument:\t", 40);
@@ -65,12 +63,11 @@ int validate_arguments(int argc, char **argv)
 }
 
 // handles logical errors like 0 or other logically wrong inputs
-int	handle_logical_errors(int argc, char **argv)
+int	handle_logical_errors(char **argv)
 {
 	int			i;
 	long long	val;
 
-	(void)argc;
 	i = 0;
 	while (argv[i])
 	{
@@ -82,8 +79,10 @@ int	handle_logical_errors(int argc, char **argv)
 			return (ERROR);
 		}
 		if (i == 2 && val == 0)
-			return (write(1, "\033[31mYou made them die instantly. :(\033[37m\n",
-					42), ERROR);
+		{
+			write(1, "\033[31mYou made them die instantly. :(\033[37m\n", 46);
+			return (ERROR);
+		}
 		i++;
 	}
 	return (SUCCESS);
@@ -93,9 +92,9 @@ int	handle_error_input(int argc, char **argv)
 {
 	if (validate_num_of_arguments(argc) == ERROR)
 		return (ERROR);
-	if (validate_arguments(argc, argv) == ERROR)
+	if (validate_arguments(argv) == ERROR)
 		return (ERROR);
-	if (handle_logical_errors(argc, argv) == ERROR)
+	if (handle_logical_errors(argv) == ERROR)
 		return (ERROR);
 	return (0);
 }

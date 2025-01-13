@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   philo.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
+/*   By: zuzanapiarova <zuzanapiarova@student.42    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 08:40:25 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/13 17:37:55 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/13 23:55:44 by zuzanapiaro      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/philosophers.h"
 
-int	init_philo(t_philo *philo, int i, char **argv, pthread_mutex_t **forks, pthread_mutex_t *msg_lock, pthread_mutex_t *stop_lock, bool *stop_simulation)
+int	init_philo(t_philo *philo, int i, char **argv, t_shared *shared)
 {
 	philo->id = i + 1;
 	philo->total = ft_atou(argv[1]);
@@ -23,14 +23,14 @@ int	init_philo(t_philo *philo, int i, char **argv, pthread_mutex_t **forks, pthr
 		philo->times_to_eat = ft_atou(argv[5]);
 	else
 		philo->times_to_eat = -1;
-	philo->forks = *forks;
+	philo->forks = shared->forks;
 	philo->times_eaten = 0;
 	philo->finished = false;
 	if (pthread_mutex_init(&philo->lock, NULL) != 0)
 		return (ERROR);
-	philo->msg_lock = msg_lock;
-	philo->stop_lock = stop_lock;
-	philo->stop_simulation = stop_simulation;
+	philo->msg_lock = &shared->msg_lock;
+	philo->stop_lock = &shared->stop_lock;
+	philo->stop_simulation = &shared->stop_simulation;
 	philo->last_eaten = get_time_in_micros();
 	if (pthread_create(&philo->thread, NULL, &routine, (void *)philo) != 0)
 		return (ERROR);
@@ -42,38 +42,34 @@ int	start_simulation(int argc, char **argv, int total)
 	int			i;
 	t_philo		*philos;
 	pthread_t	monitor;
-	// shared resources - will be passed by address to function
-	bool            stop_simulation;
-	pthread_mutex_t *forks;
-	pthread_mutex_t msg_lock;
-	pthread_mutex_t stop_lock;
+	t_shared	shared;
 	(void)argc;
 
 	i = -1;
-	stop_simulation = false;
+	shared.stop_simulation = false;
 	// init forks and other mutexes
-	forks = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t) * total);
-	if (!forks)
+	shared.forks = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t) * total);
+	if (!shared.forks)
 		return (ERROR);
 	while (++i < total)
-		pthread_mutex_init(&forks[i], NULL);
-	pthread_mutex_init(&msg_lock, NULL);
-	pthread_mutex_init(&stop_lock, NULL);
+		pthread_mutex_init(&shared.forks[i], NULL);
+	pthread_mutex_init(&shared.msg_lock, NULL);
+	pthread_mutex_init(&shared.stop_lock, NULL);
 	// start philos threads
 	i = -1;
 	philos = (t_philo *)malloc(sizeof(t_philo) * total);
 	if (!philos)
 	{
 		while (++i < total)
-			pthread_mutex_destroy(&forks[i]);
-		pthread_mutex_destroy(&msg_lock);
-		pthread_mutex_destroy(&stop_lock);
-		free(forks);
+			pthread_mutex_destroy(&shared.forks[i]);
+		pthread_mutex_destroy(&shared.msg_lock);
+		pthread_mutex_destroy(&shared.stop_lock);
+		free(shared.forks);
 		return (ERROR);
 	}
 	while (++i  < total)
 	{
-		if (init_philo(&philos[i], i, argv, &forks, &msg_lock, &stop_lock, &stop_simulation) != SUCCESS)
+		if (init_philo(&philos[i], i, argv, &shared) != SUCCESS)
 		{
 			// clean the current unsuccessful philosophers lock or thread - if here is error, one of them went wrong
 			i--;
@@ -85,10 +81,10 @@ int	start_simulation(int argc, char **argv, int total)
 			}
 			i = -1;
 			while (++i < total)
-				pthread_mutex_destroy(&forks[i]);
-			free(forks);
-			pthread_mutex_destroy(&msg_lock);
-			pthread_mutex_destroy(&stop_lock);
+				pthread_mutex_destroy(&shared.forks[i]);
+			free(shared.forks);
+			pthread_mutex_destroy(&shared.msg_lock);
+			pthread_mutex_destroy(&shared.stop_lock);
 			free(philos);
 			return (ERROR);
 		}
@@ -100,12 +96,12 @@ int	start_simulation(int argc, char **argv, int total)
 		while (++i < total)
 		{
 			pthread_join(philos[i].thread, NULL);
-			pthread_mutex_destroy(&forks[i]);
+			pthread_mutex_destroy(&shared.forks[i]);
 			pthread_mutex_destroy(&philos[i].lock);
 		}
-		free(forks);
-		pthread_mutex_destroy(&msg_lock);
-		pthread_mutex_destroy(&stop_lock);
+		free(shared.forks);
+		pthread_mutex_destroy(&shared.msg_lock);
+		pthread_mutex_destroy(&shared.stop_lock);
 		free(philos);
 		return (ERROR);
 	}
@@ -114,18 +110,18 @@ int	start_simulation(int argc, char **argv, int total)
 	{
 		pthread_mutex_destroy(&philos[i].lock);
 		pthread_join(philos[i].thread, NULL);
-		pthread_mutex_destroy(&forks[i]);
+		pthread_mutex_destroy(&shared.forks[i]);
 	}
 	// now that all threads are joined we now all of them finished eating and we can set stop_simulation t true so monitoring thread can exit
-	printf("set stop simulation to true\n");
+	// printf("set stop simulation to true\n");
 	// *(philos[0].stop_simulation) = true;
-	stop_simulation = true;
-	pthread_mutex_lock(&stop_lock); // maybe not needed ?
-	pthread_mutex_unlock(&stop_lock); // maybe not needed ?
-	free(forks);
+	shared.stop_simulation = true;
+	pthread_mutex_lock(&shared.stop_lock); // maybe not needed ?
+	pthread_mutex_unlock(&shared.stop_lock); // maybe not needed ?
+	free(shared.forks);
 	//printf("joined philo threads and destroyed forks\n");
-	pthread_mutex_destroy(&msg_lock);
-	pthread_mutex_destroy(&stop_lock);
+	pthread_mutex_destroy(&shared.msg_lock);
+	pthread_mutex_destroy(&shared.stop_lock);
 	//printf("destroyed shared mutexes\n");
 	pthread_join(monitor, NULL);
 	//printf("joined monitor thread\n");

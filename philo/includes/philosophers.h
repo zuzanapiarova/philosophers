@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philosophers.h                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
+/*   By: zuzanapiarova <zuzanapiarova@student.42    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/13 17:26:55 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/13 20:36:51 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/13 23:55:57 by zuzanapiaro      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,14 @@ typedef enum e_action
 	FINISH
 }				t_action;
 
+typedef struct s_shared
+{
+	bool			stop_simulation;
+	pthread_mutex_t *forks;
+	pthread_mutex_t msg_lock;
+	pthread_mutex_t stop_lock;
+}				t_shared;
+
 typedef struct s_philo
 {
 	// variables from user input that are static
@@ -54,7 +62,7 @@ typedef struct s_philo
 	// variables that change but belong to one thread at all times
 	unsigned int	times_eaten;
 	long long		last_eaten;
-	bool			finished; //finished eating 
+	bool			finished; //finished eating
 	pthread_mutex_t	lock;
 	// only shared resources available to all threads for both read/write
 	pthread_mutex_t	*forks;
@@ -72,7 +80,7 @@ int				take_forks(t_philo *philo);
 int				leave_forks(t_philo *philo);
 
 /* philo.c */
-int				init_philo(t_philo *philo, int i, char **argv, pthread_mutex_t **forks, pthread_mutex_t *msg_lock, pthread_mutex_t *stop_lock,bool *stop_simulation);
+int				init_philo(t_philo *philo, int i, char **argv, t_shared *shared);
 void			*routine(void *arg);
 
 /* input_val.c */
