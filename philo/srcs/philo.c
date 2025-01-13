@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zuzanapiarova <zuzanapiarova@student.42    +#+  +:+       +#+        */
+/*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 08:40:25 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/09 10:45:53 by zuzanapiaro      ###   ########.fr       */
+/*   Updated: 2025/01/13 13:51:03 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,10 +25,10 @@ int init_philo(t_philo *philo, int i, char **argv, pthread_mutex_t **forks, pthr
 		philo->times_to_eat = -1;
     philo->forks = *forks;
 	philo->times_eaten = 0;
-    philo->stopped = false;
+    philo->finished = false;
     if (pthread_mutex_init(&philo->lock, NULL) != 0)
         return (ERROR);
-	philo->msg_lock = msg_lock;
+    philo->msg_lock = msg_lock;
 	philo->stop_lock = stop_lock;
     philo->stop_simulation = stop_simulation;
 	philo->last_eaten = get_time_in_micros();
@@ -130,7 +130,7 @@ int start_simulation(int argc, char **argv, int total)
 	pthread_join(monitor, NULL);
 	//printf("joined monitor thread\n");
 	free(philos);
-	return (0);
+	return (SUCCESS);
 }
 
 int main(int argc, char **argv)

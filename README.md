@@ -28,10 +28,24 @@ if (priority > 100)
 ### important
 // TODO: implement stopping as soon as one dies
 // TODO: protect all mutex and thread functions
+// Q&A: Can we count the time in microseconds and print it in miliseconds ? So the calculation is more precise ? 
 // Q&A: What is the starting state for a philosopher?
 // Q&A: Does the philospher stop eating-let forks-start sleeping right after each other?
 // Q&A: How long does each philosopher have to think? Can they stop sleeping, start thinking and then take forks and start eating right away, having thinked for no time ???
 - simulation halts when there is only one philo and he dies - he tries to access right fork but it goes to forks[0] which is already locked and it dies while waiting for the resource to be unlocked - what to do now? - this can be solved by other functions of the pthread library unfortunatelly we cannot use these
+
+# MECHANISMS TO AVOID DEADLOCKS
+1. even philos wait for a moment before grabbing forks
+2. odd philos grab first left, then right, odd grab first right, then left forks 
+
+# HOW WE CHECK FOR END OF SIMULATION (DEATH OR FINISHED EATING)
+- monitoring thread checks every 5 ms if the time since last meal did not surpass the time_to_die constant 
+- if it surpassed, it will set the stop_simulation to true and exit the monitoring thread
+- the philos after each action check if the stop_simulation is true with check_stop_sim function 
+- if stop_simulation is found to be true, they will exit the loop and the routine straight away
+- if the philo ate for the last time, he will set the finished variable to true and the routine will exit after he ate for the last time 
+- monitoring thread will keep checking only the philosophers that have the finished variable set to false
+- after all threads finished eating, in the join caller we set stop_simulation to true so monitoring can stop and exit too
 
 ## TEST CASES
 ### --- wrong input - check parsing ---

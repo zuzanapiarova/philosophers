@@ -42,7 +42,7 @@ typedef struct		s_philo
 	// variables that change but are only available to single thread at all times
 	unsigned int	times_eaten;
 	long long		last_eaten;
-	bool			stopped;
+	bool			finished; //finished eating 
 	pthread_mutex_t	lock;
 	// only shared resources - others are manipulated by single thread at all times for both read/write
 	pthread_mutex_t	*forks;
@@ -61,7 +61,7 @@ int				take_forks(t_philo *philo);
 int				leave_forks(t_philo *philo);
 
 /* philo.c */
-int				init_philo(t_philo *philo, int i, char **argv, pthread_mutex_t **forks, pthread_mutex_t *msg_lock, pthread_mutex_t *stop_lock, bool *stop_simulation);
+int				init_philo(t_philo *philo, int i, char **argv, pthread_mutex_t **forks, pthread_mutex_t *msg_lock, pthread_mutex_t *stop_lock,bool *stop_simulation);
 void			*routine(void *arg);
 
 // !!!

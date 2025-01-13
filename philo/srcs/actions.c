@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 09:28:58 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/07 15:56:52 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/13 13:20:04 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,11 +77,13 @@ int p_eat(t_philo *philo)
 {
  	if (check_stop_sim(philo))
 		return (ERROR);
+	pthread_mutex_lock(&philo->lock);
 	if ((int)philo->times_eaten > -1)
 		philo->times_eaten++;
-	log_msg(philo, EATS);
 	philo->last_eaten = get_time_in_micros();
+	log_msg(philo, EATS);
 	usleep(philo->eat * 1000);
+	pthread_mutex_unlock(&philo->lock);
 	return (0);
 }
 
@@ -104,8 +106,10 @@ int p_sleep(t_philo *philo)
 {
 	if (check_stop_sim(philo))
 		return (ERROR);
+	pthread_mutex_lock(&philo->lock);
 	log_msg(philo, SLEEPS);
 	usleep(philo->sleep * 1000);
+	pthread_mutex_unlock(&philo->lock);
 	return (0);
 }
 
@@ -117,6 +121,7 @@ int p_think(t_philo *philo)
 	
 	if (check_stop_sim(philo))
 		return (ERROR);
+	pthread_mutex_lock(&philo->lock);
 	log_msg(philo, THINKS);
 	// maybe lock it here ??? 
 	time_passed = get_time_in_micros() - philo->last_eaten;
@@ -126,5 +131,6 @@ int p_think(t_philo *philo)
 		usleep(time_left / 4);
 	else if (time_left > 100)
 		usleep(10);
+	pthread_mutex_unlock(&philo->lock);
 	return (0);
 }

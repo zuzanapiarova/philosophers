@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   routines.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zuzanapiarova <zuzanapiarova@student.42    +#+  +:+       +#+        */
+/*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 10:00:49 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/07 23:06:31 by zuzanapiaro      ###   ########.fr       */
+/*   Updated: 2025/01/13 14:12:26 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,13 +17,14 @@ void    *routine(void *arg)
     t_philo *philo;
 
     philo = (t_philo *)arg;
+    // maybe make them wait untill they are all created and just then start - create strat constant and each adds 1 to it when it is created, when it is equal to total, it will start 
     if (philo->id % 2 == 0)
-        usleep(1);
+        usleep(10); // maybe wait for time_to_die - time_to_eat - time_to_sleep / 2 ms 
     while (1)
     {
 		if (((int)philo->times_eaten >= philo->times_to_eat && philo->times_to_eat != -1)) // so simulation does not start if times_to_eat is 0
 		{
-			philo->stopped = true;
+			philo->finished = true;
 			break ;
 		}
         if (take_forks(philo) == ERROR)
@@ -37,7 +38,7 @@ void    *routine(void *arg)
             break ;
         if (philo->times_to_eat != -1 && (int)philo->times_eaten >= philo->times_to_eat)
         {
-            philo->stopped = true;
+            philo->finished = true;
             log_msg(philo, FINISH);
             break ;
         }
@@ -64,20 +65,33 @@ void    *monitoring(void *arg)
         i = -1;
         while (++i < total)
         {
-			pthread_mutex_lock(philos[i].stop_lock);
-			stop = *(philos[i].stop_simulation);
-			pthread_mutex_unlock(philos[i].stop_lock);
-            if ((get_time_in_micros() - philos[i].last_eaten > (philos[i].die * 1000)) || stop)
-            {
-                if (!philos[i].stopped)
-                    log_msg(&philos[i], DEATH);
-                philos[i].stopped = true;
-				pthread_mutex_lock(philos[i].stop_lock);
+            pthread_mutex_lock(philos[i].stop_lock); // was stop_lock before // TODO: maybe change the stop lock everywhere to just lock so we avoid using too many mutexes ?? 
+            if (get_time_in_micros() - philos[i].last_eaten > (philos[i].die * 1000))
                 *(philos[i].stop_simulation) = true;
-				pthread_mutex_unlock(philos[i].stop_lock);
+			stop = *(philos[i].stop_simulation);
+            if (stop) // monitori exits only if simulation stopped because of death
+            {
+                if (!philos[i].finished)
+                    log_msg(&philos[i], DEATH);
+                pthread_mutex_unlock(philos[i].stop_lock);// was stop_lock before
                 return (NULL);
             }
+            pthread_mutex_unlock(philos[i].stop_lock);// was stop_lock before
         }
-        usleep(5000);
+        usleep(8000);
     }
 }
+
+			// pthread_mutex_lock(philos[i].stop_lock);
+			// stop = *(philos[i].stop_simulation);
+			// pthread_mutex_unlock(philos[i].stop_lock);
+            // if ((get_time_in_micros() - philos[i].last_eaten > (philos[i].die * 1000)) || stop)
+            // {
+            //     if (!philos[i].finished)
+            //         log_msg(&philos[i], DEATH);
+            //     philos[i].finished = true;
+			// 	pthread_mutex_lock(philos[i].stop_lock);
+            //     *(philos[i].stop_simulation) = true;
+			// 	pthread_mutex_unlock(philos[i].stop_lock);
+            //     return (NULL);
+            // }
