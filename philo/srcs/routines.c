@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 10:00:49 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/13 17:33:27 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/14 13:08:46 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,6 @@ void	*routine(void *arg)
 void	*monitoring(void *arg)
 {
 	int		i;
-	bool	stop;
 	t_philo	*philos;
 
 	philos = (t_philo *)arg;
@@ -81,10 +80,10 @@ void	*monitoring(void *arg)
 		while (++i < philos[0].total)
 		{
 			pthread_mutex_lock(philos[i].stop_lock);
-			if (get_time_in_micros() - philos[i].last_eaten > (philos[i].die * 1000) && !philos->finished)
+			if (get_time_in_micros() - philos[i].last_eaten
+				> (philos[i].die * 1000) && !philos->finished)
 				*(philos[i].stop_simulation) = true;
-			stop = *(philos[i].stop_simulation);
-			if (stop)
+			if (*(philos[i].stop_simulation) == true)
 			{
 				if (!philos[i].finished)
 					log_msg(&philos[i], DEATH);

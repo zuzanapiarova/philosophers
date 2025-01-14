@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/13 16:52:57 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/13 17:22:22 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/14 11:07:11 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,18 +34,18 @@ unsigned int	ft_atou(const char *nptr)
 
 	i = 0;
 	u = 0;
-	if (!ft_strncmp(nptr, "4294967295", 10))
-		return (0);
 	while (nptr[i] == 32 || (nptr[i] >= 9 && nptr[i] <= 13))
 		i++;
 	if (nptr[i] == '+' || nptr[i] == '-')
 	{
 		if (nptr[i] == '-')
-			return (0);
+			return (-1);
 		i++;
 	}
 	while (nptr[i] >= '0' && nptr[i] <= '9')
 	{
+		if (u > (UINT_MAX - (nptr[i] - '0')) / 10)
+			return (-1);
 		u = u * 10 + (nptr[i] - '0');
 		i++;
 	}

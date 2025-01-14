@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/13 17:26:55 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/14 10:19:37 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/14 13:01:27 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 # include <pthread.h>
 # include <stdbool.h>
 # include <string.h>
+# include <limits.h>
 
 # define ERROR 1
 # define SUCCESS 0
@@ -57,7 +58,7 @@ typedef struct s_philo
 	unsigned int	eat;
 	unsigned int	sleep;
 	unsigned int	die;
-	int				times_to_eat; // is int because can be -1 if not assigned
+	int				times_to_eat; // int because is -1 if not assigned
 	pthread_t		thread;
 	// variables that change but belong to one thread at all times
 	unsigned int	times_eaten;
@@ -71,17 +72,32 @@ typedef struct s_philo
 	bool			*stop_simulation;
 }					t_philo;
 
-/* actions.c */
-void			*monitoring(void *arg);
+/* actions.c + actions_forks.c */
 int				p_eat(t_philo *philo);
 int				p_sleep(t_philo *philo);
 int				p_think(t_philo *philo);
+int				fork_r(t_philo *p, pthread_mutex_t *rf, pthread_mutex_t *lf);
+int				fork_l(t_philo *p, pthread_mutex_t *lf, pthread_mutex_t *rf);
 int				take_forks(t_philo *philo);
 int				leave_forks(t_philo *philo);
 
 /* philo.c */
-int				init_philo(t_philo *p, int i, char **argv, t_shared *shared);
+int				start_simulation(int argc, char **argv, int total);
+int 			main(int argc, char **argv);
+
+/* init.c */
+int				init_shared_resources(t_shared *shared, int total);
+int				init_philo_data(t_philo *p, int i, char **argv, t_shared *s);
+int				allocate_philo_array(t_philo **p, t_shared *s, int t);
+int				fill_philo_array(t_philo *p, t_shared *s, char **argv, int t);
+int				init_monitor(pthread_t *mon, t_philo *p, t_shared *s, int t);
+
+/* cleanup.c */
+int				cleanup(t_philo *p, t_shared *s, pthread_t *monitor, int t);
+
+/* routines.c */
 void			*routine(void *arg);
+void			*monitoring(void *arg);
 
 /* input_val.c */
 int				handle_error_input(int argc, char **argv);

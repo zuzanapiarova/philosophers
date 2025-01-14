@@ -6,7 +6,9 @@ NAME = philo
 HEADERS := -I ./include
 
 SRCS := srcs/actions.c \
+		srcs/cleanup.c \
 		srcs/actions_forks.c \
+		srcs/init.c \
 		srcs/input_val.c \
 		srcs/logging.c \
 		srcs/philo.c \
