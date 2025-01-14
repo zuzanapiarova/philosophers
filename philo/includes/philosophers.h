@@ -6,12 +6,12 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/13 17:26:55 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/14 13:01:27 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/14 16:40:17 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PHILO_H
-# define PHILO_H
+#ifndef PHILOSOPHERS_H
+# define PHILOSOPHERS_H
 
 # include <unistd.h>
 # include <stdlib.h>
@@ -24,12 +24,8 @@
 
 # define ERROR 1
 # define SUCCESS 0
-# ifndef TIMEZONE_MILI
-#  define TIMEZONE_MILI 3600000
-# endif
-# ifndef TIMEZONE_MICRO
-#  define TIMEZONE_MICRO 3600000000
-# endif
+# define TIMEZONE_MILI 3600000
+# define TIMEZONE_MICRO 3600000000
 
 typedef enum e_action
 {
@@ -83,7 +79,7 @@ int				leave_forks(t_philo *philo);
 
 /* philo.c */
 int				start_simulation(int argc, char **argv, int total);
-int 			main(int argc, char **argv);
+int				main(int argc, char **argv);
 
 /* init.c */
 int				init_shared_resources(t_shared *shared, int total);
