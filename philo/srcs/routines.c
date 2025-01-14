@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 10:00:49 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/14 13:08:46 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/14 17:05:52 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,12 +74,14 @@ void	*monitoring(void *arg)
 	t_philo	*philos;
 
 	philos = (t_philo *)arg;
+	usleep(5000);
 	while (1)
 	{
 		i = -1;
 		while (++i < philos[0].total)
 		{
 			pthread_mutex_lock(philos[i].stop_lock);
+			pthread_mutex_lock(&philos[i].lock);
 			if (get_time_in_micros() - philos[i].last_eaten
 				> (philos[i].die * 1000) && !philos->finished)
 				*(philos[i].stop_simulation) = true;
@@ -87,9 +89,11 @@ void	*monitoring(void *arg)
 			{
 				if (!philos[i].finished)
 					log_msg(&philos[i], DEATH);
+				pthread_mutex_unlock(&philos[i].lock);
 				pthread_mutex_unlock(philos[i].stop_lock);
 				return (NULL);
 			}
+			pthread_mutex_unlock(&philos[i].lock);
 			pthread_mutex_unlock(philos[i].stop_lock);
 		}
 		usleep(5000);

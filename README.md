@@ -4,6 +4,9 @@ The Dining philosophers problem. Introducing threads and sharing resources.
 Mandatory part: philo/ - each philosopher is a thread, forks are placed between philosophers represented by mutexes
 Bonus part: philo_bonus/ - each philosopher is a process, forks are placed in the middle of the table represented by a semaphore
 
+Coffmans algorithm is for prevention of a deadlock. 
+Bankers algorithm is for avoidance of a deadlock.
+
 ### important
 // Q&A: Can we count the time in microseconds and print it in miliseconds ? So the calculation is more precise ? 
 // Q&A: What is the starting state for a philosopher?
@@ -13,6 +16,9 @@ Bonus part: philo_bonus/ - each philosopher is a process, forks are placed in th
 - working in microseconds for accuracy and logging in miliseconds
 - including timezone by macro, do it by the function !
 - TODO: they die when sleep is 0 and they have enough time but some take over more resources than others 
+- TODO: mutex that protects philo from not eating and dying at the same time 
+- TODO: may add waiting for all threads to startup - start mutex that main thread holds while spawning threads  try to grab it so they have to wait. When the last one is created, main thread releases its the start mutex and set the start time for all of them here 
+- TODO: protect all calls to thread/mutex functions - mortly init.c and cleanup.c files
 
 # working on
 - synchronize all threads to start at the same time ?
@@ -40,6 +46,7 @@ if (priority > 100)
 1. think time is calculated based on how much time they have left beofre dying, not static 
 2. after each action check if the monitoring thread did not find any death and set stop_simulation to true, if yes exit right away so we do not print any more information to the console
 3. start eating right away, the even a couple miliseconds later, because thinking or sleeping first would unneccessarily reduce their time_to_die limit
+4. tried to avoid busy-waiting 
 
 # HOW I CHECK FOR END OF SIMULATION (DEATH OR FINISHED EATING)
 - monitoring thread checks every 5-8 ms if the time since last meal did not surpass the time_to_die constant 
@@ -53,21 +60,21 @@ if (priority > 100)
 ## TEST CASES
 ### --- incorrect input - check parsing ---
 1. ./philo
-2. ./philo 100 200 300
-3. ./philo a b c 100
-4. ./philo 0 500 100 200 - zero philosophers
+2. ./philo 100 200 300 - wrong number of arguments
+3. ./philo a b c 100 - wrong arguments
 
 ### --- correct input - check functionality ---
 1. ./philo 4 500 200 100 - best case scenario with even number - should run infinitely
 2. ./philo 5 800 200 100 - second best case scenario with odd number - should run infinitely
 3. ./philo 5 800 200 100 10 - all should eat 10 times and then quit nicely
 4. ./philo 1000 500 100 100 - check with huge number of philosophers
-4. ./philo 4 410 200 200 - its close but all should run infinitely
-5. ./philo 5 400 300 200 - should end before first thread finishes sleeping
-6. ./philo 5 800 200 200 0 - they do not eat
-7. ./philo 5 0 200 100 - must die instantly or not start at all
-8. ./philo 1 800 200 100 - only one philo - should die instantly/after time_to_die because does not have enough forks 
-9. ./philo 5 800 200 0 - 0 time to sleep - cannot die, as they take resources right away
+5. ./philo 4 410 200 200 - its close but all should run infinitely
+6. ./philo 5 400 300 200 - should end before first thread finishes sleeping
+7. ./philo 0 500 100 200 - logical error - zero philosophers
+8. ./philo 5 800 200 200 0 - they do not eat
+9. ./philo 5 0 200 100 - must die instantly or not start at all
+10. ./philo 1 800 200 100 - only one philo - should die instantly/after time_to_die because does not have enough forks 
+11. ./philo 5 800 200 0 - 0 time to sleep - cannot die, as they take resources right away
 
 
 ### --- check in code ---
