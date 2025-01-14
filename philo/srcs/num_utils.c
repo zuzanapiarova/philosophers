@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/13 16:52:30 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/13 20:44:36 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/14 10:12:36 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,7 @@ int	check_arg(char *val)
 	i = 0;
 	while (val[i] == '+')
 		i++;
-	while(val[i])
+	while (val[i])
 	{
 		if (val[i] < '0' || val[i] > '9')
 			return (ERROR);

@@ -12,6 +12,7 @@ Bonus part: philo_bonus/ - each philosopher is a process, forks are placed in th
 // Q&A: Is the timestamp supposed tobe since start of program or since epoch ?
 - working in microseconds for accuracy and logging in miliseconds
 - including timezone by macro, do it by the function !
+- TODO: they die when sleep is 0 and they have enough time but some take over more resources than others 
 
 # working on
 - synchronize all threads to start at the same time ?

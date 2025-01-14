@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philosophers.h                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zuzanapiarova <zuzanapiarova@student.42    +#+  +:+       +#+        */
+/*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/13 17:26:55 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/13 23:55:57 by zuzanapiaro      ###   ########.fr       */
+/*   Updated: 2025/01/14 10:19:37 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,9 +44,9 @@ typedef enum e_action
 typedef struct s_shared
 {
 	bool			stop_simulation;
-	pthread_mutex_t *forks;
-	pthread_mutex_t msg_lock;
-	pthread_mutex_t stop_lock;
+	pthread_mutex_t	*forks;
+	pthread_mutex_t	msg_lock;
+	pthread_mutex_t	stop_lock;
 }				t_shared;
 
 typedef struct s_philo
@@ -80,7 +80,7 @@ int				take_forks(t_philo *philo);
 int				leave_forks(t_philo *philo);
 
 /* philo.c */
-int				init_philo(t_philo *philo, int i, char **argv, t_shared *shared);
+int				init_philo(t_philo *p, int i, char **argv, t_shared *shared);
 void			*routine(void *arg);
 
 /* input_val.c */

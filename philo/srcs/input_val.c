@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   input_val.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zuzanapiarova <zuzanapiarova@student.42    +#+  +:+       +#+        */
+/*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 08:42:15 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/13 23:32:00 by zuzanapiaro      ###   ########.fr       */
+/*   Updated: 2025/01/14 10:12:16 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,8 +32,10 @@ int	validate_num_of_arguments(int argc)
 }
 
 // validates if input is one of accepted number types
-// TODO: protect against numbers bigger than MAX_INT*2 and the addition of ms arguments to current time being bigger than max int *2, aleo against numbers smaller than 0
-int validate_arguments(char **argv)
+// TODO: protect against numbers bigger than MAX_INT*2 and ...
+// TODO: ... and the addition of ms arguments to current time being ...
+// TODO: ... bigger than max int *2, aleo against numbers smaller than 0
+int	validate_arguments(char **argv)
 {
 	int	i;
 	int	flag;
@@ -42,7 +44,7 @@ int validate_arguments(char **argv)
 	flag = 0;
 	while (argv[i])
 	{
-		if (check_arg(argv[i]) == ERROR) // TODO: change this too because now it takes 00 not as 0
+		if (check_arg(argv[i]) == ERROR)
 		{
 			if (flag == 0)
 			{
@@ -54,7 +56,6 @@ int validate_arguments(char **argv)
 			write(1, argv[i], ft_strlen(argv[i]));
 			write(1, "\n", 1);
 		}
-
 		i++;
 	}
 	if (flag == 1)

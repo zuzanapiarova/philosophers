@@ -3,36 +3,36 @@
 /*                                                        :::      ::::::::   */
 /*   philo.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zuzanapiarova <zuzanapiarova@student.42    +#+  +:+       +#+        */
+/*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 08:40:25 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/13 23:55:44 by zuzanapiaro      ###   ########.fr       */
+/*   Updated: 2025/01/14 10:18:36 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/philosophers.h"
 
-int	init_philo(t_philo *philo, int i, char **argv, t_shared *shared)
+int	init_philo(t_philo *p, int i, char **argv, t_shared *shared)
 {
-	philo->id = i + 1;
-	philo->total = ft_atou(argv[1]);
-	philo->die = ft_atou(argv[2]);
-	philo->eat = ft_atou(argv[3]);
-	philo->sleep = ft_atou(argv[4]);
+	p->id = i + 1;
+	p->total = ft_atou(argv[1]);
+	p->die = ft_atou(argv[2]);
+	p->eat = ft_atou(argv[3]);
+	p->sleep = ft_atou(argv[4]);
 	if (argv[5])
-		philo->times_to_eat = ft_atou(argv[5]);
+		p->times_to_eat = ft_atou(argv[5]);
 	else
-		philo->times_to_eat = -1;
-	philo->forks = shared->forks;
-	philo->times_eaten = 0;
-	philo->finished = false;
-	if (pthread_mutex_init(&philo->lock, NULL) != 0)
+		p->times_to_eat = -1;
+	p->forks = shared->forks;
+	p->times_eaten = 0;
+	p->finished = false;
+	if (pthread_mutex_init(&p->lock, NULL) != 0)
 		return (ERROR);
-	philo->msg_lock = &shared->msg_lock;
-	philo->stop_lock = &shared->stop_lock;
-	philo->stop_simulation = &shared->stop_simulation;
-	philo->last_eaten = get_time_in_micros();
-	if (pthread_create(&philo->thread, NULL, &routine, (void *)philo) != 0)
+	p->msg_lock = &shared->msg_lock;
+	p->stop_lock = &shared->stop_lock;
+	p->stop_simulation = &shared->stop_simulation;
+	p->last_eaten = get_time_in_micros();
+	if (pthread_create(&p->thread, NULL, &routine, (void *)p) != 0)
 		return (ERROR);
 	return (SUCCESS);
 }
