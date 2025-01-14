@@ -19,7 +19,7 @@ Bonus part: philo_bonus/ - each philosopher is a process, forks are placed in th
 - store shared resources to a struct and pass it to init function from start_simulation
 - norm
 - bonus :D
-- test again 
+- test and test with helgrind, vagrind seemed ok, test again
 
 ## possible algorithm for scheduling:
 1. implement a priority variable that changes based on time_left, eg with values 1, 2, 3, 3 being most critical
