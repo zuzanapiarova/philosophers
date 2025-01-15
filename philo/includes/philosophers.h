@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/13 17:26:55 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/14 16:40:17 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/15 13:39:20 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,7 @@ typedef enum e_action
 typedef struct s_shared
 {
 	bool			stop_simulation;
+	long long		start_time;
 	pthread_mutex_t	*forks;
 	pthread_mutex_t	msg_lock;
 	pthread_mutex_t	stop_lock;
@@ -55,6 +56,7 @@ typedef struct s_philo
 	unsigned int	sleep;
 	unsigned int	die;
 	int				times_to_eat; // int because is -1 if not assigned
+	long long		start_time;
 	pthread_t		thread;
 	// variables that change but belong to one thread at all times
 	unsigned int	times_eaten;
