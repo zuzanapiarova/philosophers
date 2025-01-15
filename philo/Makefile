@@ -4,6 +4,8 @@ RM = rm -rf
 AR = ar rcs
 NAME = philo
 HEADERS := -I ./include
+SAN = 
+#-fsanitize=thread
 
 SRCS := srcs/actions.c \
 		srcs/cleanup.c \
@@ -22,10 +24,10 @@ OBJS := ${SRCS:.c=.o}
 all: $(NAME)
 
 $(NAME): $(OBJS)
-	@$(CC) $(OBJS) $(HEADERS) -o $(NAME)
+	@$(CC) $(OBJS) $(HEADERS) $(SAN) -o $(NAME)
 
 %.o: %.c
-	@$(CC) $(CFLAGS) -o $@ -c $< $(HEADERS)
+	@$(CC) $(CFLAGS) $(SAN) -o $@ -c $< $(HEADERS)
 
 allc: all clean
 	@echo "Making all and cleaning up"

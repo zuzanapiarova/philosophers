@@ -8,14 +8,11 @@ Coffmans algorithm is for prevention of a deadlock.
 Bankers algorithm is for avoidance of a deadlock.
 
 ### important
-// Q&A: Can we count the time in microseconds and print it in miliseconds ? So the calculation is more precise ? 
-// Q&A: What is the starting state for a philosopher?
-// Q&A: Does the philospher stop eating-let forks-start sleeping right after each other?
 // Q&A: How long does each philosopher have to think? Can they stop sleeping, start thinking and then take forks and start eating right away, having thinked for no time ???
 // Q&A: Is the timestamp supposed tobe since start of program or since epoch ?
 - working in microseconds for accuracy and logging in miliseconds
 - including timezone by macro, do it by the function !
-- TODO: they die when sleep is 0 and they have enough time but some take over more resources than others 
+- TODO: they die when sleep is 0 and they have enough time but some take over more resources than others - also change dynamically as in think time 
 - TODO: mutex that protects philo from not eating and dying at the same time 
 - TODO: may add waiting for all threads to startup - start mutex that main thread holds while spawning threads  try to grab it so they have to wait. When the last one is created, main thread releases its the start mutex and set the start time for all of them here 
 - TODO: protect all calls to thread/mutex functions - mortly init.c and cleanup.c files
