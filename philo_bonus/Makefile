@@ -1,23 +1,25 @@
 CC = cc
-CFLAGS = -Wall -Wextra -Werror -g
+CFLAGS = 
+# -Wall -Wextra -Werror -g
 RM = rm -rf
 AR = ar rcs
-NAME = philo
+NAME = philo_bonus
 HEADERS := -I ./include
 SAN = 
 #-fsanitize=thread
 
-SRCS := srcs/philo.c \
-		srcs/init.c \
-		srcs/routines.c \
-		srcs/actions.c \
-		srcs/actions_forks.c \
-		srcs/cleanup.c \
-		srcs/utils/input_val.c \
-		srcs/utils/logging.c \
-		srcs/utils/num_utils.c \
-		srcs/utils/str_utils.c \
-		srcs/utils/utils.c \
+SRCS := srcs/philo_bonus.c \
+		srcs/utils.c \
+		srcs/num_utils.c \
+		srcs/str_utils.c \
+		srcs/input_val.c \
+
+# 		srcs/routines.c \
+# 		srcs/actions.c \
+# 		srcs/cleanup.c \
+# 		srcs/actions_forks.c \
+# 		srcs/init.c \
+# 		srcs/logging.c \
 
 OBJS := ${SRCS:.c=.o}
 

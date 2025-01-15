@@ -26,16 +26,18 @@ Program expects 4 or 5 arguments. Run ./philo(_bonus)/philo(_bonus) [1] [2] [3] 
 - Mandatory part done.
 - bonus :D
 
-# MECHANISMS TO AVOID DEADLOCKS
+## MANDATORY
+
+### MECHANISMS TO AVOID DEADLOCKS
 1. even philos wait for a moment before grabbing forks
 2. odd philos grab first left, then right, odd grab first right, then left forks 
 
-# MECHANISMS TO AVOID DYING
+### MECHANISMS TO AVOID DYING
 1. think time is calculated based on how much time they have left beofre dying, not static 
 3. the odd start eating right away, the even a couple miliseconds later, because thinking or sleeping first would unneccessarily reduce their time_to_die limit
 4. tried to avoid busy-waiting 
 
-# HOW I CHECK FOR END OF SIMULATION (DEATH OR FINISHED EATING)
+### HOW I CHECK FOR END OF SIMULATION (DEATH OR FINISHED EATING)
 - monitoring thread checks every 5-8 ms if the time since last meal did not surpass the time_to_die constant 
 - if it surpassed, it will set the stop_simulation to true and exit the monitoring thread
 - the philos after each action check if the stop_simulation is true with check_stop_sim function 
@@ -44,6 +46,12 @@ Program expects 4 or 5 arguments. Run ./philo(_bonus)/philo(_bonus) [1] [2] [3] 
 - monitoring thread will keep checking only the philosophers that have the finished variable set to false
 - after all threads finished eating, in the join caller we set stop_simulation to true so monitoring can stop and exit too
 - after each action, philosopher threads check if the monitoring thread did not find any death and set stop_simulation to true, if yes exit right away so we do not print any more information to the console
+
+## BONUS
+- processes are properly created and freed and they get the philo data
+- need to transfer actions and logging from mandatory
+- add while loop in the child process function to perform the actions until death occurs 
+- big challenge: implement the monitoring process
 
 ## TEST CASES
 ### --- incorrect input - check parsing ---
@@ -66,7 +74,7 @@ Program expects 4 or 5 arguments. Run ./philo(_bonus)/philo(_bonus) [1] [2] [3] 
 
 
 ### --- check in code ---
-1. ... that each thread does not access other philo data
+1. ... that each thread does not access other philo data - if it gets the data but does not use it, discuss 
 2. ... that last_eaten is updated at start of the meal, not after
 3. ... that death is logged not more than 10ms after it happened
 4. ... that when one thread eats for times_to_eat times, monitoring thread must wait until they all finish, not exit straight away, as some philos may die in the meantime
