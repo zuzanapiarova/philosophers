@@ -4,6 +4,18 @@ The Dining philosophers problem. Introducing threads and sharing resources.
 Mandatory part: philo/ - each philosopher is a thread, forks are placed between philosophers represented by mutexes
 Bonus part: philo_bonus/ - each philosopher is a process, forks are placed in the middle of the table represented by a semaphore
 
+# 1. COMPILATION
+Compiling Mandatory Part: make -C philo/
+Compiling Bonus Part: make -C philo_bonus/
+
+# 2. EXECUTION
+Program expects 4 or 5 arguments. Run ./philo(_bonus)/philo(_bonus) [1] [2] [3] [4] (5): 
+    [1] number_of_philosophers
+    [2] time_to_die (ms)
+    [3] time_to_eat (ms)
+    [4] time_to_sleep (ms)
+    (5) (optional) number_of_times_each_philosopher_must_eat (ms)
+
 ### my approach
 - working in microseconds for accuracy and logging in miliseconds
 - not waiting for all to start at the same time 
