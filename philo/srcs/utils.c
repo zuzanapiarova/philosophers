@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 08:40:37 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/14 19:37:54 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/15 14:56:35 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ bool	check_stop_sim(t_philo *philo)
 	pthread_mutex_lock(&philo->lock);
 	if (stopped || philo->finished)
 	{
-		pthread_mutex_unlock(&philo->lock);		
+		pthread_mutex_unlock(&philo->lock);
 		return (true);
 	}
 	pthread_mutex_unlock(&philo->lock);

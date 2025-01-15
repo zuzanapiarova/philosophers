@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 10:00:49 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/15 14:52:14 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/15 15:07:30 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,6 +63,13 @@ void	*routine(void *arg)
 	return (NULL);
 }
 
+int	unlock_two_mutexes(pthread_mutex_t *one, pthread_mutex_t *two)
+{
+	pthread_mutex_unlock(one);
+	pthread_mutex_unlock(two);
+	return (SUCCESS);
+}
+
 // runs in a separate monitoring thread to check for deaths
 // every 5ms loops through all philos
 // and checks if time since last meal did not surpass time_to_die
@@ -74,7 +81,6 @@ void	*monitoring(void *arg)
 	t_philo	*philos;
 
 	philos = (t_philo *)arg;
-	usleep(5000);
 	while (1)
 	{
 		i = -1;
@@ -89,12 +95,10 @@ void	*monitoring(void *arg)
 			{
 				if (!philos[i].finished)
 					log_msg(&philos[i], DEATH);
-				pthread_mutex_unlock(&philos[i].lock);
-				pthread_mutex_unlock(philos[i].stop_lock);
+				unlock_two_mutexes(&philos[i].lock, philos[i].stop_lock);
 				return (NULL);
 			}
-			pthread_mutex_unlock(&philos[i].lock);
-			pthread_mutex_unlock(philos[i].stop_lock);
+			unlock_two_mutexes(&philos[i].lock, philos[i].stop_lock);
 		}
 		usleep(1000);
 	}

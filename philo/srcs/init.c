@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 11:25:49 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/15 13:48:34 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/15 14:55:50 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,12 +89,10 @@ int	fill_philo_array(t_philo *philos, t_shared *shared, char **argv, int total)
 	{
 		if (init_philo_data(&philos[i], i, argv, shared) != SUCCESS)
 		{
-			i--;
-			while (i > 0)
+			while (--i)
 			{
 				pthread_mutex_destroy(&philos[i].lock);
 				pthread_join(philos[i].thread, NULL);
-				i--;
 			}
 			i = -1;
 			while (++i < total)

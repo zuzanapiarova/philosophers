@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 11:14:19 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/14 17:14:01 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/15 14:56:15 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,8 +27,8 @@ int	cleanup(t_philo *philos, t_shared *shared, pthread_t *monitor, int total)
 	i = -1;
 	while (++i < total)
 	{
-		pthread_mutex_destroy(&philos[i].lock); // possible to destroy locked mutex
-		pthread_mutex_destroy(&shared->forks[i]); // possible to destroy locked mutex
+		pthread_mutex_destroy(&philos[i].lock);
+		pthread_mutex_destroy(&shared->forks[i]);
 	}
 	free(shared->forks);
 	pthread_mutex_destroy(&shared->msg_lock);

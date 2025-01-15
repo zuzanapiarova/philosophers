@@ -4,36 +4,15 @@ The Dining philosophers problem. Introducing threads and sharing resources.
 Mandatory part: philo/ - each philosopher is a thread, forks are placed between philosophers represented by mutexes
 Bonus part: philo_bonus/ - each philosopher is a process, forks are placed in the middle of the table represented by a semaphore
 
-Coffmans algorithm is for prevention of a deadlock. 
-Bankers algorithm is for avoidance of a deadlock.
-
-### important
-// Q&A: How long does each philosopher have to think? Can they stop sleeping, start thinking and then take forks and start eating right away, having thinked for no time ???
-// Q&A: Is the timestamp supposed tobe since start of program or since epoch ?
+### my approach
 - working in microseconds for accuracy and logging in miliseconds
-- including timezone by macro, do it by the function !
-- TODO: they die when sleep is 0 and they have enough time but some take over more resources than others - also change dynamically as in think time 
-- TODO: mutex that protects philo from not eating and dying at the same time 
-- TODO: may add waiting for all threads to startup - start mutex that main thread holds while spawning threads  try to grab it so they have to wait. When the last one is created, main thread releases its the start mutex and set the start time for all of them here 
-- TODO: protect all calls to thread/mutex functions - mortly init.c and cleanup.c files
+- not waiting for all to start at the same time 
+- TODO?: including timezone by macro, do it by the function !
+- TODO?: mutex that protects philo from not eating and dying at the same time 
 
 # working on
-- synchronize all threads to start at the same time ?
-- store shared resources to a struct and pass it to init function from start_simulation
-- norm
+- Mandatory part done.
 - bonus :D
-- test and test with helgrind, vagrind seemed ok, test again
-
-## possible algorithm for scheduling:
-1. implement a priority variable that changes based on time_left, eg with values 1, 2, 3, 3 being most critical
-- at start of every routine / before taking the forks check this priority variable
-- if priority is low, sleep for a while, if more critical, sleep for just a bit, if critical, execute
-priority = philo->die - (get_time_in_ms() - philo->last_eaten);
-if (priority < 0)
-    priority = 0; // Ensure no negative priorities
-if (priority > 100)
-    usleep(priority * 100); // Sleep proportional to priority
-2. another solution would be to change each fork from mutex to struct with variable "available", being changed each time the fork is/isnt available, and based on this, each philo could pick up the forks only if they are both available - check before taking them if available, if not continue to another loop iteration and so on until both of them are available - but has to do this in a mutex because the state of the forks may change
 
 # MECHANISMS TO AVOID DEADLOCKS
 1. even philos wait for a moment before grabbing forks
@@ -41,8 +20,7 @@ if (priority > 100)
 
 # MECHANISMS TO AVOID DYING
 1. think time is calculated based on how much time they have left beofre dying, not static 
-2. after each action check if the monitoring thread did not find any death and set stop_simulation to true, if yes exit right away so we do not print any more information to the console
-3. start eating right away, the even a couple miliseconds later, because thinking or sleeping first would unneccessarily reduce their time_to_die limit
+3. the odd start eating right away, the even a couple miliseconds later, because thinking or sleeping first would unneccessarily reduce their time_to_die limit
 4. tried to avoid busy-waiting 
 
 # HOW I CHECK FOR END OF SIMULATION (DEATH OR FINISHED EATING)
@@ -53,6 +31,7 @@ if (priority > 100)
 - if the philo ate for the last time, he will set the finished variable to true and the routine will exit after he ate for the last time 
 - monitoring thread will keep checking only the philosophers that have the finished variable set to false
 - after all threads finished eating, in the join caller we set stop_simulation to true so monitoring can stop and exit too
+- after each action, philosopher threads check if the monitoring thread did not find any death and set stop_simulation to true, if yes exit right away so we do not print any more information to the console
 
 ## TEST CASES
 ### --- incorrect input - check parsing ---
