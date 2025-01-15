@@ -6,28 +6,45 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/15 16:05:45 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/15 20:06:51 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/15 21:02:13 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/philosophers.h"
 
-// TODO: monitoring provess
+// TODO: monitoring process
+// TODO: do i need any algo to allow fair access to resources like sleepng for a bit in threads?
+// TODO: log messages are sometimes mixed up - possibly implement a binary semaphore for access to stdout ? 
 // TODO: implement the actions 
 int	child_process(t_philo *philo, sem_t *semaphore)
 {
-	// Wait (decrement semaphore)
-	sem_wait(semaphore);
-	printf("%lld Process %d took left fork.\n", get_time_in_micros(), philo->id);
-	sem_wait(semaphore);
-	printf("%lld Process %d took right fork.\n", get_time_in_micros(), philo->id);
-	// Critical section
-	sleep(1); // Simulate some work
-	// Signal (increment semaphore)
-	sem_post(semaphore);
-	printf("%lld Process %d left left fork.\n", get_time_in_micros(), philo->id);
-	sem_post(semaphore);
-	printf("%lld Process %d left right fork.\n", get_time_in_micros(), philo->id);
+	while (1)
+	{
+		// Wait (decrement semaphore)
+		sem_wait(semaphore);
+		log_msg(philo, FORK_L);
+		sem_wait(semaphore);
+		log_msg(philo, FORK_R);
+		// Critical section
+		p_eat(philo);
+		sem_post(semaphore);
+		sem_post(semaphore);
+		if (philo->times_to_eat != -1 && (int)philo->times_eaten >= philo->times_to_eat)
+		{
+			philo->finished = true;
+			log_msg(philo, FINISH);
+			return (ERROR);
+		}
+		p_sleep(philo);
+		p_think(philo);
+		// TODO: change death checking, for now it is after each actions iteration
+		if (get_time_in_micros() - philo->last_eaten > (philo->die * 1000) && !philo->finished)
+		{
+			//*(philos[i].stop_simulation) = true;
+			log_msg(philo, DEATH);
+			return (ERROR);
+		}
+	}
 	printf("Resources destroyed in %d. Program exiting.\n", philo->id);
 	// must clean all resources - mallocs and sems before exiting 
 	return (SUCCESS); // Exit child process
@@ -62,7 +79,7 @@ int	init_philo_data(t_philo *p, int i, char **argv, t_shared *shared)
 		p->times_to_eat = -1;
 	p->times_eaten = 0;
 	p->last_eaten = get_time_in_micros();
-	// ? p->finished = false;
+	p->finished = false;
 	// shared (value, not in memory): 
 	p->start_time = shared->start_time;
 	// ? p->stop_simulation = &shared->stop_simulation;
@@ -88,6 +105,7 @@ int	start_simulation(int argc, char **argv, int total)
 	if (semaphore == SEM_FAILED) 
 	{
 		free(pids);
+		perror("error");
 		return (write(2, "Error creating semaphore.\n", 26), ERROR);
 	}
 	// create philo structures - alloc ---------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -103,14 +121,7 @@ int	start_simulation(int argc, char **argv, int total)
 	init_shared_resources(&shared, total);
 	i = -1;
 	while (++i < total)
-	{
 		init_philo_data(&philos[i], i, argv, &shared);
-	}
-	printf("id 1: %d\n", philos[0].id);
-	printf("id 2: %d\n", philos[1].id);
-	printf("id 3: %d\n", philos[2].id);
-	printf("id 4: %d\n", philos[3].id);
-	printf("id 5: %d\n", philos[4].id);
 	i = -1;
 	// Create child processes ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	while (++i < total)

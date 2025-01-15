@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/13 17:26:55 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/15 19:52:59 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/15 21:00:31 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,8 @@
 # define SUCCESS 0
 # define TIMEZONE_MILI 3600000
 # define TIMEZONE_MICRO 3600000000
-# define SEM "/semaphore"
+# define SEM "/my_sem"
+// used names: sem, semaphore, my_sem
 
 typedef enum e_action
 {
@@ -45,11 +46,8 @@ typedef enum e_action
 
 typedef struct s_shared
 {
-	bool			stop_simulation;
+	// ? bool			stop_simulation;
 	long long		start_time;
-	pthread_mutex_t	*forks;
-	pthread_mutex_t	msg_lock;
-	pthread_mutex_t	stop_lock;
 }				t_shared;
 
 typedef struct s_philo
@@ -64,7 +62,7 @@ typedef struct s_philo
 	// variables that change but belong to one thread at all times
 	unsigned int	times_eaten;
 	long long		last_eaten;
-	// ? bool			finished; //finished eating
+	bool			finished; //finished eating
 	// only shared resources available to all threads for both read/write
 	// ? bool			*stop_simulation;
 	long long		start_time;

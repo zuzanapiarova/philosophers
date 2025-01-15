@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/13 16:51:21 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/15 14:15:16 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/15 20:37:13 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,7 +90,6 @@ int	log_msg(t_philo *philo, t_action action)
 	time = ft_utoa(((get_time_in_micros() - philo->start_time) / 1000));
 	color_time = ft_strjoin(color, time);
 	free(time);
-	pthread_mutex_lock(philo->msg_lock);
 	write(1, color_time, ft_strlen(color_time));
 	write(1, "\t", 1);
 	ft_putnbr(philo->id);
@@ -101,7 +100,6 @@ int	log_msg(t_philo *philo, t_action action)
 		ft_putnbr(philo->times_eaten);
 		write(1, ". time\n", 7);
 	}
-	pthread_mutex_unlock(philo->msg_lock);
 	free(color_time);
 	return (SUCCESS);
 }

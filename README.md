@@ -25,6 +25,7 @@ Program expects 4 or 5 arguments. Run ./philo(_bonus)/philo(_bonus) [1] [2] [3] 
 # working on
 - Mandatory part done.
 - bonus :D
+- sometimes semaphore already exists and it will not create it anew. Find reason and fix 
 
 ## MANDATORY
 

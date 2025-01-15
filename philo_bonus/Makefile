@@ -9,17 +9,17 @@ SAN =
 #-fsanitize=thread
 
 SRCS := srcs/philo_bonus.c \
+		srcs/actions.c \
 		srcs/utils.c \
 		srcs/num_utils.c \
 		srcs/str_utils.c \
 		srcs/input_val.c \
+		srcs/logging.c \
 
 # 		srcs/routines.c \
-# 		srcs/actions.c \
 # 		srcs/cleanup.c \
 # 		srcs/actions_forks.c \
 # 		srcs/init.c \
-# 		srcs/logging.c \
 
 OBJS := ${SRCS:.c=.o}
 
