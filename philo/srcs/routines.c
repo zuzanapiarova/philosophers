@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 10:00:49 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/14 17:05:52 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/15 14:52:14 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,6 +96,6 @@ void	*monitoring(void *arg)
 			pthread_mutex_unlock(&philos[i].lock);
 			pthread_mutex_unlock(philos[i].stop_lock);
 		}
-		usleep(5000);
+		usleep(1000);
 	}
 }

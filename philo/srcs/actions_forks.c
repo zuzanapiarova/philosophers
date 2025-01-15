@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 10:15:48 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/14 10:20:31 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/15 14:39:19 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,7 @@ int	fork_l(t_philo *philo, pthread_mutex_t *left_f, pthread_mutex_t *right_f)
 	if (philo->total == 1)
 	{
 		usleep(philo->die * 1000);
+		pthread_mutex_unlock(left_f);
 		return (ERROR);
 	}
 	pthread_mutex_lock(right_f);
