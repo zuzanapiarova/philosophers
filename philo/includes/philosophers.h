@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 19:00:40 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/16 19:01:20 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/16 19:09:01 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,6 @@ typedef struct s_philo
 	// variables that change but belong to one thread at all times
 	unsigned int	times_eaten;
 	long long		last_eaten;
-	bool			finished; //finished eating
 	pthread_mutex_t	lock;
 	// only shared resources available to all threads for both read/write
 	pthread_mutex_t	*forks;

@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/15 16:05:45 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/16 18:15:50 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/16 19:03:02 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ int	child_process(t_philo *philo)
 {
 	while (1)
 	{
-		if ((philo->times_to_eat == 0))
+		if (philo->times_to_eat == 0)
 		{
 			philo->finished = true;
 			break ;

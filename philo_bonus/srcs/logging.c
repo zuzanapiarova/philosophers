@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/13 16:51:21 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/16 18:19:25 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/16 19:03:55 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,8 @@ char	*get_color(t_action action)
 		color = "\033[31m";
 	else if (action == FINISH)
 		color = "\033[38;5;146m";
+	else if (action == FULL)
+		color = "\033[38;5;214m";
 	else
 		color = "\033[37m";
 	return (color);

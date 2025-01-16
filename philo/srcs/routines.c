@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 10:00:49 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/16 18:57:15 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/16 19:08:55 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,13 +16,11 @@
 // after each action checks if the philo did not die while performing it 
 // if yes, returns error and breaks out of the loop
 // first if() checks if times_to_eat is not 0 
+// returns ERROR if loop should stop, SUCCESS to continue
 int	perform_actions(t_philo *p)
 {
 	if (p->times_to_eat == 0)
-	{
-		p->finished = true;
 		return (ERROR);
-	}
 	if (take_forks(p) == ERROR)
 		return (ERROR);
 	if (p_eat(p) == ERROR)

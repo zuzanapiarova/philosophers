@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 11:25:49 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/16 18:57:06 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/16 19:09:06 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,6 @@ int	init_philo_data(t_philo *p, int i, char **argv, t_shared *shared)
 	p->start_time = shared->start_time;
 	p->forks = shared->forks;
 	p->times_eaten = 0;
-	p->finished = false;
 	if (pthread_mutex_init(&p->lock, NULL) != 0)
 		return (ERROR);
 	p->msg_lock = &shared->msg_lock;
