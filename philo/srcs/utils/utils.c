@@ -6,11 +6,11 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 08:40:37 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/15 14:56:35 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/16 17:33:07 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/philosophers.h"
+#include "../../includes/philosophers.h"
 
 // returns time in miliseconds
 long long	get_time_in_ms(void)
@@ -37,13 +37,13 @@ long long	get_time_in_micros(void)
 // if either is true, returns true and caller will stop the specific thread
 bool	check_stop_sim(t_philo *philo)
 {
-	bool	stopped;
+	int	stopped;
 
 	pthread_mutex_lock(philo->stop_lock);
 	stopped = *(philo->stop_simulation);
 	pthread_mutex_unlock(philo->stop_lock);
 	pthread_mutex_lock(&philo->lock);
-	if (stopped || philo->finished)
+	if (stopped == philo->total)
 	{
 		pthread_mutex_unlock(&philo->lock);
 		return (true);

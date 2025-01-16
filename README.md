@@ -22,10 +22,12 @@ Program expects 4 or 5 arguments. Run ./philo(_bonus)/philo(_bonus) [1] [2] [3] 
 - TODO?: including timezone by macro, do it by the function !
 - TODO?: mutex that protects philo from not eating and dying at the same time 
 
-# working on
-- Mandatory part done.
-- bonus :D
-- sometimes semaphore already exists and it will not create it anew. Find reason and fix 
+# TODO - working on
+- Mandatory: (almost) done
+- TODO: they die eventually when sleep is 0 - probably steal resources as they sleep 0
+- Bonus: only needs monitoring
+- bonus - big challenge: implement the monitoring process
+- sometimes semaphore already exists and it will not create it anew - because program terminated abnormaly and did ot close and unlink the semaphore form memory, thus we cannot open it again. Create one with new name 
 
 ## MANDATORY
 
@@ -50,9 +52,6 @@ Program expects 4 or 5 arguments. Run ./philo(_bonus)/philo(_bonus) [1] [2] [3] 
 
 ## BONUS
 - processes are properly created and freed and they get the philo data
-- need to transfer actions and logging from mandatory
-- add while loop in the child process function to perform the actions until death occurs 
-- big challenge: implement the monitoring process
 
 ## TEST CASES
 ### --- incorrect input - check parsing ---
@@ -62,17 +61,25 @@ Program expects 4 or 5 arguments. Run ./philo(_bonus)/philo(_bonus) [1] [2] [3] 
 
 ### --- correct input - check functionality ---
 1. ./philo 4 500 200 100 - best case scenario with even number - should run infinitely
-2. ./philo 5 800 200 100 - second best case scenario with odd number - should run infinitely
-3. ./philo 5 800 200 100 10 - all should eat 10 times and then quit nicely
-4. ./philo 1000 500 100 100 - check with huge number of philosophers
-5. ./philo 4 410 200 200 - its close but all should run infinitely
+2. ./philo 4 410 200 200 - its close but all should run infinitely
+3. ./philo 5 800 200 100 - second best case scenario with odd number - should run infinitely
+4. ./philo 5 800 200 100 10 - all should eat 10 times and then quit nicely
+5. ./philo 1000 500 100 100 - check with huge number of philosophers
 6. ./philo 5 400 300 200 - should end before first thread finishes sleeping
 7. ./philo 0 500 100 200 - logical error - zero philosophers
-8. ./philo 5 800 200 200 0 - they do not eat
+8. ./philo 5 800 200 200 0 - logical error - they do not eat
 9. ./philo 5 0 200 100 - must die instantly or not start at all
 10. ./philo 1 800 200 100 - only one philo - should die instantly/after time_to_die because does not have enough forks 
 11. ./philo 5 800 200 0 - 0 time to sleep - cannot die, as they take resources right away
 
+### --- memory ---
+1. valgrind --tool=helgrind ./philo 5 800 200 200 5 - no races when simulation stops when all are full
+2. valgrind --tool=helgrind ./philo 5 400 200 200 5 - no races when simulation stops by one of them dying
+3. valgrind --tool=helgrind ./philo 5 800 200 200 0 - no races when they are full from beginning
+4. valgrind ./philo 5 800 200 200 5 - no leaks when simulation stops when all are full
+5. valgrind ./philo 5 400 200 200 5 - no leaks when simulation stops by one of them dying
+6. valgrind --tool=helgrind ./philo 1 800 200 100  - no races when only 1 philo
+7. valgrind ./philo 1 800 200 100 - no leaks when only 1 philo
 
 ### --- check in code ---
 1. ... that each thread does not access other philo data - if it gets the data but does not use it, discuss 

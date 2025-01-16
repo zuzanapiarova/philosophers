@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/15 16:05:45 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/16 12:27:47 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/16 14:20:11 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 // TODO: log messages are sometimes mixed up - possibly implement a binary semaphore for access to stdout ? 
 // TODO: --> msg semaphore - binary
 // TODO: change check_im_status function to accept a semaphore 
+// TODO: move start time to later in code as now it is too soon
 int	child_process(t_philo *philo)
 {
 	while (1)
@@ -92,7 +93,7 @@ int	init_shared_resources(t_shared *shared, int total)
 		sem_unlink(MSG_SEM);
 		return (write(2, "Error creating monitoring semaphore.\n", 37), ERROR);
 	}
-	shared->start_time = get_time_in_micros(); // or here set to 0 and in code move further 
+	shared->start_time = 0;
 	// ? shared->stop_simulation = false;
 	return (SUCCESS);
 }
@@ -140,7 +141,6 @@ int	init_resources(t_philo **philos, pid_t **pids, t_shared *shared, char **argv
 	*pids = (pid_t *)malloc(sizeof(pid_t) * total);
 	if (!(*pids))
 		return (write(2, "Memory allocation problem. Exiting.\n", 36), ERROR);
-	pids[total] = NULL;
 	// create philo structures - alloc ---------------------------------------------------------------------------------------------------------------------------------------------------------
 	*philos = (t_philo *)malloc(sizeof(t_philo) * total);
 	if (!(*philos))
@@ -148,7 +148,6 @@ int	init_resources(t_philo **philos, pid_t **pids, t_shared *shared, char **argv
 		free(*pids);
 		return (write(2, "Memory allocation problem. Exiting.\n", 36), ERROR);
 	}
-	philos[total] = NULL;
 	// init shared struct, init philos structures, and pass them the shared struct -------------------------------------------------------------------------------------------------------------
 	if (init_shared_resources(shared, total) == ERROR)
 	{
@@ -174,6 +173,7 @@ int	start_simulation(int argc, char **argv, int total)
 	philos = NULL;
 	if (init_resources(&philos, &pids, &shared, argv) == ERROR)
 		return (ERROR);
+	shared.start_time = get_time_in_micros(); // or here set to 0 and in code move further 
 	// Create child processes ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	printf("forking processes\n");
 	i = -1;
@@ -190,7 +190,6 @@ int	start_simulation(int argc, char **argv, int total)
 		// Child process functionality ---------------------------------------------------------------------------------------------------------------------------------------------------------
 		if (pids[i] == 0)
 		{
-			printf("in child process %d\n", i);
 			int	exit_status = child_process(&philos[i]);
 			// cleanup child process here because it does not have access ot entire philo array nor entire pids array - because philos should not know the state of other philos in my opinion 
 			free(pids);
@@ -225,10 +224,6 @@ int	main(int argc, char **argv)
 	if (handle_error_input(argc, argv) == ERROR)
 		return (ERROR);
 	if (start_simulation(argc, argv, ft_atou(argv[1])) == ERROR)
-	{
-		printf("c\n");
 		return (ERROR);
-	}
-	printf("b\n");
 	return (SUCCESS);
 }

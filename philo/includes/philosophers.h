@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/13 17:26:55 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/15 13:39:20 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/16 16:55:27 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ typedef enum e_action
 
 typedef struct s_shared
 {
-	bool			stop_simulation;
+	int				stop_simulation;
 	long long		start_time;
 	pthread_mutex_t	*forks;
 	pthread_mutex_t	msg_lock;
@@ -67,7 +67,7 @@ typedef struct s_philo
 	pthread_mutex_t	*forks;
 	pthread_mutex_t	*msg_lock;
 	pthread_mutex_t	*stop_lock;
-	bool			*stop_simulation;
+	int				*stop_simulation;
 }					t_philo;
 
 /* actions.c + actions_forks.c */

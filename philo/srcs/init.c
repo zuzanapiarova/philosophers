@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 11:25:49 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/15 14:55:50 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/16 17:27:47 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ int	init_shared_resources(t_shared *shared, int total)
 
 	i = -1;
 	shared->start_time = 0;
-	shared->stop_simulation = false;
+	shared->stop_simulation = 0; //  & -----------------------------------
 	pthread_mutex_init(&shared->msg_lock, NULL);
 	pthread_mutex_init(&shared->stop_lock, NULL);
 	shared->forks = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t) * total);
@@ -85,6 +85,7 @@ int	fill_philo_array(t_philo *philos, t_shared *shared, char **argv, int total)
 
 	i = -1;
 	shared->start_time = get_time_in_micros();
+	//printf("stop sim: %d\n", *(philos[0].stop_simulation));
 	while (++i < total)
 	{
 		if (init_philo_data(&philos[i], i, argv, shared) != SUCCESS)

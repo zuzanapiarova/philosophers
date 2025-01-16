@@ -6,11 +6,11 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/13 16:51:21 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/15 14:15:16 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/16 17:02:59 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/philosophers.h"
+#include "../../includes/philosophers.h"
 
 // "\033[31m" red
 // "\033[33m" yellow
@@ -67,7 +67,7 @@ char	*get_msg(t_action action)
 	else if (action == DEATH)
 		msg = "died\033[37m\n";
 	else if (action == FINISH)
-		msg = "finished last meal\033[37m\n";
+		msg = "simulation finished\033[37m\n";
 	else
 		msg = "";
 	return (msg);
@@ -93,7 +93,10 @@ int	log_msg(t_philo *philo, t_action action)
 	pthread_mutex_lock(philo->msg_lock);
 	write(1, color_time, ft_strlen(color_time));
 	write(1, "\t", 1);
-	ft_putnbr(philo->id);
+	if (action != FINISH)
+		ft_putnbr(philo->id);
+	else 
+		write(1, "X", 1);
 	write(1, " ", 1);
 	write(1, msg, ft_strlen(msg));
 	if (action == EATS)

@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 11:14:19 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/15 14:56:15 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/16 16:40:50 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ int	cleanup(t_philo *philos, t_shared *shared, pthread_t *monitor, int total)
 	while (++i < total)
 		pthread_join(philos[i].thread, NULL);
 	pthread_mutex_lock(philos[0].stop_lock);
-	shared->stop_simulation = true;
+	shared->stop_simulation = philos[0].total;
 	pthread_mutex_unlock(philos[0].stop_lock);
 	pthread_join(*monitor, NULL);
 	i = -1;

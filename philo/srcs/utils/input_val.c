@@ -6,11 +6,11 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 08:42:15 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/14 11:20:56 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/16 16:53:56 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/philosophers.h"
+#include "../../includes/philosophers.h"
 
 // validates number of arguments
 int	validate_num_of_arguments(int argc)

@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 10:00:49 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/16 10:32:24 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/16 17:31:01 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,10 +15,10 @@
 // performs actions in order - take forks - eat - sleep - think - repeat
 // after each action checks if the philo did not die while performing it 
 // if yes, returns error and breaks out of the loop
-// first if() checks if times_to_eat is not 0 or smaller than times_eaten
+// first if() checks if times_to_eat is not 0 
 int	perform_actions(t_philo *p)
 {
-	if (((int)p->times_eaten >= p->times_to_eat && p->times_to_eat != -1))
+	if (p->times_to_eat == 0) //(((int)p->times_eaten >= p->times_to_eat && p->times_to_eat != -1))
 	{
 		p->finished = true;
 		return (ERROR);
@@ -32,12 +32,13 @@ int	perform_actions(t_philo *p)
 	}
 	if (leave_forks(p) == ERROR)
 		return (ERROR);
-	if (p->times_to_eat != -1 && (int)p->times_eaten >= p->times_to_eat)
-	{
-		p->finished = true;
-		log_msg(p, FINISH);
-		return (ERROR); // & ??? this is success logically but for loop to exit this must be error 
-	}
+	if ((int)p->times_eaten == p->times_to_eat)
+		*(p->stop_simulation) += 1;
+	// {
+		//p->finished = true;
+	// 	log_msg(p, FINISH);
+	// 	return (ERROR); // & ??? this is success logically but for loop to exit this must be error 
+	// }
 	if (p_sleep(p) == ERROR)
 		return (ERROR);
 	if (p_think(p) == ERROR)
@@ -79,7 +80,9 @@ void	*monitoring(void *arg)
 {
 	int		i;
 	t_philo	*philos;
+	int		stop_sim;
 
+	stop_sim = 0;
 	philos = (t_philo *)arg;
 	while (1)
 	{
@@ -88,13 +91,20 @@ void	*monitoring(void *arg)
 		{
 			pthread_mutex_lock(philos[i].stop_lock);
 			pthread_mutex_lock(&philos[i].lock);
-			if (get_time_in_micros() - philos[i].last_eaten
-				> (philos[i].die * 1000) && !philos->finished)
-				*(philos[i].stop_simulation) = true;
-			if (*(philos[i].stop_simulation) == true)
+			// if (philos[i].finished == true)
+			// {
+			// 	philos[i].finished == false;
+			// 	/*(philos[i].stop_simulation)++;
+			// }
+			if (get_time_in_micros() - philos[i].last_eaten > (philos[i].die * 1000)/*  && !philos->finished */)
 			{
-				if (!philos[i].finished)
-					log_msg(&philos[i], DEATH);
+				*(philos[i].stop_simulation) = philos[i].total;
+				log_msg(&philos[i], DEATH);
+			}
+			// printf("stop sim status: %d\n", *(philos[i].stop_simulation));
+			if (*(philos[i].stop_simulation) >= philos[i].total)
+			{
+				log_msg(&philos[i], FINISH);
 				unlock_two_mutexes(&philos[i].lock, philos[i].stop_lock);
 				return (NULL);
 			}
