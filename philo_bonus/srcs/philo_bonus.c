@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/15 16:05:45 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/16 14:20:11 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/16 18:15:50 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ int	child_process(t_philo *philo)
 {
 	while (1)
 	{
-		if (((int)philo->times_eaten >= philo->times_to_eat && philo->times_to_eat != -1))
+		if ((philo->times_to_eat == 0))
 		{
 			philo->finished = true;
 			break ;
@@ -43,10 +43,10 @@ int	child_process(t_philo *philo)
 		sem_post(philo->shared->fork_sem);
 		sem_post(philo->shared->fork_sem);
 		// check if times_eaten is not equal to times_to_reach thus philo is full(finished)
-		if (philo->times_to_eat != -1 && (int)philo->times_eaten >= philo->times_to_eat)
+		if ((int)philo->times_eaten == philo->times_to_eat)
 		{
 			philo->finished = true;
-			log_msg(philo, FINISH);
+			log_msg(philo, FULL);
 			break ;
 		}
 		if (p_sleep(philo) == ERROR)

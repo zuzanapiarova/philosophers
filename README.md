@@ -4,11 +4,11 @@ The Dining philosophers problem. Introducing threads and sharing resources.
 Mandatory part: philo/ - each philosopher is a thread, forks are placed between philosophers represented by mutexes
 Bonus part: philo_bonus/ - each philosopher is a process, forks are placed in the middle of the table represented by a semaphore
 
-# 1. COMPILATION
+## 1. COMPILATION
 Compiling Mandatory Part: make -C philo/
 Compiling Bonus Part: make -C philo_bonus/
 
-# 2. EXECUTION
+## 2. EXECUTION
 Program expects 4 or 5 arguments. Run ./philo(_bonus)/philo(_bonus) [1] [2] [3] [4] (5): 
     [1] number_of_philosophers
     [2] time_to_die (ms)
@@ -21,8 +21,11 @@ Program expects 4 or 5 arguments. Run ./philo(_bonus)/philo(_bonus) [1] [2] [3] 
 - not waiting for all to start at the same time 
 - TODO?: including timezone by macro, do it by the function !
 - TODO?: mutex that protects philo from not eating and dying at the same time 
+- stopping the simulation: stop simulation int pointer shared among all:
+a. if philo is full, he increments it and when it reaches number of philosophers, monitor stops the simulation
+b. if philo dies, it sets it to number of philosophers straight away, so monitor stops the simulation right away
 
-# TODO - working on
+## TODO - working on
 - Mandatory: (almost) done
 - TODO: they die eventually when sleep is 0 - probably steal resources as they sleep 0
 - Bonus: only needs monitoring

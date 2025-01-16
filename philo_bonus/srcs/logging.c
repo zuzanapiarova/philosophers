@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/13 16:51:21 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/16 14:28:25 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/16 18:19:25 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,6 +68,8 @@ char	*get_msg(t_action action)
 		msg = "died\033[37m\n";
 	else if (action == FINISH)
 		msg = "finished last meal\033[37m\n";
+	else if (action == FULL)
+		msg = "is full\033[37m\n";
 	else
 		msg = "";
 	return (msg);

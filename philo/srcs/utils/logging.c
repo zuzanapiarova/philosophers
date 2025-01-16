@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/13 16:51:21 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/16 17:02:59 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/16 19:01:39 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
 // "\033[36m" cyan
 // "\033[37m" white
 // "\033[38;2;255;255;179m" - Pastel Yellow
-// "\033[38;5;208m" - Pastel Orange
+// "\033[38;5;214m" - Pastel Orange
 // "\033[38;2;255;182;193m" - Pastel Pink
 // "\033[38;2;144;238;144m" - Pastel Green
 // "\033[38;5;146m" - Pastel Purple
@@ -44,6 +44,8 @@ char	*get_color(t_action action)
 		color = "\033[31m";
 	else if (action == FINISH)
 		color = "\033[38;5;146m";
+	else if (action == FULL)
+		color = "\033[38;5;214m";
 	else
 		color = "\033[37m";
 	return (color);
@@ -68,6 +70,8 @@ char	*get_msg(t_action action)
 		msg = "died\033[37m\n";
 	else if (action == FINISH)
 		msg = "simulation finished\033[37m\n";
+	else if (action == FULL)
+		msg = "is full\033[37m\n";
 	else
 		msg = "";
 	return (msg);
@@ -83,19 +87,17 @@ int	log_msg(t_philo *philo, t_action action)
 	char	*msg;
 	char	*time;
 	char	*color_time;
-	char	*color;
 
 	msg = get_msg(action);
-	color = get_color(action);
 	time = ft_utoa(((get_time_in_micros() - philo->start_time) / 1000));
-	color_time = ft_strjoin(color, time);
+	color_time = ft_strjoin(get_color(action), time);
 	free(time);
 	pthread_mutex_lock(philo->msg_lock);
 	write(1, color_time, ft_strlen(color_time));
 	write(1, "\t", 1);
 	if (action != FINISH)
 		ft_putnbr(philo->id);
-	else 
+	else
 		write(1, "X", 1);
 	write(1, " ", 1);
 	write(1, msg, ft_strlen(msg));

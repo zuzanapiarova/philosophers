@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/01/13 17:26:55 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/16 16:55:27 by zpiarova         ###   ########.fr       */
+/*   Created: 2025/01/16 19:00:40 by zpiarova          #+#    #+#             */
+/*   Updated: 2025/01/16 19:01:20 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,8 +35,9 @@ typedef enum e_action
 	SLEEPS, // STARTED SLEEPING
 	THINKS, // STARTED THINKING
 	DEATH, // DIED
-	FINISH
-}				t_action;
+	FINISH, // FINISHED SIMULATION
+	FULL // PHILO ATE FOR THE LAST TIME
+}			t_action;
 
 typedef struct s_shared
 {
