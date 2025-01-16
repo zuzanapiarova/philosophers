@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 10:00:49 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/15 15:07:30 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/16 10:32:24 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 // performs actions in order - take forks - eat - sleep - think - repeat
 // after each action checks if the philo did not die while performing it 
 // if yes, returns error and breaks out of the loop
-// at beginning checks if the times_to_eat is not 0 or smaller than times_eaten
+// first if() checks if times_to_eat is not 0 or smaller than times_eaten
 int	perform_actions(t_philo *p)
 {
 	if (((int)p->times_eaten >= p->times_to_eat && p->times_to_eat != -1))
@@ -36,7 +36,7 @@ int	perform_actions(t_philo *p)
 	{
 		p->finished = true;
 		log_msg(p, FINISH);
-		return (ERROR);
+		return (ERROR); // & ??? this is success logically but for loop to exit this must be error 
 	}
 	if (p_sleep(p) == ERROR)
 		return (ERROR);

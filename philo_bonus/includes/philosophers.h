@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/13 17:26:55 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/15 21:00:31 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/16 10:57:39 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,8 +30,10 @@
 # define SUCCESS 0
 # define TIMEZONE_MILI 3600000
 # define TIMEZONE_MICRO 3600000000
-# define SEM "/my_sem"
-// used names: sem, semaphore, my_sem
+# define FORK_SEM "/fork_sem3"
+# define MSG_SEM "/msg_sem3"
+# define MONITORING_SEM "/monitoring_sem3"
+// used names: sem, semaphore, my_sem, fork_sem, msg_sem, monitoring_sem
 
 typedef enum e_action
 {
@@ -48,6 +50,9 @@ typedef struct s_shared
 {
 	// ? bool			stop_simulation;
 	long long		start_time;
+	sem_t			*fork_sem;
+	sem_t			*msg_sem;
+	sem_t			*monitoring_sem;
 }				t_shared;
 
 typedef struct s_philo
@@ -65,7 +70,8 @@ typedef struct s_philo
 	bool			finished; //finished eating
 	// only shared resources available to all threads for both read/write
 	// ? bool			*stop_simulation;
-	long long		start_time;
+	//long long		start_time;
+	t_shared		*shared;
 }					t_philo;
 
 /* actions.c + actions_forks.c */

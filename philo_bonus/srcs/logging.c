@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/13 16:51:21 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/15 20:37:13 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/16 10:54:52 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,7 +87,7 @@ int	log_msg(t_philo *philo, t_action action)
 
 	msg = get_msg(action);
 	color = get_color(action);
-	time = ft_utoa(((get_time_in_micros() - philo->start_time) / 1000));
+	time = ft_utoa(((get_time_in_micros() - philo->shared->start_time) / 1000));
 	color_time = ft_strjoin(color, time);
 	free(time);
 	write(1, color_time, ft_strlen(color_time));
