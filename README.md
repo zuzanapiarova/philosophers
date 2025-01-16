@@ -4,6 +4,20 @@ The Dining philosophers problem. Introducing threads and sharing resources.
 Mandatory part: philo/ - each philosopher is a thread, forks are placed between philosophers represented by mutexes
 Bonus part: philo_bonus/ - each philosopher is a process, forks are placed in the middle of the table represented by a semaphore
 
+## PROBLEM DESCRIPTION
+- One or more philosophers sit at a round table. There is a large bowl of spaghetti in the middle of the table.
+- The philosophers alternatively eat, think, or sleep. While they are eating, they are not thinking nor sleeping; while thinking, they are not eating nor sleeping; and, of course, while sleeping, they are not eating nor thinking.
+- There are also forks on the table. There are as many forks as philosophers.
+- Because serving and eating spaghetti with only one fork is very inconvenient, a
+philosopher takes their right and their left forks to eat, one in each hand.
+- When a philosopher has finished eating, they put their forks back on the table and start sleeping. Once awake, they start thinking again. The simulation stops when a philosopher dies of starvation.
+- Every philosopher needs to eat and should never starve.
+- Philosophers don’t speak with each other.
+- Philosophers don’t know if another philosopher is about to die.
+- No need to say that philosophers should avoid dying
+
+We have to come up with an algorithm that keeps them  when the time received as arguments allows it, preventing deadlocks and data races. 
+
 ## 1. COMPILATION
 Compiling Mandatory Part: make -C philo/
 Compiling Bonus Part: make -C philo_bonus/
@@ -31,6 +45,14 @@ b. if philo dies, it sets it to number of philosophers straight away, so monitor
 - Bonus: only needs monitoring
 - bonus - big challenge: implement the monitoring process
 - sometimes semaphore already exists and it will not create it anew - because program terminated abnormaly and did ot close and unlink the semaphore form memory, thus we cannot open it again. Create one with new name 
+- https://github.com/mcombeau/philosophers/blob/main/philo_bonus/sources/ipc.c - philo bonus implementation
+- how to exit all processes when they are full:
+- semaphore is initialized with 0
+- each process when full will post there
+- monitoring process will wait for n - 1 (or n?? in slack people had n) times
+- after the last wait, it will kill all processes and exit, doesnt need to post to it to get it to start state
+- and death will post n times so it can be full and monitoring will catch the exit 
+- LEFT ON: DID WHAT IS ABOVE, WAITING FOR SEMAPHORE IN MAIN, POSTING TO SEMAPHORE ONCE WHEN PHILO IS FUL OR NUMBER_OF_PHILOS TIMES WHEN ONE DIES SO WE CAN KILL ALL PROCESSES
 
 ## MANDATORY
 

@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/15 16:05:45 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/16 19:03:02 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/16 20:09:11 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,10 +23,7 @@ int	child_process(t_philo *philo)
 	while (1)
 	{
 		if (philo->times_to_eat == 0)
-		{
-			philo->finished = true;
 			break ;
-		}
 		// take forks - wait(decrement) semaphore
 		sem_wait(philo->shared->fork_sem);
 		log_msg(philo, FORK_L);
@@ -43,20 +40,23 @@ int	child_process(t_philo *philo)
 		sem_post(philo->shared->fork_sem);
 		sem_post(philo->shared->fork_sem);
 		// check if times_eaten is not equal to times_to_reach thus philo is full(finished)
-		if ((int)philo->times_eaten == philo->times_to_eat)
+		if ((int)philo->times_eaten == philo->times_to_eat) // full --> post to semaphore 
 		{
-			philo->finished = true;
+			sem_post(philo->shared->monitoring_sem);
 			log_msg(philo, FULL);
-			break ;
 		}
 		if (p_sleep(philo) == ERROR)
 			break ;
 		if (p_think(philo) == ERROR)
 			break ;
 		// TODO: change death checking, for now it is after each actions iteration
-		if (get_time_in_micros() - philo->last_eaten > (philo->die * 1000) && !philo->finished)
+		if (get_time_in_micros() - philo->last_eaten > (philo->die * 1000)) // died - post n times to sem so it can exit - later do it in separate moniroting thread every xy ms 
 		{
-			// ? *(philos[i].stop_simulation) = true;
+			int i = -1;
+			while (++i)
+			{
+				sem_post(philo->shared->monitoring_sem);
+			}
 			log_msg(philo, DEATH);
 			break ;
 		}
@@ -75,7 +75,7 @@ int	init_shared_resources(t_shared *shared, int total)
 	shared->fork_sem = sem_open(FORK_SEM, O_CREAT | O_EXCL, 0644, total); // need to check the permissions later 
 	if (shared->fork_sem == SEM_FAILED) 
 		return (write(2, "Error creating forks semaphore.\n", 32), ERROR);
-	shared->msg_sem = sem_open(MSG_SEM, O_CREAT | O_EXCL, 0644, 1); // need to check the permissions later 
+	shared->msg_sem = sem_open(MSG_SEM, O_CREAT | O_EXCL, 0644, 0); // need to check the permissions later 
 	//  create semaphore for locking msg output ----------------------------------------------------------------------------------------------------------------------------------------------------
 	if (shared->msg_sem == SEM_FAILED)  
 	{
@@ -83,7 +83,7 @@ int	init_shared_resources(t_shared *shared, int total)
 		sem_unlink(FORK_SEM);
 		return (write(2, "Error creating message semaphore.\n", 34), ERROR);
 	}
-	shared->monitoring_sem = sem_open(MONITORING_SEM, O_CREAT | O_EXCL, 0644, 1); // need to check the permissions later 
+	shared->monitoring_sem = sem_open(MONITORING_SEM, O_CREAT | O_EXCL, 0644, 0); // need to check the permissions later 
 	// create semaphore for stop_simulation ---------------------------------------------------------------------------------------------------------------------------------------------------------
 	if (shared->monitoring_sem == SEM_FAILED) 
 	{
@@ -200,7 +200,20 @@ int	start_simulation(int argc, char **argv, int total)
 		}
 	}
 	// monitoring process ??? ------------------------------------------------------------------------------------------------------------------------------------------------------------------
-	monitor(philos);
+	//monitor(philos);
+	printf("got out\n");
+	i = -1;
+	while (++i < philos[0].total)
+	{
+		sem_wait(philos[0].shared->monitoring_sem);
+	}
+	// kill the processes after it can post to the monitoring sem
+    for (int i = 0; i < total; ++i)
+	{
+        if (kill(pids[i], SIGKILL) == -1) {
+            perror("Error killing process");
+        }
+    }
 	// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	// Cleanup
 	i = -1;
