@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/13 17:26:55 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/17 10:39:54 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/17 15:49:32 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,9 +32,10 @@
 # define SUCCESS 0
 # define TIMEZONE_MILI 3600000
 # define TIMEZONE_MICRO 3600000000
-# define FORK_SEM "/fork_sem20"
-# define MSG_SEM "/msg_sem20"
-# define MONITORING_SEM "/monitoring_sem20"
+# define FORK_SEM "/fork_sem41"
+# define MSG_SEM "/msg_sem41"
+# define STOP_SEM "/stop_sem41"
+# define MONITORING_SEM "/monitoring_sem41"
 // used names: sem, semaphore, my_sem, fork_sem, msg_sem, monitoring_sem
 
 typedef enum e_action
@@ -51,12 +52,13 @@ typedef enum e_action
 
 typedef struct s_shared
 {
-	// ? bool			stop_simulation;
 	long long		start_time;
 	sem_t			*fork_sem;
 	sem_t			*msg_sem;
 	sem_t			*monitoring_sem;
-}				t_shared;
+	sem_t			*stop_sem;
+	bool			*stop_simulation;
+}					t_shared;
 
 typedef struct s_philo
 {
@@ -70,10 +72,10 @@ typedef struct s_philo
 	// variables that change but belong to one thread at all times
 	unsigned int	times_eaten;
 	long long		last_eaten;
-	bool			finished; //finished eating
+	pthread_t		death_checker; // &
+	pthread_t		stop_sim_checker; // &
+	pthread_mutex_t	lock; // &
 	// only shared resources available to all threads for both read/write
-	// ? bool			*stop_simulation;
-	//long long		start_time;
 	t_shared		*shared;
 }					t_philo;
 

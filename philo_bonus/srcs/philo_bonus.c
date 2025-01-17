@@ -6,11 +6,60 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/15 16:05:45 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/17 11:24:59 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/17 15:50:13 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/philosophers.h"
+
+// this thread can communicate with the others 
+// only waits to receive a "signal" from the semaphore signalling that the simulation is over
+// then it sets stop_simulation to true in THIS process
+// further functions and threads will work with this variable
+void	*stop_routine(void	*arg)
+{
+	t_philo	*philo;
+
+	philo = (t_philo *)arg;
+	printf("started stop_checker thread\n");
+	sem_wait(philo->shared->stop_sem);
+	sem_post(philo->shared->stop_sem);
+	pthread_mutex_lock(&philo->lock);
+	*(philo->shared->stop_simulation) = true;
+	pthread_mutex_unlock(&philo->lock);
+	printf("stop_simulation in %d after receiving death signal: %d\n", philo->id, *(philo->shared->stop_simulation));
+	return (NULL);
+}
+
+// runs constantly until philo dies
+// if he dies, prints DEATH msg and exits 
+// if stop_simulation is true, exits
+void	*death_routine(void *arg)
+{
+	t_philo	*philo;
+
+	philo = (t_philo *)arg;
+	printf("started death_checker thread\n");
+	while (1)
+	{
+		pthread_mutex_lock(&philo->lock);
+		if (get_time_in_micros() - philo->last_eaten > (philo->die * 1000) || *(philo->shared->stop_simulation))
+		{
+			if (*(philo->shared->stop_simulation) != true)
+				log_msg(philo, DEATH);
+			pthread_mutex_unlock(&philo->lock);
+			int i = 0;
+			while (i < philo->total)
+			{
+				sem_post(philo->shared->monitoring_sem);
+				i++;
+			}
+			return (NULL);
+		}
+		pthread_mutex_unlock(&philo->lock);
+		usleep(1000);
+	}
+}
 
 // TODO: monitoring process - monitoring semaphore
 // TODO: do i need any algo to allow fair access to resources like sleepng for a bit in threads?
@@ -20,18 +69,9 @@
 // TODO: move start time to later in code as now it is too soon
 int	child_process(t_philo *philo)
 {
-	printf("a%d\n", philo->id);
-	// re-open the semaphore for each process
-	philo->shared->fork_sem = sem_open(FORK_SEM, O_CREAT, 0644, philo->total); // need to check the permissions later 
-	if (philo->shared->fork_sem == SEM_FAILED) 
-		return (write(2, "Error creating forks semaphore.\n", 32), ERROR);
-	philo->shared->msg_sem = sem_open(MSG_SEM, O_CREAT, 0644, 0); // need to check the permissions later 
-	if (philo->shared->msg_sem == SEM_FAILED)  
-		return (write(2, "Error creating message semaphore.\n", 34), ERROR);
-	philo->shared->monitoring_sem = sem_open(MONITORING_SEM, O_CREAT, 0644, 0); // need to check the permissions later 
-	if (philo->shared->monitoring_sem == SEM_FAILED) 
-		return (write(2, "Error creating monitoring semaphore.\n", 37), ERROR);
-	printf("c%d\n", philo->id);
+	pthread_mutex_init(&philo->lock, NULL);
+	pthread_create(&philo->stop_sim_checker, NULL, &stop_routine, philo); // & create stop_sim_checker = waiter for stop signal thread
+	pthread_create(&philo->death_checker, NULL, &death_routine, philo); // & create death_checker thread = constantly checks if a philo died
 	while (1)
 	{
 		if (philo->times_to_eat == 0)
@@ -41,7 +81,8 @@ int	child_process(t_philo *philo)
 		log_msg(philo, FORK_L);
 		sem_wait(philo->shared->fork_sem);
 		log_msg(philo, FORK_R);
-		printf("d%d\n", philo->id);
+		if (check_stop_sim(philo))
+			break ;
 		// Eat
 		if (p_eat(philo) == ERROR)
 		{
@@ -52,29 +93,21 @@ int	child_process(t_philo *philo)
 		// leave forks - signal(return to) semaphore
 		sem_post(philo->shared->fork_sem);
 		sem_post(philo->shared->fork_sem);
-		// check finished eating - if times_eaten is equal to times_to_reach thus philo is full(finished)
-		if ((int)philo->times_eaten == philo->times_to_eat) // full --> post to semaphore 
+		// check if times_eaten is not equal to times_to_reach thus philo is full(finished)
+		if ((int)philo->times_eaten == philo->times_to_eat) // & ------- full --> post 1x to monitor ---------------------------------
 		{
-			sem_post(philo->shared->monitoring_sem); // & --------------------------------------------------------------------------------------------------- full --> post 1x -----------------------------------------------
+			sem_post(philo->shared->monitoring_sem);
 			log_msg(philo, FULL);
+			//break ;
 		}
 		if (p_sleep(philo) == ERROR)
 			break ;
 		if (p_think(philo) == ERROR)
 			break ;
-		// TODO: change death checking, for now it is after each actions iteration
-		if (get_time_in_micros() - philo->last_eaten > (philo->die * 1000)) // died - post n times to sem so it can exit - later do it in separate moniroting thread every xy ms 
-		{
-			int i = -1;
-			while (++i  < philo->total)  // & ---------------------------------------------------------------------------------------------------------------- dead --> post n times ------------------------------------------
-			{
-				sem_post(philo->shared->monitoring_sem); 
-			}
-			log_msg(philo, DEATH);
-			break ;
-		}
 	}
-	printf("finishing child %d\n", philo->id);
+	pthread_join(philo->stop_sim_checker, NULL);
+	pthread_join(philo->death_checker, NULL);
+	pthread_mutex_destroy(&philo->lock);
 	return (SUCCESS);
 }
 
@@ -89,22 +122,34 @@ int	init_shared_resources(t_shared *shared, int total)
 	shared->fork_sem = sem_open(FORK_SEM, O_CREAT, 0644, total); // need to check the permissions later 
 	if (shared->fork_sem == SEM_FAILED) 
 		return (write(2, "Error creating forks semaphore.\n", 32), ERROR);
-	shared->msg_sem = sem_open(MSG_SEM, O_CREAT, 0644, 0); // need to check the permissions later 
 	//  create semaphore for locking msg output ----------------------------------------------------------------------------------------------------------------------------------------------------
+	shared->msg_sem = sem_open(MSG_SEM, O_CREAT, 0644, 1); // need to check the permissions later 
 	if (shared->msg_sem == SEM_FAILED)  
 	{
 		sem_close(shared->fork_sem);
 		sem_unlink(FORK_SEM);
 		return (write(2, "Error creating message semaphore.\n", 34), ERROR);
 	}
-	shared->monitoring_sem = sem_open(MONITORING_SEM, O_CREAT, 0644, 0); // need to check the permissions later 
+	//  create semaphore for stop simulation signalling ---------------------------------------------------------------------------------------------------------------------------------------------
+	shared->stop_sem = sem_open(STOP_SEM, O_CREAT, 0644, 0); // need to check the permissions later 
+	if (shared->msg_sem == SEM_FAILED)  
+	{
+		sem_close(shared->fork_sem);
+		sem_unlink(FORK_SEM);
+		sem_close(shared->msg_sem);
+		sem_unlink(MSG_SEM);
+		return (write(2, "Error creating message semaphore.\n", 34), ERROR);
+	}
 	// create semaphore for stop_simulation ---------------------------------------------------------------------------------------------------------------------------------------------------------
+	shared->monitoring_sem = sem_open(MONITORING_SEM, O_CREAT, 0644, 0); // need to check the permissions later 
 	if (shared->monitoring_sem == SEM_FAILED) 
 	{
 		sem_close(shared->fork_sem);
 		sem_unlink(FORK_SEM);
 		sem_close(shared->msg_sem);
 		sem_unlink(MSG_SEM);
+		sem_close(shared->stop_sem);
+		sem_unlink(STOP_SEM);
 		return (write(2, "Error creating monitoring semaphore.\n", 37), ERROR);
 	}
 	shared->start_time = 0;
@@ -119,6 +164,8 @@ int	destroy_semaphores(t_shared *shared)
 	sem_unlink(MSG_SEM);
 	sem_close(shared->monitoring_sem);
 	sem_unlink(MONITORING_SEM);
+	sem_close(shared->stop_sem);
+	sem_unlink(STOP_SEM);
 	return (SUCCESS);
 }
 
@@ -138,8 +185,8 @@ int	init_philo_data(t_philo *p, int i, char **argv, t_shared *shared)
 		p->times_to_eat = -1;
 	p->times_eaten = 0;
 	p->last_eaten = get_time_in_micros();
-	p->finished = false;
 	p->shared = shared;
+	// TODO: probably add a state_sem semaphore for reading shared resources but idk if needed
 	return (SUCCESS);
 }
 
@@ -188,6 +235,7 @@ int	start_simulation(int argc, char **argv, int total)
 		return (ERROR);
 	shared.start_time = get_time_in_micros(); // or here set to 0 and in code move further 
 	// Create child processes ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+	printf("forking processes\n");
 	i = -1;
 	while (++i < total)
 	{
@@ -202,44 +250,39 @@ int	start_simulation(int argc, char **argv, int total)
 		// Child process functionality ---------------------------------------------------------------------------------------------------------------------------------------------------------
 		if (pids[i] == 0)
 		{
-			printf("created child %d\n", i);
+			printf("forked child %d\n", i);
 			int	exit_status = child_process(&philos[i]);
 			// cleanup child process here because it does not have access ot entire philo array nor entire pids array - because philos should not know the state of other philos in my opinion 
 			free(pids);
 			free(philos);
-			destroy_semaphores(&shared); // mabe semaphores will be already destroyed or some of them failed in opening - TODO
+			//destroy_semaphores(&shared);
+			sem_close(shared.fork_sem);
+			sem_close(shared.msg_sem);
+			sem_close(shared.stop_sem);
+			sem_close(shared.monitoring_sem);
 			printf("Resources destroyed. Child %d exiting.\n", i);
 			exit(exit_status);
 		}
 	}
 	// monitoring process ??? ------------------------------------------------------------------------------------------------------------------------------------------------------------------
-	//monitor(philos);
-	printf("got out\n");
 	i = 0;
-	while (i < philos[0].total)
+	while (i < philos[0].total) // & -------------------------------- wait for collecting output from all philos for being full --- OR --- output from one of them that he died ----------------
 	{
 		sem_wait(philos[0].shared->monitoring_sem);
-		printf("waited %d. time\n", i);
+		printf("waited for p%d\n", i);
 		i++;
 	}
-	// kill the processes after it can post to the monitoring sem
-    // for (int i = 0; i < total; ++i)
-	// {
-    //     if (kill(pids[i], SIGKILL) == -1) {
-    //         perror("Error killing process");
-    //     }
-    // }
+	// !! after all of them ate or one died, we can post to stop_simulation semaphore
+	sem_post(philos->shared->stop_sem);
 	// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	// Cleanup
 	i = -1;
-	// Wait for all child processes to finish 
 	while (++i < total)
 	{
 		// TODO: gather exit codes of processes and if they are all 0, return 0, if any is error, return error
-		// TODO: its ok because routine(child_process) cannot go wron, only breaks if we catch death or full, so we return success
+		// TODO: its ok because routine(child_process) cannot go wrong, only breaks if we catch death or full, so we return success
 		waitpid(pids[i], NULL, 0);
 	}
-	// Close and unlink the semaphore, free allocs
 	destroy_semaphores(&shared);
 	free(philos);
 	free(pids);

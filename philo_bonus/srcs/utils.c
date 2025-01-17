@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 08:40:37 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/16 19:45:05 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/17 15:21:22 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,17 +37,10 @@ long long	get_time_in_micros(void)
 // if either is true, returns true and caller will stop the specific thread
 bool	check_stop_sim(t_philo *philo)
 {
-	// bool	stopped;
+	bool	stopped;
 
-	// pthread_mutex_lock(philo->stop_lock);
-	// stopped = *(philo->stop_simulation);
-	// pthread_mutex_unlock(philo->stop_lock);
-	// pthread_mutex_lock(&philo->lock);
-	// if (stopped)
-	// {
-	// 	pthread_mutex_unlock(&philo->lock);
-	// 	return (true);
-	// }
-	// pthread_mutex_unlock(&philo->lock);
-	return (false);
+	pthread_mutex_lock(&philo->lock);
+	stopped = *(philo->shared->stop_simulation);
+	pthread_mutex_unlock(&philo->lock);
+	return (stopped);
 }
