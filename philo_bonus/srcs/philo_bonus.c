@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/15 16:05:45 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/17 11:13:31 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/17 11:24:59 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,26 +20,28 @@
 // TODO: move start time to later in code as now it is too soon
 int	child_process(t_philo *philo)
 {
-	// printf("a%d\n", philo->id);
-	// // re-open the semaphore for each process
-	// philo->shared->monitoring_sem = sem_open(MONITORING_SEM, O_CREAT, 0644, 0); // need to check the permissions later 
-	// printf("b%d\n", philo->id);
-	// // create semaphore for stop_simulation ---------------------------------------------------------------------------------------------------------------------------------------------------------
-	// if (philo->shared->monitoring_sem == SEM_FAILED) 
-	// {
-	// 	return (write(2, "Error creating monitoring semaphore in child.\n", 46), ERROR);
-	// }
-	// printf("c%d\n", philo->id);
+	printf("a%d\n", philo->id);
+	// re-open the semaphore for each process
+	philo->shared->fork_sem = sem_open(FORK_SEM, O_CREAT, 0644, philo->total); // need to check the permissions later 
+	if (philo->shared->fork_sem == SEM_FAILED) 
+		return (write(2, "Error creating forks semaphore.\n", 32), ERROR);
+	philo->shared->msg_sem = sem_open(MSG_SEM, O_CREAT, 0644, 0); // need to check the permissions later 
+	if (philo->shared->msg_sem == SEM_FAILED)  
+		return (write(2, "Error creating message semaphore.\n", 34), ERROR);
+	philo->shared->monitoring_sem = sem_open(MONITORING_SEM, O_CREAT, 0644, 0); // need to check the permissions later 
+	if (philo->shared->monitoring_sem == SEM_FAILED) 
+		return (write(2, "Error creating monitoring semaphore.\n", 37), ERROR);
+	printf("c%d\n", philo->id);
 	while (1)
 	{
 		if (philo->times_to_eat == 0)
 			break ;
 		// take forks - wait(decrement) semaphore
-		printf("a%d\n", philo->id);
 		sem_wait(philo->shared->fork_sem);
 		log_msg(philo, FORK_L);
 		sem_wait(philo->shared->fork_sem);
 		log_msg(philo, FORK_R);
+		printf("d%d\n", philo->id);
 		// Eat
 		if (p_eat(philo) == ERROR)
 		{
@@ -205,7 +207,7 @@ int	start_simulation(int argc, char **argv, int total)
 			// cleanup child process here because it does not have access ot entire philo array nor entire pids array - because philos should not know the state of other philos in my opinion 
 			free(pids);
 			free(philos);
-			destroy_semaphores(&shared);
+			destroy_semaphores(&shared); // mabe semaphores will be already destroyed or some of them failed in opening - TODO
 			printf("Resources destroyed. Child %d exiting.\n", i);
 			exit(exit_status);
 		}
@@ -213,13 +215,13 @@ int	start_simulation(int argc, char **argv, int total)
 	// monitoring process ??? ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	//monitor(philos);
 	printf("got out\n");
-	// i = 0;
-	// while (i < philos[0].total)
-	// {
-	// 	sem_wait(philos[0].shared->monitoring_sem);
-	// 	printf("waited %d. time\n", i);
-	// 	i++;
-	// }
+	i = 0;
+	while (i < philos[0].total)
+	{
+		sem_wait(philos[0].shared->monitoring_sem);
+		printf("waited %d. time\n", i);
+		i++;
+	}
 	// kill the processes after it can post to the monitoring sem
     // for (int i = 0; i < total; ++i)
 	// {
