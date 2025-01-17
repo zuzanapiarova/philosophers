@@ -1,6 +1,5 @@
 CC = cc
-CFLAGS = 
-# -Wall -Wextra -Werror -g
+CFLAGS = -Wall -Wextra -Werror -g
 RM = rm -rf
 AR = ar rcs
 NAME = philo_bonus
@@ -10,11 +9,11 @@ SAN =
 
 SRCS := srcs/philo_bonus.c \
 		srcs/actions.c \
-		srcs/utils.c \
-		srcs/num_utils.c \
-		srcs/str_utils.c \
-		srcs/input_val.c \
-		srcs/logging.c \
+		srcs/utils/utils.c \
+		srcs/utils/num_utils.c \
+		srcs/utils/str_utils.c \
+		srcs/utils/input_val.c \
+		srcs/utils/logging.c \
 
 # 		srcs/routines.c \
 # 		srcs/cleanup.c \

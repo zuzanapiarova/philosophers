@@ -53,6 +53,9 @@ b. if philo dies, it sets it to number of philosophers straight away, so monitor
 - after the last wait, it will kill all processes and exit, doesnt need to post to it to get it to start state
 - and death will post n times so it can be full and monitoring will catch the exit 
 - LEFT ON: DID WHAT IS ABOVE, WAITING FOR SEMAPHORE IN MAIN, POSTING TO SEMAPHORE ONCE WHEN PHILO IS FUL OR NUMBER_OF_PHILOS TIMES WHEN ONE DIES SO WE CAN KILL ALL PROCESSES
+- possible way not to make them print anything after stop_sim signal: 	set sem_wait(philos[0].shared->msg_sem); so it takes the one resource and pothers cannot take it BUT it doesnt work 
+- // TODO: move start time to later in code as now it is too soon
+- TODO: when they die they exit immediately, but when full, the simulation goes on for a bit before exiting 
 
 ## MANDATORY
 

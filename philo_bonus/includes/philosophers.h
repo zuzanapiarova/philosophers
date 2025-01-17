@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/13 17:26:55 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/17 15:49:32 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/17 17:18:44 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,11 +32,10 @@
 # define SUCCESS 0
 # define TIMEZONE_MILI 3600000
 # define TIMEZONE_MICRO 3600000000
-# define FORK_SEM "/fork_sem41"
-# define MSG_SEM "/msg_sem41"
-# define STOP_SEM "/stop_sem41"
-# define MONITORING_SEM "/monitoring_sem41"
-// used names: sem, semaphore, my_sem, fork_sem, msg_sem, monitoring_sem
+# define FORK_SEM "/fork_sem48"
+# define MSG_SEM "/msg_sem48"
+# define STOP_SEM "/stop_sem48"
+# define MONITORING_SEM "/monitoring_sem48"
 
 typedef enum e_action
 {
@@ -89,7 +88,7 @@ int				take_forks(t_philo *philo);
 int				leave_forks(t_philo *philo);
 
 /* philo.c */
-int				start_simulation(int argc, char **argv, int total);
+int				start_simulation(char **argv, int total);
 int				main(int argc, char **argv);
 
 /* init.c */

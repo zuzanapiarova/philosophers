@@ -6,11 +6,11 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/13 16:52:57 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/14 11:07:11 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/17 16:32:08 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/philosophers.h"
+#include "../../includes/philosophers.h"
 
 size_t	ft_strlen(const char *s)
 {

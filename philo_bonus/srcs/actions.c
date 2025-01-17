@@ -6,11 +6,29 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 09:28:58 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/15 20:41:12 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/17 17:30:32 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/philosophers.h"
+
+int	take_forks(t_philo *philo)
+{
+	sem_wait(philo->shared->fork_sem);
+	log_msg(philo, FORK_L);
+	sem_wait(philo->shared->fork_sem);
+	log_msg(philo, FORK_R);
+	if (check_stop_sim(philo))
+		return (ERROR);
+	return (SUCCESS);
+}
+
+int	leave_forks(t_philo *philo)
+{
+	sem_post(philo->shared->fork_sem);
+	sem_post(philo->shared->fork_sem);
+	return (SUCCESS);
+}
 
 int	p_eat(t_philo *philo)
 {
