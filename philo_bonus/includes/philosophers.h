@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/13 17:26:55 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/16 20:09:17 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/17 10:39:54 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,9 +32,9 @@
 # define SUCCESS 0
 # define TIMEZONE_MILI 3600000
 # define TIMEZONE_MICRO 3600000000
-# define FORK_SEM "/fork_sem18"
-# define MSG_SEM "/msg_sem18"
-# define MONITORING_SEM "/monitoring_sem18"
+# define FORK_SEM "/fork_sem20"
+# define MSG_SEM "/msg_sem20"
+# define MONITORING_SEM "/monitoring_sem20"
 // used names: sem, semaphore, my_sem, fork_sem, msg_sem, monitoring_sem
 
 typedef enum e_action
