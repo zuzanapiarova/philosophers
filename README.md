@@ -18,6 +18,10 @@ philosopher takes their right and their left forks to eat, one in each hand.
 
 We have to come up with an algorithm that keeps them  when the time received as arguments allows it, preventing deadlocks and data races. 
 
+### ALLOWED FUNCTIONS
+Mandatory: memset, printf, malloc, free, write, usleep, gettimeofday, pthread_create, pthread_detach, pthread_join, pthread_mutex_init, pthread_mutex_destroy, pthread_mutex_lock, pthread_mutex_unlock
+Bonus: memset, printf, malloc, free, write, fork, kill, exit, pthread_create, pthread_detach, pthread_join, usleep, gettimeofday, waitpid, sem_open, sem_close, sem_post, sem_wait, sem_unlink
+
 ## 1. COMPILATION
 Compiling Mandatory Part: make -C philo/
 Compiling Bonus Part: make -C philo_bonus/
@@ -31,33 +35,26 @@ Program expects 4 or 5 arguments. Run ./philo(_bonus)/philo(_bonus) [1] [2] [3] 
     (5) (optional) number_of_times_each_philosopher_must_eat (ms)
 
 ### my approach
+- MAIN IDEA was to only pass one philosopher structure and its information to each thread/process, so the others cannot access the data of other philosophers in any way
 - working in microseconds for accuracy and logging in miliseconds
 - not waiting for all to start at the same time 
 - TODO?: including timezone by macro, do it by the function !
 - TODO?: mutex that protects philo from not eating and dying at the same time 
-- stopping the simulation: stop simulation int pointer shared among all:
+- stopping the simulation in threads: stop simulation int pointer shared among all:
 a. if philo is full, he increments it and when it reaches number of philosophers, monitor stops the simulation
 b. if philo dies, it sets it to number of philosophers straight away, so monitor stops the simulation right away
+- stopping the simulation in processes: monitoring named semaphore and stop_simulation named semaphore, both initialized with 0:
+a. if philo is full, he posts to monitoring semaphore which waits n times and when it reaches number of philosophers, continues to post to stop_simulation semaphore
+b. if philo dies, it posts to stop_simulation semaphore n times altogehter, which allows to continue straight away to post to the stop_simulation semaphore
 
 ## TODO - working on
 - Mandatory: (almost) done
 - TODO: they die eventually when sleep is 0 - probably steal resources as they sleep 0
-- Bonus: only needs monitoring
-- bonus - big challenge: implement the monitoring process
 - sometimes semaphore already exists and it will not create it anew - because program terminated abnormaly and did ot close and unlink the semaphore form memory, thus we cannot open it again. Create one with new name 
-- https://github.com/mcombeau/philosophers/blob/main/philo_bonus/sources/ipc.c - philo bonus implementation
-- how to exit all processes when they are full:
-- semaphore is initialized with 0
-- each process when full will post there
-- monitoring process will wait for n - 1 (or n?? in slack people had n) times
-- after the last wait, it will kill all processes and exit, doesnt need to post to it to get it to start state
-- and death will post n times so it can be full and monitoring will catch the exit 
 - LEFT ON: DID WHAT IS ABOVE, WAITING FOR SEMAPHORE IN MAIN, POSTING TO SEMAPHORE ONCE WHEN PHILO IS FUL OR NUMBER_OF_PHILOS TIMES WHEN ONE DIES SO WE CAN KILL ALL PROCESSES
 - possible way not to make them print anything after stop_sim signal: 	set sem_wait(philos[0].shared->msg_sem); so it takes the one resource and pothers cannot take it BUT it doesnt work 
 - // TODO: move start time to later in code as now it is too soon
-- TODO: when they die they exit immediately, but when full, the simulation goes on for a bit before exiting 
-
-## MANDATORY
+- TODO: not allowed mutexes in bonus part ??? 
 
 ### MECHANISMS TO AVOID DEADLOCKS
 1. even philos wait for a moment before grabbing forks

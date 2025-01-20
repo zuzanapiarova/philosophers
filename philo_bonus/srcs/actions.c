@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 09:28:58 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/17 17:30:32 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/20 11:42:35 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,12 +14,22 @@
 
 int	take_forks(t_philo *philo)
 {
+	if (check_stop_sim(philo))
+		return (ERROR);
 	sem_wait(philo->shared->fork_sem);
 	log_msg(philo, FORK_L);
+	if (check_stop_sim(philo))
+	{
+		sem_post(philo->shared->fork_sem);
+		return (ERROR);
+	}
 	sem_wait(philo->shared->fork_sem);
 	log_msg(philo, FORK_R);
 	if (check_stop_sim(philo))
+	{
+		leave_forks(philo);
 		return (ERROR);
+	}
 	return (SUCCESS);
 }
 

@@ -14,11 +14,9 @@ SRCS := srcs/philo_bonus.c \
 		srcs/utils/str_utils.c \
 		srcs/utils/input_val.c \
 		srcs/utils/logging.c \
-
-# 		srcs/routines.c \
-# 		srcs/cleanup.c \
-# 		srcs/actions_forks.c \
-# 		srcs/init.c \
+		srcs/threads.c \
+		srcs/init.c \
+		srcs/cleanup.c \
 
 OBJS := ${SRCS:.c=.o}
 

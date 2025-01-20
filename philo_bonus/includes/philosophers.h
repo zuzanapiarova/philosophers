@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/13 17:26:55 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/17 17:18:44 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/20 13:42:33 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,10 +32,11 @@
 # define SUCCESS 0
 # define TIMEZONE_MILI 3600000
 # define TIMEZONE_MICRO 3600000000
-# define FORK_SEM "/fork_sem48"
-# define MSG_SEM "/msg_sem48"
-# define STOP_SEM "/stop_sem48"
-# define MONITORING_SEM "/monitoring_sem48"
+# define FORK_SEM "/fork_sem51"
+# define MSG_SEM "/msg_sem51"
+# define STOP_SEM "/stop_sem51"
+# define FULL_SEM "/stop_sem51"
+# define MONITORING_SEM "/monitoring_sem51"
 
 typedef enum e_action
 {
@@ -46,7 +47,9 @@ typedef enum e_action
 	THINKS, // STARTED THINKING
 	DEATH, // DIED
 	FINISH, // SIMULATION IS FINISHED
-	FULL // PHILO ATE FOR THE LAST TIME
+	FULL, // PHILO ATE FOR THE LAST TIME
+	STOP, // TEST - SIMULATION IS STOPPED
+	LAST // TEST - RECEIVED LAST SEMAPHORE SIGNAL FOR FULLNESS/DEATH
 }				t_action;
 
 typedef struct s_shared
@@ -56,6 +59,7 @@ typedef struct s_shared
 	sem_t			*msg_sem;
 	sem_t			*monitoring_sem;
 	sem_t			*stop_sem;
+	sem_t			*full_sem;
 	bool			*stop_simulation;
 }					t_shared;
 
@@ -71,9 +75,10 @@ typedef struct s_philo
 	// variables that change but belong to one thread at all times
 	unsigned int	times_eaten;
 	long long		last_eaten;
-	pthread_t		death_checker; // &
-	pthread_t		stop_sim_checker; // &
-	pthread_mutex_t	lock; // &
+	pthread_t		death_checker;
+	pthread_t		full_checker;
+	pthread_t		stop_sim_checker;
+	pthread_mutex_t	lock;
 	// only shared resources available to all threads for both read/write
 	t_shared		*shared;
 }					t_philo;
@@ -82,31 +87,30 @@ typedef struct s_philo
 int				p_eat(t_philo *philo);
 int				p_sleep(t_philo *philo);
 int				p_think(t_philo *philo);
-int				fork_r(t_philo *p, pthread_mutex_t *rf, pthread_mutex_t *lf);
-int				fork_l(t_philo *p, pthread_mutex_t *lf, pthread_mutex_t *rf);
 int				take_forks(t_philo *philo);
 int				leave_forks(t_philo *philo);
 
-/* philo.c */
+/* philo_bonus.c */
+int				routine(t_philo *philo);
 int				start_simulation(char **argv, int total);
 int				main(int argc, char **argv);
 
-/* init.c */
-int				init_shared_resources(t_shared *shared, int total);
-int				init_philo_data(t_philo *p, int i, char **argv, t_shared *s);
-int				allocate_philo_array(t_philo **p, t_shared *s, int t);
-int				fill_philo_array(t_philo *p, t_shared *s, char **argv, int t);
-int				init_monitor(pthread_t *mon, t_philo *p, t_shared *s, int t);
 
 /* cleanup.c */
-int				cleanup(t_philo *p, t_shared *s, pthread_t *monitor, int t);
+int				destroy_semaphores(t_shared *shared);
 
-/* routines.c */
-void			*routine(void *arg);
-void			*monitoring(void *arg);
+/* init.c */
+int				init_shared_resources(t_shared *shared, int total);
+int				init_philo_data(t_philo *p, int i, char **argv, t_shared *shared);
+int				init_resources(t_philo **philos, pid_t **pids, t_shared *shared, char **argv);
 
 /* input_val.c */
 int				handle_error_input(int argc, char **argv);
+
+/* threads.c */
+void			*stop_routine(void	*arg);
+void			*full_routine(void	*arg);
+void			*death_routine(void *arg);
 
 /* utils.c && logging.c */
 long long		get_time_in_ms(void);

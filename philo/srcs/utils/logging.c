@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/13 16:51:21 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/16 19:01:39 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/20 12:59:23 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,7 +94,7 @@ int	log_msg(t_philo *philo, t_action action)
 	free(time);
 	pthread_mutex_lock(philo->msg_lock);
 	write(1, color_time, ft_strlen(color_time));
-	write(1, "\t", 1);
+	write(1, "\t  ", 3);
 	if (action != FINISH)
 		ft_putnbr(philo->id);
 	else
