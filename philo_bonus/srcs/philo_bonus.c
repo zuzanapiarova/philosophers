@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/15 16:05:45 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/21 19:10:05 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/21 20:03:43 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,14 +61,16 @@ int	init_child(t_resources *resources, int i)
 		result = ERROR;
 	else	
 		result = SUCCESS;
-	exit(result); // it will not get here, jus to be sure 
 	// log_msg(resources->philo, STOP);
-	// pthread_join(resources->philo->stop_sim_checker, NULL);
-	// pthread_join(resources->philo->death_checker, NULL);
-	// close_semaphores(resources->shared);
-	// free(resources->philos);
-	// free(resources->pids);
-	// exit(result);
+	pthread_join(resources->philo->death_checker, NULL);
+	pthread_join(resources->philo->stop_sim_checker, NULL);
+	close_semaphores(resources->shared);
+	sem_close(resources->philo->mutex_local_sem);
+	sem_unlink(resources->philo->mutex_sem_name);
+	free(resources->philo->mutex_sem_name);
+	free(resources->philos);
+	free(resources->pids);
+	return (SUCCESS);
 }
 
 int	start_simulation(char **argv, int total)
@@ -84,11 +86,12 @@ int	start_simulation(char **argv, int total)
 	
 	if (init_resources(&philos, &pids, &shared, argv) == ERROR)
 		return (ERROR);
-	resources.shared = &shared;
 	resources.pids = pids;
 	resources.philos = philos;
 	resources.philo = NULL;
 	//printf("forking processes\n");
+	shared.start_time = get_time_in_micros();
+	resources.shared = &shared;
 	i = -1;
 	while (++i < total)
 	{
@@ -104,7 +107,7 @@ int	start_simulation(char **argv, int total)
 		if (pids[i] == 0)
 		{
 			// printf("forked child %d\n", i);
-			init_child(&resources, i);
+			int exit_status = init_child(&resources, i);
 			// if (child_process(&philos[i]) == ERROR)
 			// 	break ; // or EXIT ??
 			// 	// TODO: possibly clean
@@ -114,7 +117,7 @@ int	start_simulation(char **argv, int total)
 			//free(philos);
 			//destroy_semaphores(&shared);
 			//printf("Resources destroyed. Child %d exiting.\n", i);
-			//exit(exit_status);
+			exit(exit_status);
 		}
 	}
 	// TODO: add a semaphore that posts to all processes when they are all created, the processes first thing they do wait for this semaphore so they all start at the same time 

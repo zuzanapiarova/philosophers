@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 10:20:07 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/21 19:10:30 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/21 20:06:56 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,21 +22,22 @@ void	*stop_routine(void	*arg)
 	t_resources	*resources;
 
 	resources = (t_resources *)arg;
-	// printf("started stop_routine thread\n");
 	sem_wait(resources->shared->stop_sem);
 	log_msg(resources->philo, RECEIVED);
+	sem_wait(resources->philo->mutex_local_sem);
 	resources->philo->stop_simulation = true;
-	pthread_join(resources->philo->death_checker, NULL); //  we wait for the death thread, which got teh memo to end throug stop_simulation variable 
-	pthread_detach(resources->philo->death_checker); // we detach this thread
-	// clean resources - close semaphores, join threads
-	printf("joined death thread id %d\n", resources->philo->id);
-	close_semaphores(resources->shared);
-	sem_close(resources->philo->mutex_local_sem);
-	sem_unlink(resources->philo->mutex_sem_name);
-	free(resources->philo->mutex_sem_name);
-	free(resources->philos);
-	free(resources->pids);
-	exit(SUCCESS);
+	sem_post(resources->philo->mutex_local_sem);
+	
+	// cleanup - semaphores, threads, mallocs
+	// //pthread_detach(resources->philo->death_checker); // we detach this thread
+	// pthread_join(resources->philo->death_checker, NULL); //  we wait for the death thread, which got teh memo to end throug stop_simulation variable 
+	// close_semaphores(resources->shared);
+	// sem_close(resources->philo->mutex_local_sem);
+	// sem_unlink(resources->philo->mutex_sem_name);
+	// free(resources->philo->mutex_sem_name);
+	// free(resources->philos);
+	// free(resources->pids);
+	// exit(SUCCESS);
 	return (NULL);
 }
 
@@ -66,14 +67,22 @@ void	*death_routine(void *arg)
 	t_philo	*philo;
 	int		i;
 	bool	dead = false;
+	bool	stopped;
 
 	// printf("started death_routine thread\n");
 	philo = (t_philo *)arg;
 	while (1)
 	{
+		sem_wait(philo->mutex_local_sem);
 		if (get_time_in_micros() - philo->last_eaten > (philo->die * 1000))
+		{
+			philo->stop_simulation = true;
+			sem_post(philo->shared->fork_sem);
 			dead = true;
-		if (dead || philo->stop_simulation)
+		}
+		stopped = philo->stop_simulation;
+		sem_post(philo->mutex_local_sem);
+		if (dead || stopped)
 		{
 			if (dead)
 			{

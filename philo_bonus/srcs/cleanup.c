@@ -6,19 +6,11 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 10:43:17 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/21 18:05:06 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/21 19:51:29 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/philosophers.h"
-
-void handle_signal(int sig)
-{
-    printf("Process exiting due to signal %d\n", sig);
-    // resources to cleanup in each process if signal is received
-    //sem_destroy(&sem);  // Clean up semaphore
-    exit(0);            // Exit the process
-}
 
 int	close_semaphores(t_shared *shared)
 {
