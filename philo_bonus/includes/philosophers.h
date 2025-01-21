@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philosophers.h                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zuzanapiarova <zuzanapiarova@student.42    +#+  +:+       +#+        */
+/*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/13 17:26:55 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/20 22:04:24 by zuzanapiaro      ###   ########.fr       */
+/*   Updated: 2025/01/21 11:35:10 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,11 +32,11 @@
 # define SUCCESS 0
 # define TIMEZONE_MILI 3600000
 # define TIMEZONE_MICRO 3600000000
-# define FORK_SEM "/fork_sem62"
-# define MSG_SEM "/msg_sem62"
-# define STOP_SEM "/stop_sem62"
-# define FULL_SEM "/stop_sem62"
-# define MONITORING_SEM "/monitoring_sem62"
+# define FORK_SEM "/fork_sem68"
+# define MSG_SEM "/msg_sem68"
+# define STOP_SEM "/stop_sem68"
+# define FULL_SEM "/stop_sem68"
+# define MONITORING_SEM "/monitoring_sem68"
 
 typedef enum e_action
 {
@@ -50,7 +50,8 @@ typedef enum e_action
 	FULL, // PHILO ATE FOR THE LAST TIME
 	STOP, // TEST - SIMULATION IS STOPPED
 	LAST, // TEST - SEMAPHORE SIGNAL FOR DEATH WA SSENT
-	RECEIVED // TEST - CHECKS IF STOP SIGNAL WAS RECEIVED
+	RECEIVED, // TEST - CHECKS IF STOP SIGNAL WAS RECEIVED
+	STOP_STATUS // TEST - shows value of stop_simulation at each check
 }				t_action;
 
 typedef struct s_shared
@@ -61,7 +62,7 @@ typedef struct s_shared
 	sem_t			*monitoring_sem;
 	sem_t			*stop_sem;
 	sem_t			*full_sem;
-	//bool			*stop_simulation;
+	bool			*stop_simulation;
 }					t_shared;
 
 typedef struct s_philo
@@ -83,6 +84,14 @@ typedef struct s_philo
 	// only shared resources available to all threads for both read/write
 	t_shared		*shared;
 }					t_philo;
+
+typedef struct s_resources
+{
+	t_philo		*philos;
+	t_shared	*shared;
+	pid_t		*pids;
+	t_philo		*philo;
+}				t_resources;
 
 /* actions.c + actions_forks.c */
 int				p_eat(t_philo *philo);
@@ -111,7 +120,7 @@ int				handle_error_input(int argc, char **argv);
 
 /* threads.c */
 void			*stop_routine(void	*arg);
-void			*full_routine(void	*arg);
+// void			*full_routine(void	*arg);
 void			*death_routine(void *arg);
 
 /* utils.c && logging.c */

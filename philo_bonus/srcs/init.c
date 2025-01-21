@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   init.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zuzanapiarova <zuzanapiarova@student.42    +#+  +:+       +#+        */
+/*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 10:21:56 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/20 20:44:27 by zuzanapiaro      ###   ########.fr       */
+/*   Updated: 2025/01/21 11:21:51 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 
 int	init_shared_resources(t_shared *shared, int total)
 {
+	*(shared->stop_simulation) = false;
 	// create semaphore representing forks ---------------------------------------------------------------------------------------------------------------------------------------------------------
 	shared->fork_sem = sem_open(FORK_SEM, O_CREAT | O_EXCL, 0644, total); // need to check the permissions later
 	if (shared->fork_sem == SEM_FAILED)
@@ -61,7 +62,6 @@ int	init_shared_resources(t_shared *shared, int total)
 		sem_unlink(FULL_SEM);
 		return (write(2, "Error creating monitoring semaphore.\n", 37), ERROR);
 	}
-	// /*(shared->stop_simulation) = false;
 	shared->start_time = get_time_in_micros(); // or here set to 0 and in code move further
     return (SUCCESS);
 }

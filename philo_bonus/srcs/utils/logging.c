@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   logging.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zuzanapiarova <zuzanapiarova@student.42    +#+  +:+       +#+        */
+/*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/13 16:51:21 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/20 21:40:34 by zuzanapiaro      ###   ########.fr       */
+/*   Updated: 2025/01/21 11:42:46 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,6 +78,8 @@ char	*get_msg(t_action action)
 		msg = "SENDING STOP SIGNAL\033[37m\n";
 	else if (action == RECEIVED)
 		msg = "stop signal received\033[37m\n";
+	else if (action == STOP_STATUS)
+		msg = "stop_sim status is \033[37m\n";
 	else
 		msg = "";
 	return (msg);
@@ -111,6 +113,13 @@ int	log_msg(t_philo *philo, t_action action)
 	{
 		ft_putnbr(philo->times_eaten);
 		write(1, ". time\n", 7);
+	}
+	if (action == STOP_STATUS)
+	{
+		if (*(philo->shared->stop_simulation))
+			ft_putchar('a');
+		else
+			ft_putchar('b');
 	}
 	sem_post(philo->shared->msg_sem);
 	free(color_time);

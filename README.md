@@ -28,11 +28,11 @@ Compiling Bonus Part: make -C philo_bonus/
 
 ## 2. EXECUTION
 Program expects 4 or 5 arguments. Run ./philo(_bonus)/philo(_bonus) [1] [2] [3] [4] (5): 
-    [1] number_of_philosophers
-    [2] time_to_die (ms)
-    [3] time_to_eat (ms)
-    [4] time_to_sleep (ms)
-    (5) (optional) number_of_times_each_philosopher_must_eat (ms)
+- [1] number_of_philosophers
+- [2] time_to_die (ms)
+- [3] time_to_eat (ms)
+- [4] time_to_sleep (ms)
+- (5) (optional) number_of_times_each_philosopher_must_eat (ms)
 
 ### my approach
 - MAIN IDEA was to only pass one philosopher structure and its information to each thread/process, so the others cannot access the data of other philosophers in any way

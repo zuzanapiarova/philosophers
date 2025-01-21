@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zuzanapiarova <zuzanapiarova@student.42    +#+  +:+       +#+        */
+/*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 08:40:37 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/20 20:48:01 by zuzanapiaro      ###   ########.fr       */
+/*   Updated: 2025/01/21 11:36:45 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,9 +40,8 @@ bool	check_stop_sim(t_philo *philo)
 	bool	stopped;
 
 	(void)philo;
-	stopped = false;
-	// pthread_mutex_lock(&philo->lock);
-	// stopped = *(philo->shared->stop_simulation);
-	// pthread_mutex_unlock(&philo->lock);
+	log_msg(philo, STOP_STATUS);
+	// TODO: maybe change it to return 0 if false, 1 if dead, 2 if full so we can distinguish
+	stopped = *(philo->shared->stop_simulation);
 	return (stopped);
 }
