@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 10:21:56 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/21 18:22:53 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/21 20:43:46 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,20 +36,9 @@ int	init_shared_resources(t_shared *shared, int total)
 		sem_unlink(MSG_SEM);
 		return (write(2, "Error creating message semaphore.\n", 34), ERROR);
 	}
-    shared->full_sem = sem_open(FULL_SEM, O_CREAT | O_EXCL, 0644, 0); // need to check the permissions later
-	if (shared->msg_sem == SEM_FAILED)
-	{
-		sem_close(shared->fork_sem);
-		sem_unlink(FORK_SEM);
-		sem_close(shared->msg_sem);
-		sem_unlink(MSG_SEM);
-        sem_close(shared->stop_sem);
-		sem_unlink(STOP_SEM);
-		return (write(2, "Error creating message semaphore.\n", 34), ERROR);
-	}
 	// create semaphore for stop_simulation ---------------------------------------------------------------------------------------------------------------------------------------------------------
-	shared->monitoring_sem = sem_open(MONITORING_SEM, O_CREAT | O_EXCL, 0644, 0); // need to check the permissions later
-	if (shared->monitoring_sem == SEM_FAILED)
+	shared->fullness_sem = sem_open(FULLNESS_SEM, O_CREAT | O_EXCL, 0644, 0); // need to check the permissions later
+	if (shared->fullness_sem == SEM_FAILED)
 	{
 		sem_close(shared->fork_sem);
 		sem_unlink(FORK_SEM);
@@ -57,8 +46,6 @@ int	init_shared_resources(t_shared *shared, int total)
 		sem_unlink(MSG_SEM);
 		sem_close(shared->stop_sem);
 		sem_unlink(STOP_SEM);
-        sem_close(shared->full_sem);
-		sem_unlink(FULL_SEM);
 		return (write(2, "Error creating monitoring semaphore.\n", 37), ERROR);
 	}
 	shared->start_time = get_time_in_micros(); // or here set to 0 and in code move further

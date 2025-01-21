@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/13 17:26:55 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/21 17:56:35 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/21 21:07:25 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,11 +32,11 @@
 # define SUCCESS 0
 # define TIMEZONE_MILI 3600000
 # define TIMEZONE_MICRO 3600000000
+
 # define FORK_SEM "/fork_sem69"
 # define MSG_SEM "/msg_sem69"
 # define STOP_SEM "/stop_sem69"
-# define FULL_SEM "/stop_sem69"
-# define MONITORING_SEM "/monitoring_sem69"
+# define FULLNESS_SEM "/fullness_sem69"
 
 typedef enum e_action
 {
@@ -59,9 +59,8 @@ typedef struct s_shared
 	long long		start_time;
 	sem_t			*fork_sem;
 	sem_t			*msg_sem;
-	sem_t			*monitoring_sem;
+	sem_t			*fullness_sem;
 	sem_t			*stop_sem;
-	sem_t			*full_sem;
 }					t_shared;
 
 typedef struct s_philo
@@ -121,8 +120,8 @@ int				handle_error_input(int argc, char **argv);
 
 /* threads.c */
 void			*stop_routine(void	*arg);
-// void			*full_routine(void	*arg);
 void			*death_routine(void *arg);
+void			*fullness_checker_routine(void *arg);
 
 /* utils.c && logging.c */
 long long		get_time_in_ms(void);
