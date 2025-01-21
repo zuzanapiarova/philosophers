@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 10:20:07 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/21 11:34:30 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/21 19:10:30 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,18 +22,21 @@ void	*stop_routine(void	*arg)
 	t_resources	*resources;
 
 	resources = (t_resources *)arg;
-	
+	// printf("started stop_routine thread\n");
 	sem_wait(resources->shared->stop_sem);
 	log_msg(resources->philo, RECEIVED);
-	*(resources->philo->shared->stop_simulation) = true;
-	printf("stop sim in %d: %d\n", resources->philo->id, *(resources->philo->shared->stop_simulation));
-	// pthread_join(resources->philo->death_checker, NULL);
-	// /clean resources - close semaphores, join threads
-	// printf("joined death thread id %d\n", resources->philo->id);
-	// close_semaphores(resources->shared);
-	// free(resources->philos);
-	// free(resources->pids);
-	//exit(SUCCESS);
+	resources->philo->stop_simulation = true;
+	pthread_join(resources->philo->death_checker, NULL); //  we wait for the death thread, which got teh memo to end throug stop_simulation variable 
+	pthread_detach(resources->philo->death_checker); // we detach this thread
+	// clean resources - close semaphores, join threads
+	printf("joined death thread id %d\n", resources->philo->id);
+	close_semaphores(resources->shared);
+	sem_close(resources->philo->mutex_local_sem);
+	sem_unlink(resources->philo->mutex_sem_name);
+	free(resources->philo->mutex_sem_name);
+	free(resources->philos);
+	free(resources->pids);
+	exit(SUCCESS);
 	return (NULL);
 }
 
@@ -57,35 +60,34 @@ void	*stop_routine(void	*arg)
 
 // runs for each philo constantly until he dies
 // if he dies, prints DEATH msg and sends signal to all processes (incl. this one) which are caught by stop_routine thread
+// can finish if philo dies or if it receives stop_simulation == true
 void	*death_routine(void *arg)
 {
 	t_philo	*philo;
 	int		i;
+	bool	dead = false;
 
+	// printf("started death_routine thread\n");
 	philo = (t_philo *)arg;
 	while (1)
 	{
-		// pthread_mutex_lock(&philo->lock);
-		if (get_time_in_micros() - philo->last_eaten > (philo->die * 1000) || *(philo->shared->stop_simulation))
+		if (get_time_in_micros() - philo->last_eaten > (philo->die * 1000))
+			dead = true;
+		if (dead || philo->stop_simulation)
 		{
-			if (*(philo->shared->stop_simulation) == false) // only log death if the time surpassed tiem to die, not when we received signal to change stop_sim to false
+			if (dead)
+			{
 				log_msg(philo, DEATH);
-            // & post n times to stop_semaphore so all processes get the memo that simulation is over
-            i = -1;
-            while (++i < philo->total)
-                sem_post(philo->shared->stop_sem);
-			log_msg(philo, LAST);
-            // TODO: post to monitoring_semaphore so the main process can continue
-			// i = 0;
-			// while (i < philo->total)
-			// {
-			// 	sem_post(philo->shared->monitoring_sem);
-			// 	i++;
-			// }
-			// pthread_mutex_unlock(&philo->lock);
+				i = -1;
+				while (++i < philo->total)
+					sem_post(philo->shared->stop_sem);
+			}
+            // post to monitoring_semaphore so the main process can continue
+			i = -1;
+			while (++i < philo->total)
+				sem_post(philo->shared->monitoring_sem);
 			return (NULL);
 		}
-		// pthread_mutex_unlock(&philo->lock);
 		usleep(100);
 	}
 }

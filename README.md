@@ -51,10 +51,15 @@ b. if philo dies, it posts to stop_simulation semaphore n times altogehter, whic
 - Mandatory: (almost) done
 - TODO: they die eventually when sleep is 0 - probably steal resources as they sleep 0
 - sometimes semaphore already exists and it will not create it anew - because program terminated abnormaly and did ot close and unlink the semaphore form memory, thus we cannot open it again. Create one with new name 
-- LEFT ON: DID WHAT IS ABOVE, WAITING FOR SEMAPHORE IN MAIN, POSTING TO SEMAPHORE ONCE WHEN PHILO IS FUL OR NUMBER_OF_PHILOS TIMES WHEN ONE DIES SO WE CAN KILL ALL PROCESSES
-- possible way not to make them print anything after stop_sim signal: 	set sem_wait(philos[0].shared->msg_sem); so it takes the one resource and pothers cannot take it BUT it doesnt work 
-- // TODO: move start time to later in code as now it is too soon
-- TODO: not allowed mutexes in bonus part ??? 
+- // TODO: move start time to later in code as now it is too soon ?? 
+- NOW DOING: start one thread for deah checking and one for full checking in main process
+- if they detect death, they
+- TODO: create a mutex_sem that works like msg_sem
+- PROBLEMS:
+1. leaks when exiting from a thread
+2. data races for stop_sim variable - fix with semaphores specific to each process
+3. when one philo waits for fork and dies, he prints death but then takes the fork he has been waiting for 
+
 
 ### MECHANISMS TO AVOID DEADLOCKS
 1. even philos wait for a moment before grabbing forks
@@ -77,6 +82,7 @@ b. if philo dies, it posts to stop_simulation semaphore n times altogehter, whic
 
 ## BONUS
 - processes are properly created and freed and they get the philo data
+- BIGGEST PROBLEM: So, I have n processes representing n philosophers. Each has a thread that monitors if he died. When one dies, he must somehow signal to the others that he died, which I do by posting n times to a stop_simulation semaphore. For this I create another thread for every philo that only waits for this semaphore and then starts the exiting sequence. I clean resources from this stop_simulation thread, but somehow I must wait for the death_thread and the only way to let it know it should escape the while(1) loop is through a varable that changes stop_simulation from false to true. BUT this will lead to race conditions since we cannot use mutexes. AND another problem is that I detach this thread, but I cannot free its resources because I exit the process from this thread. If I did not exit the process from this thread, I would again have to use this variable which causes race conditions. 
 
 ## TEST CASES
 ### --- incorrect input - check parsing ---

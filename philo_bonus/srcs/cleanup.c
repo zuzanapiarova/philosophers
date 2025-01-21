@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cleanup.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zuzanapiarova <zuzanapiarova@student.42    +#+  +:+       +#+        */
+/*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 10:43:17 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/20 21:09:40 by zuzanapiaro      ###   ########.fr       */
+/*   Updated: 2025/01/21 18:05:06 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ int	close_semaphores(t_shared *shared)
 	sem_close(shared->monitoring_sem);
 	return (SUCCESS);
 }
+
 int	destroy_semaphores(t_shared *shared)
 {
 	sem_close(shared->fork_sem);

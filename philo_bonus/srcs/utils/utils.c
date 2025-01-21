@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 08:40:37 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/21 11:36:45 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/21 17:56:26 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,8 +40,20 @@ bool	check_stop_sim(t_philo *philo)
 	bool	stopped;
 
 	(void)philo;
-	log_msg(philo, STOP_STATUS);
+	stopped = false;
+	//log_msg(philo, STOP_STATUS);
 	// TODO: maybe change it to return 0 if false, 1 if dead, 2 if full so we can distinguish
-	stopped = *(philo->shared->stop_simulation);
+	//stopped = *(philo->shared->stop_simulation);
 	return (stopped);
+}
+
+char	*get_mutex_sem_name(t_philo *philo)
+{
+	char	*name;
+	char	*number;
+
+	number = ft_utoa(philo->id);
+	name = ft_strjoin("mutex_sem", number);
+	free(number);
+	return (name);
 }

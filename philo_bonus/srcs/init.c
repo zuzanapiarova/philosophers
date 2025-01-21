@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 10:21:56 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/21 11:21:51 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/21 18:22:53 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,6 @@
 
 int	init_shared_resources(t_shared *shared, int total)
 {
-	*(shared->stop_simulation) = false;
 	// create semaphore representing forks ---------------------------------------------------------------------------------------------------------------------------------------------------------
 	shared->fork_sem = sem_open(FORK_SEM, O_CREAT | O_EXCL, 0644, total); // need to check the permissions later
 	if (shared->fork_sem == SEM_FAILED)
@@ -83,7 +82,14 @@ int	init_philo_data(t_philo *p, int i, char **argv, t_shared *shared)
 	p->times_eaten = 0;
 	p->last_eaten = get_time_in_micros();
 	p->shared = shared;
-	// TODO: probably add a state_sem semaphore for reading shared resources but idk if needed
+	p->stop_simulation = false;
+	// p->mutex_sem_name = get_mutex_sem_name(p);
+	// p->mutex_local_sem = sem_open(p->mutex_sem_name, O_CREAT | O_EXCL, 0644, 1);
+	// if (p->mutex_local_sem == SEM_FAILED)
+	// {
+	// 	free(p->mutex_sem_name);
+	// 	return (write(2, "Error creating forks semaphore.\n", 32), ERROR);
+	// }
 	return (SUCCESS);
 }
 

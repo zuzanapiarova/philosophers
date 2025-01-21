@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/13 17:26:55 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/21 11:35:10 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/21 17:56:35 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,11 +32,11 @@
 # define SUCCESS 0
 # define TIMEZONE_MILI 3600000
 # define TIMEZONE_MICRO 3600000000
-# define FORK_SEM "/fork_sem68"
-# define MSG_SEM "/msg_sem68"
-# define STOP_SEM "/stop_sem68"
-# define FULL_SEM "/stop_sem68"
-# define MONITORING_SEM "/monitoring_sem68"
+# define FORK_SEM "/fork_sem69"
+# define MSG_SEM "/msg_sem69"
+# define STOP_SEM "/stop_sem69"
+# define FULL_SEM "/stop_sem69"
+# define MONITORING_SEM "/monitoring_sem69"
 
 typedef enum e_action
 {
@@ -62,7 +62,6 @@ typedef struct s_shared
 	sem_t			*monitoring_sem;
 	sem_t			*stop_sem;
 	sem_t			*full_sem;
-	bool			*stop_simulation;
 }					t_shared;
 
 typedef struct s_philo
@@ -77,6 +76,9 @@ typedef struct s_philo
 	// variables that change but belong to one thread at all times
 	unsigned int	times_eaten;
 	long long		last_eaten;
+	bool			stop_simulation;
+	char			*mutex_sem_name;
+	sem_t			*mutex_local_sem;
 	pthread_t		death_checker;
 	pthread_t		full_checker;
 	pthread_t		stop_sim_checker;
@@ -101,7 +103,6 @@ int				take_forks(t_philo *philo);
 int				leave_forks(t_philo *philo);
 
 /* philo_bonus.c */
-int				routine(t_philo *philo);
 int				start_simulation(char **argv, int total);
 int				main(int argc, char **argv);
 
@@ -139,5 +140,6 @@ void			ft_putnbr(long long nb);
 char			*ft_strjoin(char const *s1, char const *s2);
 void			ft_putchar(char c);
 int				check_arg(char *val);
+char			*get_mutex_sem_name(t_philo *philo);
 
 #endif

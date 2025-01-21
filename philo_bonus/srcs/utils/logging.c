@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/13 16:51:21 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/21 11:42:46 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/21 17:53:07 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,7 +116,7 @@ int	log_msg(t_philo *philo, t_action action)
 	}
 	if (action == STOP_STATUS)
 	{
-		if (*(philo->shared->stop_simulation))
+		if (philo->stop_simulation)
 			ft_putchar('a');
 		else
 			ft_putchar('b');
