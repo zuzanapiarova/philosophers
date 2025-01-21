@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/15 16:05:45 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/21 21:08:24 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/21 21:22:23 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ int	init_child(t_resources *resources, int i)
 		free(resources->philo->mutex_sem_name);
 		return (write(2, "Error creating forks semaphore.\n", 32), ERROR);
 	}
-	pthread_create(&resources->philo->stop_sim_checker, NULL, &stop_routine, resources); // will free all resources regarding this process besided itself (obvi)
+	pthread_create(&resources->philo->stop_sim_checker, NULL, &stop_routine, resources);
 	pthread_create(&resources->philo->death_checker, NULL, &death_routine, resources->philo);
 	if (child_process(resources->philo) == ERROR)
 		result = ERROR;

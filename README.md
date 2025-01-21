@@ -52,13 +52,12 @@ b. if philo dies, it posts to stop_simulation semaphore n times altogehter, whic
 - TODO: they die eventually when sleep is 0 - probably steal resources as they sleep 0
 - sometimes semaphore already exists and it will not create it anew - because program terminated abnormaly and did ot close and unlink the semaphore form memory, thus we cannot open it again. Create one with new name 
 - // TODO: move start time to later in code as now it is too soon ?? 
-- NOW DOING: start one thread for deah checking and one for full checking in main process
-- if they detect death, they
-- TODO: create a mutex_sem that works like msg_sem
+- TODO: when the last one has the last meal, he goes to sleep. He should exit but the info doesnt get to him quickly enough. fix and then its ok. 
+- TODO: sometimes two deaths close to each other print both, the more philos, the more deaths print - they do not get the signal quickly enough
 - PROBLEMS:
-1. leaks when exiting from a thread
-2. data races for stop_sim variable - fix with semaphores specific to each process
-3. when one philo waits for fork and dies, he prints death but then takes the fork he has been waiting for 
+1. leaks when exiting from a thread - not exiting from threads
+2. data races for stop_sim variable - fix with semaphores representing mutexes specific toeach process
+3. when one philo waits for fork and dies, he prints death but then takes the fork he has been waiting for - fixed by giving him the fork before death log and changing stop_sim to true so stop_sim_checker wont let him eat 
 
 
 ### MECHANISMS TO AVOID DEADLOCKS

@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 10:20:07 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/21 21:10:09 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/21 21:14:43 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,6 +78,7 @@ void	*fullness_checker_routine(void *arg)
 	t_resources *resources;
 	int			i;
 
+	i = 0;
 	resources = (t_resources *)arg;
 	// fullness checker waits n times until all philos are full
 	while (++i < resources->philos[0].total)
