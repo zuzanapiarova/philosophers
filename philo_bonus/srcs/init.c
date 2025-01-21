@@ -3,32 +3,32 @@
 /*                                                        :::      ::::::::   */
 /*   init.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
+/*   By: zuzanapiarova <zuzanapiarova@student.42    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 10:21:56 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/20 13:28:28 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/20 20:44:27 by zuzanapiaro      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include"../includes/philosophers.h"
 
 int	init_shared_resources(t_shared *shared, int total)
-{	
+{
 	// create semaphore representing forks ---------------------------------------------------------------------------------------------------------------------------------------------------------
-	shared->fork_sem = sem_open(FORK_SEM, O_CREAT | O_EXCL, 0644, total); // need to check the permissions later 
-	if (shared->fork_sem == SEM_FAILED) 
+	shared->fork_sem = sem_open(FORK_SEM, O_CREAT | O_EXCL, 0644, total); // need to check the permissions later
+	if (shared->fork_sem == SEM_FAILED)
 		return (write(2, "Error creating forks semaphore.\n", 32), ERROR);
 	//  create semaphore for locking msg output ----------------------------------------------------------------------------------------------------------------------------------------------------
-	shared->msg_sem = sem_open(MSG_SEM, O_CREAT | O_EXCL, 0644, 1); // need to check the permissions later 
-	if (shared->msg_sem == SEM_FAILED)  
+	shared->msg_sem = sem_open(MSG_SEM, O_CREAT | O_EXCL, 0644, 1); // need to check the permissions later
+	if (shared->msg_sem == SEM_FAILED)
 	{
 		sem_close(shared->fork_sem);
 		sem_unlink(FORK_SEM);
 		return (write(2, "Error creating message semaphore.\n", 34), ERROR);
 	}
 	//  create semaphore for stop simulation signalling ---------------------------------------------------------------------------------------------------------------------------------------------
-	shared->stop_sem = sem_open(STOP_SEM, O_CREAT | O_EXCL, 0644, 0); // need to check the permissions later 
-	if (shared->msg_sem == SEM_FAILED)  
+	shared->stop_sem = sem_open(STOP_SEM, O_CREAT | O_EXCL, 0644, 0); // need to check the permissions later
+	if (shared->msg_sem == SEM_FAILED)
 	{
 		sem_close(shared->fork_sem);
 		sem_unlink(FORK_SEM);
@@ -36,8 +36,8 @@ int	init_shared_resources(t_shared *shared, int total)
 		sem_unlink(MSG_SEM);
 		return (write(2, "Error creating message semaphore.\n", 34), ERROR);
 	}
-    shared->full_sem = sem_open(FULL_SEM, O_CREAT | O_EXCL, 0644, 0); // need to check the permissions later 
-	if (shared->msg_sem == SEM_FAILED)  
+    shared->full_sem = sem_open(FULL_SEM, O_CREAT | O_EXCL, 0644, 0); // need to check the permissions later
+	if (shared->msg_sem == SEM_FAILED)
 	{
 		sem_close(shared->fork_sem);
 		sem_unlink(FORK_SEM);
@@ -48,8 +48,8 @@ int	init_shared_resources(t_shared *shared, int total)
 		return (write(2, "Error creating message semaphore.\n", 34), ERROR);
 	}
 	// create semaphore for stop_simulation ---------------------------------------------------------------------------------------------------------------------------------------------------------
-	shared->monitoring_sem = sem_open(MONITORING_SEM, O_CREAT | O_EXCL, 0644, 0); // need to check the permissions later 
-	if (shared->monitoring_sem == SEM_FAILED) 
+	shared->monitoring_sem = sem_open(MONITORING_SEM, O_CREAT | O_EXCL, 0644, 0); // need to check the permissions later
+	if (shared->monitoring_sem == SEM_FAILED)
 	{
 		sem_close(shared->fork_sem);
 		sem_unlink(FORK_SEM);
@@ -61,8 +61,8 @@ int	init_shared_resources(t_shared *shared, int total)
 		sem_unlink(FULL_SEM);
 		return (write(2, "Error creating monitoring semaphore.\n", 37), ERROR);
 	}
-	*(shared->stop_simulation) = false;
-	shared->start_time = get_time_in_micros(); // or here set to 0 and in code move further 
+	// /*(shared->stop_simulation) = false;
+	shared->start_time = get_time_in_micros(); // or here set to 0 and in code move further
     return (SUCCESS);
 }
 
@@ -92,7 +92,7 @@ int	init_resources(t_philo **philos, pid_t **pids, t_shared *shared, char **argv
 {
 	int	i;
 	int	total;
-	
+
 	total = ft_atou(argv[1]);
 	// create pids array -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	*pids = (pid_t *)malloc(sizeof(pid_t) * total);

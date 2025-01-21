@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   logging.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
+/*   By: zuzanapiarova <zuzanapiarova@student.42    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/13 16:51:21 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/20 13:01:54 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/20 21:40:34 by zuzanapiaro      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 // "\033[31m" red
 // "\033[33m" yellow
-// "\033[34m" blue 
+// "\033[34m" blue
 // "\033[35m" magenta
 // "\033[36m" cyan
 // "\033[37m" white
@@ -24,7 +24,7 @@
 // "\033[38;2;144;238;144m" - Pastel Green
 // "\033[38;5;146m" - Pastel Purple
 // "\033[38;5;153m" - Pastel Blue
-// "\033[38;5;213m" - Pastel Magenta 
+// "\033[38;5;213m" - Pastel Magenta
 // assigns collor to each action
 char	*get_color(t_action action)
 {
@@ -76,6 +76,8 @@ char	*get_msg(t_action action)
 		msg = "simulation stopped\033[37m\n";
 	else if (action == LAST)
 		msg = "SENDING STOP SIGNAL\033[37m\n";
+	else if (action == RECEIVED)
+		msg = "stop signal received\033[37m\n";
 	else
 		msg = "";
 	return (msg);

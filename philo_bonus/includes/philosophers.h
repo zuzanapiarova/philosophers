@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philosophers.h                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
+/*   By: zuzanapiarova <zuzanapiarova@student.42    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/13 17:26:55 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/20 13:42:33 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/20 22:04:24 by zuzanapiaro      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,11 +32,11 @@
 # define SUCCESS 0
 # define TIMEZONE_MILI 3600000
 # define TIMEZONE_MICRO 3600000000
-# define FORK_SEM "/fork_sem51"
-# define MSG_SEM "/msg_sem51"
-# define STOP_SEM "/stop_sem51"
-# define FULL_SEM "/stop_sem51"
-# define MONITORING_SEM "/monitoring_sem51"
+# define FORK_SEM "/fork_sem62"
+# define MSG_SEM "/msg_sem62"
+# define STOP_SEM "/stop_sem62"
+# define FULL_SEM "/stop_sem62"
+# define MONITORING_SEM "/monitoring_sem62"
 
 typedef enum e_action
 {
@@ -49,7 +49,8 @@ typedef enum e_action
 	FINISH, // SIMULATION IS FINISHED
 	FULL, // PHILO ATE FOR THE LAST TIME
 	STOP, // TEST - SIMULATION IS STOPPED
-	LAST // TEST - RECEIVED LAST SEMAPHORE SIGNAL FOR FULLNESS/DEATH
+	LAST, // TEST - SEMAPHORE SIGNAL FOR DEATH WA SSENT
+	RECEIVED // TEST - CHECKS IF STOP SIGNAL WAS RECEIVED
 }				t_action;
 
 typedef struct s_shared
@@ -60,7 +61,7 @@ typedef struct s_shared
 	sem_t			*monitoring_sem;
 	sem_t			*stop_sem;
 	sem_t			*full_sem;
-	bool			*stop_simulation;
+	//bool			*stop_simulation;
 }					t_shared;
 
 typedef struct s_philo
@@ -97,6 +98,7 @@ int				main(int argc, char **argv);
 
 
 /* cleanup.c */
+int				close_semaphores(t_shared *shared);
 int				destroy_semaphores(t_shared *shared);
 
 /* init.c */

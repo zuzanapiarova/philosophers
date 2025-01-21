@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo_bonus.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
+/*   By: zuzanapiarova <zuzanapiarova@student.42    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/15 16:05:45 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/20 13:42:13 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/20 21:59:06 by zuzanapiaro      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,36 +95,33 @@ int	start_simulation(char **argv, int total)
 		if (pids[i] == 0)
 		{
 			printf("forked child %d\n", i);
-			int	exit_status = child_process(&philos[i]);
-			// cleanup child process here because it does not have access ot entire philo array nor entire pids array - because philos should not know the state of other philos in my opinion 
-			free(pids);
-			free(philos);
+			if (child_process(&philos[i]) == ERROR)
+				break ; // or EXIT ??
+				// TODO: possibly clean
+			//int	exit_status = child_process(&philos[i]);
+			// cleanup child process here because it does not have access ot entire philo array nor entire pids array - because philos should not know the state of other philos in my opinion
+			//free(pids);
+			//free(philos);
 			//destroy_semaphores(&shared);
-			sem_close(shared.fork_sem);
-			sem_close(shared.msg_sem);
-			sem_close(shared.stop_sem);
-			sem_close(shared.full_sem);
-			sem_close(shared.monitoring_sem);
-			printf("Resources destroyed. Child %d exiting.\n", i);
-			exit(exit_status);
+			//printf("Resources destroyed. Child %d exiting.\n", i);
+			//exit(exit_status);
 		}
 	}
 	// monitoring process ??? ------------------------------------------------------------------------------------------------------------------------------------------------------------------
-	i = 0;
-	while (i < philos[0].total) // & -------------------------------- wait for collecting signals from all philos for being full --- OR --- signal from one of them that he died ---------------
-	{
-		sem_wait(philos[0].shared->monitoring_sem);
-		printf("waited for p%d\n", i + 1);
-		i++;
-	}
-	log_msg(&philos[0],FINISH);
+	// i = 0;
+	// while (i < philos[0].total) // & -------------------------------- wait for collecting signals from all philos for being full --- OR --- signal from one of them that he died ---------------
+	// {
+	// 	sem_wait(philos[0].shared->monitoring_sem);
+	// 	printf("waited for p%d\n", i + 1);
+	// 	i++;
+	// }
 	 // when the monitoring semaphore finished waiting and reaches here, it means simulation should stop
-	i = 0;
-	while (i < philos[0].total) // & -------------------------------- post n times to semaphore so all processes get the memo that simulation is over ------------------------------------------
-	{
-		sem_post(philos[0].shared->stop_sem);
-		i++;
-	}
+	// i = 0;
+	// while (i < philos[0].total) // & -------------------------------- post n times to semaphore so all processes get the memo that simulation is over ------------------------------------------
+	// {
+	// 	sem_post(philos[0].shared->stop_sem);
+	// 	i++;
+	// }
 	// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	// Cleanup
 	i = -1;
@@ -133,7 +130,9 @@ int	start_simulation(char **argv, int total)
 		// TODO: gather exit codes of processes and if they are all 0, return 0, if any is error, return error
 		// TODO: its ok because routine(child_process) cannot go wrong, only breaks if we catch death or full, so we return success
 		waitpid(pids[i], NULL, 0);
+		printf("waited %d\n", i);
 	}
+	log_msg(&philos[0],FINISH);
 	destroy_semaphores(&shared);
 	free(philos);
 	free(pids);
