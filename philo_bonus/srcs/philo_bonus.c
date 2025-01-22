@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/15 16:05:45 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/22 19:09:21 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/22 19:16:30 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,8 @@
 
 // runs for each child with input of one philo struct
 // each philo has 2 monitoring threads - one for its death, other for stop_sim
+// sleep after it is full lets the last full thread have enough time to
+// get memo that simulation ended
 void	child_routine(t_philo *philo)
 {
 	while (1)
@@ -77,7 +79,7 @@ int	main(int argc, char **argv)
 	pid_t		*pids;
 	t_philo		*philos;
 	t_shared	shared;
-	
+
 	total = ft_atou(argv[1]);
 	pids = NULL;
 	philos = NULL;

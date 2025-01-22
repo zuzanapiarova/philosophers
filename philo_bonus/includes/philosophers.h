@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/13 17:26:55 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/22 19:06:38 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/22 19:29:56 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,8 @@
 // it says the sepaphore did not wait for post action
 // but this happens for semaphores innitialized with 0
 
-#ifndef PHILOSOPHERS_H
-# define PHILOSOPHERS_H
+#ifndef PHILOSOPHERS_BONUS_H
+# define PHILOSOPHERS_BONUS_H
 
 # include <unistd.h>
 # include <stdlib.h>
@@ -35,16 +35,19 @@
 # include <sys/types.h>
 # include <signal.h>
 
+/* MACROS */
 # define ERROR 1
 # define SUCCESS 0
 # define TIMEZONE_MILI 3600000
 # define TIMEZONE_MICRO 3600000000
 
-# define FORK_SEM "/fork_sem69"
-# define MSG_SEM "/msg_sem69"
-# define STOP_SEM "/stop_sem69"
-# define FULLNESS_SEM "/fullness_sem69"
+/* SEMAPHORES */
+# define FORK_SEM "/fork_sem"
+# define MSG_SEM "/msg_sem"
+# define STOP_SEM "/stop_sem"
+# define FULLNESS_SEM "/fullness_sem"
 
+/* STRUCTS & OTHER DT */
 typedef enum e_action
 {
 	FORK_L, // TOOK LEFT FORK
@@ -96,11 +99,13 @@ typedef struct s_philo
 
 typedef struct s_resources
 {
-	t_philo		*philos;
-	t_shared	*shared;
-	pid_t		*pids;
-	t_philo		*philo;
-}				t_resources;
+	t_philo			*philos;
+	t_shared		*shared;
+	pid_t			*pids;
+	t_philo			*philo;
+}					t_resources;
+
+/*  FUNCTIONS */
 
 /* actions.c + actions_forks.c */
 int				p_eat(t_philo *philo);

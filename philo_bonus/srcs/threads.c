@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 10:20:07 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/22 19:01:34 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/22 19:16:16 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,18 +66,19 @@ void	*death_routine(void *arg)
 int	run_full_checker_thread(t_philo *philo)
 {
 	pthread_t	full_checker;
-	
+
 	if (pthread_create(&full_checker, NULL, &full_routine, philo) == ERROR)
 		return (write(2, "Error creating full_check thread.\n", 34), ERROR);
 	pthread_join(full_checker, NULL);
 	return (SUCCESS);
 }
+
 // fullness checker waits n times until all philos are full
 // when fullness semaphore waits n times, means sim has stopped
 // so the thread posts n times to stop semaphore and returns
 void	*full_routine(void *arg)
 {
-	t_philo *philo;
+	t_philo	*philo;
 	int		i;
 
 	philo = (t_philo *)arg;
@@ -85,7 +86,7 @@ void	*full_routine(void *arg)
 	while (++i < philo->total)
 		sem_wait(philo->shared->fullness_sem);
 	i = -1;
-	while (++i < philo->total) 
+	while (++i < philo->total)
 		sem_post(philo->shared->stop_sem);
 	return (NULL);
 }

@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 08:42:15 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/16 16:53:56 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/22 19:47:29 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,9 +32,7 @@ int	validate_num_of_arguments(int argc)
 }
 
 // validates if input is one of accepted number types
-// TODO: protect against numbers bigger than MAX_INT*2 and ...
-// TODO: ... and the addition of ms arguments to current time being ...
-// TODO: ... bigger than max int *2, aleo against numbers smaller than 0
+// TODO: protect against numbers bigger than MAX_INT*2
 int	validate_arguments(char **argv)
 {
 	int				i;
@@ -76,13 +74,17 @@ int	handle_logical_errors(char **argv)
 		val = ft_atou(argv[i]);
 		if (i == 1 && val < 1)
 		{
-			write(2, "\033[31mNumber of philosophers must be ", 36);
-			write(2, "at least 1 for program to start\n", 32);
+			write(2, "\033[31mNeed at least 1 philo to start.\033[37m\n", 42);
 			return (ERROR);
 		}
 		if (i == 2 && val == 0)
 		{
-			write(2, "\033[31mYou made them die instantly. :(\033[37m\n", 46);
+			write(2, "\033[31mYou made them die instantly. :(\033[37m\n", 42);
+			return (ERROR);
+		}
+		if (i == 5 && val == 0)
+		{
+			write(2, "\033[31mAlready full. Not starting.\033[37m\n", 38);
 			return (ERROR);
 		}
 		i++;

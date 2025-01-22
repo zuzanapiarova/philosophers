@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/13 16:51:21 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/22 14:14:44 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/22 19:20:14 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,15 @@ char	*get_color(t_action action)
 }
 
 // gets correcponding log msg based on action
+// tetsing messages: 
+	// else if (action == CHANGE)
+	// 	msg = "changed stop_sim to true\033[37m\n";
+	// else if (action == RECEIVED)
+	// 	msg = "stop signal received\033[37m\n";
+	// else if (action == STOP_STATUS)
+	// 	msg = "stop_sim status is \033[37m";
+	// else if (action == STOP)
+	// 	msg = "simulation stopped\033[37m\n";
 char	*get_msg(t_action action)
 {
 	char	*msg;
@@ -72,14 +81,6 @@ char	*get_msg(t_action action)
 		msg = "simulation finished\033[37m\n";
 	else if (action == FULL)
 		msg = "is full\033[37m\n";
-	else if (action == STOP)
-		msg = "simulation stopped\033[37m\n";
-	else if (action == CHANGE)
-		msg = "changed stop_sim to true\033[37m\n";
-	else if (action == RECEIVED)
-		msg = "stop signal received\033[37m\n";
-	else if (action == STOP_STATUS)
-		msg = "stop_sim status is \033[37m";
 	else
 		msg = "";
 	return (msg);
@@ -89,7 +90,19 @@ char	*get_msg(t_action action)
 // in format: timestamp_in_ms id action
 // use mutex to lock access to terminal while one log msg is being printed out
 // prevents messages from being mixed up
-// & when testing, can change time to be in microseconds by removing / 1000
+// testing messages:
+	// if (action != FINISH)
+	// 	ft_putnbr(philo->id);
+	// else
+	// 	write(1, "X", 1);
+	// --------------------------
+	// if (action == STOP_STATUS)
+	// {
+	// 	if (philo->stop_simulation)
+	// 		write(1, " 1\n", 3);
+	// 	else
+	// 		write(1, " 0\n", 3);
+	// }
 int	log_msg(t_philo *philo, t_action action)
 {
 	char	*msg;
@@ -97,16 +110,13 @@ int	log_msg(t_philo *philo, t_action action)
 	char	*color_time;
 
 	msg = get_msg(action);
-	time = ft_utoa(((get_time_in_micros() - philo->start_time)));
+	time = ft_utoa(((get_time_in_micros() - philo->start_time) / 1000));
 	color_time = ft_strjoin(get_color(action), time);
 	free(time);
 	sem_wait(philo->shared->msg_sem);
 	write(1, color_time, ft_strlen(color_time));
 	write(1, "\t  ", 3);
-	if (action != FINISH)
-		ft_putnbr(philo->id);
-	else
-		write(1, "X", 1);
+	ft_putnbr(philo->id);
 	write(1, " ", 1);
 	write(1, msg, ft_strlen(msg));
 	if (action == EATS)
@@ -114,16 +124,7 @@ int	log_msg(t_philo *philo, t_action action)
 		ft_putnbr(philo->times_eaten);
 		write(1, ". time\n", 7);
 	}
-	if (action == STOP_STATUS)
-	{
-		if (philo->stop_simulation)
-			write(1, " 1\n", 3);
-		else
-			write(1, " 0\n", 3);
-	}
 	sem_post(philo->shared->msg_sem);
 	free(color_time);
 	return (SUCCESS);
 }
-
-

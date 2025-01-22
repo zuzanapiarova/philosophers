@@ -6,11 +6,11 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 10:21:56 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/22 18:53:47 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/22 19:21:37 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include"../includes/philosophers.h"
+#include "../includes/philosophers.h"
 
 int	init_global_semaphores(t_shared *shared, int total)
 {
@@ -44,12 +44,13 @@ int	init_global_semaphores(t_shared *shared, int total)
 		sem_unlink(STOP_SEM);
 		return (write(2, "Error creating monitoring semaphore.\n", 37), ERROR);
 	}
-    return (SUCCESS);
+	return (SUCCESS);
 }
 
 // initialzes each philo separately
 // each philo is a separate entity and cannot see the data of other philos
-// data that will be intialized in each process separately: mutex_sem_name, mutex_local_sem
+// data that will be intialized in each process separately so it doesnt consume
+// memory of all processes: mutex_sem_name, mutex_local_sem, mutex_sem_name
 int	init_philo_data(t_philo *p, int i, char **argv, t_shared *shared)
 {
 	p->id = i + 1;
@@ -71,30 +72,30 @@ int	init_philo_data(t_philo *p, int i, char **argv, t_shared *shared)
 }
 
 // allocated pids array, philo array, shared resources and each philo structure
-int	init_global_resources(t_philo **philos, pid_t **pids, t_shared *shared, char **argv)
+int	init_global_resources(t_philo **ph, pid_t **pids, t_shared *sh, char **agv)
 {
 	int	i;
 	int	total;
 
-	total = ft_atou(argv[1]);
+	total = ft_atou(agv[1]);
 	*pids = (pid_t *)malloc(sizeof(pid_t) * total);
 	if (!(*pids))
 		return (write(2, "Memory allocation problem. Exiting.\n", 36), ERROR);
-	*philos = (t_philo *)malloc(sizeof(t_philo) * total);
-	if (!(*philos))
+	*ph = (t_philo *)malloc(sizeof(t_philo) * total);
+	if (!(*ph))
 	{
 		free(*pids);
 		return (write(2, "Memory allocation problem. Exiting.\n", 36), ERROR);
 	}
-	if (init_global_semaphores(shared, total) == ERROR)
+	if (init_global_semaphores(sh, total) == ERROR)
 	{
 		free(*pids);
-		free(*philos);
+		free(*ph);
 		return (ERROR);
 	}
 	i = -1;
 	while (++i < total)
-		init_philo_data(&(*philos)[i], i, argv, shared);
+		init_philo_data(&(*ph)[i], i, agv, sh);
 	return (SUCCESS);
 }
 
@@ -102,15 +103,18 @@ int	init_global_resources(t_philo **philos, pid_t **pids, t_shared *shared, char
 int	init_local_resources(t_philo *philo)
 {
 	philo->mutex_sem_name = get_mutex_sem_name(philo);
-	philo->mutex_local_sem = sem_open(philo->mutex_sem_name, O_CREAT | O_EXCL, 0644, 1);
+	philo->mutex_local_sem
+		= sem_open(philo->mutex_sem_name, O_CREAT | O_EXCL, 0644, 1);
 	if (philo->mutex_local_sem == SEM_FAILED)
 	{
 		free(philo->mutex_sem_name);
 		return (write(2, "Error creating mutex semaphore.\n", 32), ERROR);
 	}
-	if (pthread_create(&philo->stop_sim_checker, NULL, &stop_routine, philo) != SUCCESS)
+	if (pthread_create(&philo->stop_sim_checker, NULL, &stop_routine, philo)
+		!= SUCCESS)
 		return (ERROR);
-	if (pthread_create(&philo->death_checker, NULL, &death_routine, philo) != SUCCESS)
+	if (pthread_create(&philo->death_checker, NULL, &death_routine, philo)
+		!= SUCCESS)
 		return (ERROR);
 	return (SUCCESS);
 }

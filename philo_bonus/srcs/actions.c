@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 09:28:58 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/22 18:17:29 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/22 19:32:26 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,12 @@ int	take_forks(t_philo *philo)
 		return (ERROR);
 	}
 	log_msg(philo, FORK_L);
+	if (philo->total == 1)
+	{
+		usleep(philo->die * 1000);
+		sem_post(philo->shared->fork_sem);
+		return (ERROR);
+	}
 	sem_wait(philo->shared->fork_sem);
 	if (check_stop_sim(philo))
 	{
