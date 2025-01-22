@@ -52,7 +52,8 @@ typedef enum e_action
 	STOP, // TEST - SIMULATION IS STOPPED
 	CHANGE, // TEST - changed stop_sim to true
 	RECEIVED, // TEST - CHECKS IF STOP SIGNAL WAS RECEIVED
-	STOP_STATUS // TEST - shows value of stop_simulation at each check
+	STOP_STATUS, // TEST - shows value of stop_simulation at each check
+	CHANGE // test - stop_simulaiton changed to true
 }				t_action;
 
 typedef struct s_shared

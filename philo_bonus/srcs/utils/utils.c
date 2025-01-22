@@ -45,6 +45,7 @@ bool	check_stop_sim(t_philo *philo)
 	return (stopped);
 }
 
+// gets specific name for local philo mutex-representing semaphore
 char	*get_mutex_sem_name(t_philo *philo)
 {
 	char	*name;

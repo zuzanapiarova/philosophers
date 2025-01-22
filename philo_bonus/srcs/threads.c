@@ -27,6 +27,7 @@ void	*stop_routine(void	*arg)
 	sem_wait(philo->shared->stop_sem);
 	sem_wait(philo->mutex_local_sem);
 	philo->stop_simulation = true;
+	log_msg(philo, CHANGE);
 	sem_post(philo->mutex_local_sem);
 	return (NULL);
 }
