@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 10:20:07 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/22 17:01:08 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/22 17:42:52 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,7 +116,7 @@ void	*full_routine(void *arg)
 	t_philo *philo;
 	int			i;
 
-	i = 0;
+	i = -1;
 	philo = (t_philo *)arg;
 	while (++i < philo->total)
 		sem_wait(philo->shared->fullness_sem);

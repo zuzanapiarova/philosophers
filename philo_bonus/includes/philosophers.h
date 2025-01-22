@@ -6,9 +6,16 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/13 17:26:55 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/22 14:11:40 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/22 17:38:13 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+// valgrind error: 
+// Bug in libpthread: sem_wait succeeded on semaphore without prior sem_post
+// https://valgrind-users.narkive.com/5U7vfz8J/helgrind-sem-wait-succeeded-on-
+// semaphore-without-prior-sem-post
+// it says the sepaphore did not wait for post action
+// but this happens for semaphores innitialized with 0
 
 #ifndef PHILOSOPHERS_H
 # define PHILOSOPHERS_H
@@ -36,7 +43,6 @@
 # define FORK_SEM "/fork_sem69"
 # define MSG_SEM "/msg_sem69"
 # define STOP_SEM "/stop_sem69"
-# define START_SEM "/start_sem69"
 # define FULLNESS_SEM "/fullness_sem69"
 
 typedef enum e_action
@@ -62,7 +68,6 @@ typedef struct s_shared
 	sem_t			*msg_sem;
 	sem_t			*fullness_sem;
 	sem_t			*stop_sem;
-	sem_t			*start_sem;
 }					t_shared;
 
 typedef struct s_philo

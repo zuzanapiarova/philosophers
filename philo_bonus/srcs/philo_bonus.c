@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/15 16:05:45 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/22 17:09:28 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/22 17:35:42 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,8 +50,6 @@ int	start_simulation(t_philo *philos, t_shared *shared, pid_t *pids, int total)
 	long long	start_time;
 	pthread_t	full_checker;
 
-	if (pthread_create(&full_checker, NULL, &full_routine, &philos[0]) == ERROR)
-		return (write(2, "Error creating full_check thread.\n", 34), ERROR);
 	start_time = get_time_in_micros();
 	i = -1;
 	while (++i < total)
@@ -73,6 +71,8 @@ int	start_simulation(t_philo *philos, t_shared *shared, pid_t *pids, int total)
 			exit(exit_status);
 		}
 	}
+	if (pthread_create(&full_checker, NULL, &full_routine, &philos[0]) == ERROR)
+		return (write(2, "Error creating full_check thread.\n", 34), ERROR);
 	pthread_join(full_checker, NULL);
 	return (SUCCESS);
 }

@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 10:21:56 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/22 15:32:50 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/22 17:38:24 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,19 +43,6 @@ int	init_global_semaphores(t_shared *shared, int total)
 		sem_close(shared->stop_sem);
 		sem_unlink(STOP_SEM);
 		return (write(2, "Error creating monitoring semaphore.\n", 37), ERROR);
-	}
-	shared->start_sem = sem_open(START_SEM, O_CREAT | O_EXCL, 0644, 0);
-	if (shared->start_sem == SEM_FAILED)
-	{
-		sem_close(shared->fork_sem);
-		sem_unlink(FORK_SEM);
-		sem_close(shared->msg_sem);
-		sem_unlink(MSG_SEM);
-		sem_close(shared->stop_sem);
-		sem_unlink(STOP_SEM);
-			sem_close(shared->fullness_sem);
-		sem_unlink(FULLNESS_SEM);
-		return (write(2, "Error creating start semaphore.\n", 37), ERROR);
 	}
     return (SUCCESS);
 }
