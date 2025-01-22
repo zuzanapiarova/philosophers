@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 10:20:07 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/22 17:42:52 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/22 17:52:50 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,7 +114,7 @@ void	*death_routine(void *arg)
 void	*full_routine(void *arg)
 {
 	t_philo *philo;
-	int			i;
+	int		i;
 
 	i = -1;
 	philo = (t_philo *)arg;
