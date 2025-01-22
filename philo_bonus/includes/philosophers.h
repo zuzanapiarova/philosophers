@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/13 17:26:55 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/22 17:38:13 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/22 19:06:38 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,6 @@ typedef enum e_action
 	FINISH, // SIMULATION IS FINISHED
 	FULL, // PHILO ATE FOR THE LAST TIME
 	STOP, // TEST - SIMULATION IS STOPPED
-	CHANGE, // TEST - changed stop_sim to true
 	RECEIVED, // TEST - CHECKS IF STOP SIGNAL WAS RECEIVED
 	STOP_STATUS, // TEST - shows value of stop_simulation at each check
 	CHANGE // test - stop_simulaiton changed to true
@@ -134,12 +133,14 @@ int				handle_error_input(int argc, char **argv);
 void			*stop_routine(void	*arg);
 void			*death_routine(void *arg);
 void			*full_routine(void *arg);
+int				run_full_checker_thread(t_philo *philo);
 
 /* utils.c && logging.c */
 long long		get_time_in_ms(void);
 long long		get_time_in_micros(void);
 bool			check_stop_sim(t_philo *philo);
 int				log_msg(t_philo *philo, t_action action);
+int				handle_fork_error(pid_t *pids, int i);
 
 /* utils_libft.c */
 unsigned int	ft_atou(const char *nptr);

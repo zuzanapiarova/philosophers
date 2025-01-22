@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 10:21:56 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/22 17:38:24 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/22 18:53:47 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,21 +70,6 @@ int	init_philo_data(t_philo *p, int i, char **argv, t_shared *shared)
 	return (SUCCESS);
 }
 
-// initializes local resources - local threads, local semaphore
-int	init_local_resources(t_philo *philo)
-{
-	philo->mutex_sem_name = get_mutex_sem_name(philo);
-	philo->mutex_local_sem = sem_open(philo->mutex_sem_name, O_CREAT | O_EXCL, 0644, 1);
-	if (philo->mutex_local_sem == SEM_FAILED)
-	{
-		free(philo->mutex_sem_name);
-		return (write(2, "Error creating mutex semaphore.\n", 32), ERROR);
-	}
-	pthread_create(&philo->stop_sim_checker, NULL, &stop_routine, philo);
-	pthread_create(&philo->death_checker, NULL, &death_routine, philo);
-	return (SUCCESS);
-}
-
 // allocated pids array, philo array, shared resources and each philo structure
 int	init_global_resources(t_philo **philos, pid_t **pids, t_shared *shared, char **argv)
 {
@@ -110,5 +95,22 @@ int	init_global_resources(t_philo **philos, pid_t **pids, t_shared *shared, char
 	i = -1;
 	while (++i < total)
 		init_philo_data(&(*philos)[i], i, argv, shared);
+	return (SUCCESS);
+}
+
+// initializes local resources - local threads, local semaphore
+int	init_local_resources(t_philo *philo)
+{
+	philo->mutex_sem_name = get_mutex_sem_name(philo);
+	philo->mutex_local_sem = sem_open(philo->mutex_sem_name, O_CREAT | O_EXCL, 0644, 1);
+	if (philo->mutex_local_sem == SEM_FAILED)
+	{
+		free(philo->mutex_sem_name);
+		return (write(2, "Error creating mutex semaphore.\n", 32), ERROR);
+	}
+	if (pthread_create(&philo->stop_sim_checker, NULL, &stop_routine, philo) != SUCCESS)
+		return (ERROR);
+	if (pthread_create(&philo->death_checker, NULL, &death_routine, philo) != SUCCESS)
+		return (ERROR);
 	return (SUCCESS);
 }

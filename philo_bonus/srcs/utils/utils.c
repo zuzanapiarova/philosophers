@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 08:40:37 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/22 17:09:03 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/22 19:06:28 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,4 +55,12 @@ char	*get_mutex_sem_name(t_philo *philo)
 	name = ft_strjoin("mutex_sem", number);
 	free(number);
 	return (name);
+}
+
+// terminates processes forked so far if fork error is encountered
+int	handle_fork_error(pid_t *pids, int i)
+{
+	while (--i) 
+		kill(pids[i], SIGTERM);
+	return (write(2, "Error forking processes.\n", 25), ERROR);
 }
