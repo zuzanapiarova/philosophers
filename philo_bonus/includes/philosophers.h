@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/13 17:26:55 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/21 21:07:25 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/22 12:32:30 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,6 +84,7 @@ typedef struct s_philo
 	pthread_mutex_t	lock;
 	// only shared resources available to all threads for both read/write
 	t_shared		*shared;
+	int				exit_status;
 }					t_philo;
 
 typedef struct s_resources
@@ -102,18 +103,21 @@ int				take_forks(t_philo *philo);
 int				leave_forks(t_philo *philo);
 
 /* philo_bonus.c */
-int				start_simulation(char **argv, int total);
+int				start_simulation(t_philo *philos, t_shared *shared, pid_t *pids, int total);
 int				main(int argc, char **argv);
 
-
 /* cleanup.c */
-int				close_semaphores(t_shared *shared);
-int				destroy_semaphores(t_shared *shared);
+int				close_global_semaphores(t_shared *shared);
+int				destroy_global_semaphores(t_shared *shared);
+int				destroy_local_resources(t_philo *philo);
+int				destroy_global_resources_child(t_philo *ph, t_shared *shared, pid_t *pids);
+int				destroy_global_resources_parent(t_philo *ph, t_shared *shared, pid_t *pids);
 
 /* init.c */
-int				init_shared_resources(t_shared *shared, int total);
+int				init_global_semaphores(t_shared *shared, int total);
 int				init_philo_data(t_philo *p, int i, char **argv, t_shared *shared);
-int				init_resources(t_philo **philos, pid_t **pids, t_shared *shared, char **argv);
+int				init_global_resources(t_philo **philos, pid_t **pids, t_shared *shared, char **argv);
+int				init_local_resources(t_philo *philo);
 
 /* input_val.c */
 int				handle_error_input(int argc, char **argv);
@@ -121,7 +125,7 @@ int				handle_error_input(int argc, char **argv);
 /* threads.c */
 void			*stop_routine(void	*arg);
 void			*death_routine(void *arg);
-void			*fullness_checker_routine(void *arg);
+void			*full_routine(void *arg);
 
 /* utils.c && logging.c */
 long long		get_time_in_ms(void);

@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 10:20:07 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/21 21:14:43 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/22 12:32:21 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,14 +19,14 @@
 // then it sets stop_simulation for this process to true and returns
 void	*stop_routine(void	*arg)
 {
-	t_resources	*resources;
+	t_philo	*philo;
 
-	resources = (t_resources *)arg;
-	sem_wait(resources->shared->stop_sem);
-	log_msg(resources->philo, RECEIVED);
-	sem_wait(resources->philo->mutex_local_sem);
-	resources->philo->stop_simulation = true;
-	sem_post(resources->philo->mutex_local_sem);
+	philo = (t_philo *)arg;
+	sem_wait(philo->shared->stop_sem);
+	log_msg(philo, RECEIVED); // remove later 
+	sem_wait(philo->mutex_local_sem);
+	philo->stop_simulation = true;
+	sem_post(philo->mutex_local_sem);
 	return (NULL);
 }
 
@@ -73,19 +73,20 @@ void	*death_routine(void *arg)
 	}
 }
 
-void	*fullness_checker_routine(void *arg)
+// fullness checker waits n times until all philos are full
+// when fullness semaphore waits n times, means sim has stopped
+// so the thread posts n times to stop semaphore and returns
+void	*full_routine(void *arg)
 {
-	t_resources *resources;
+	t_philo *philo;
 	int			i;
 
 	i = 0;
-	resources = (t_resources *)arg;
-	// fullness checker waits n times until all philos are full
-	while (++i < resources->philos[0].total)
-		sem_wait(resources->philos[0].shared->fullness_sem);
-	// when the monitoring semaphore finished waiting and reaches here, it means simulation should stop
+	philo = (t_philo *)arg;
+	while (++i < philo->total)
+		sem_wait(philo->shared->fullness_sem);
 	i = -1;
-	while (++i < resources->philos[0].total) 
-		sem_post(resources->philos[0].shared->stop_sem);
+	while (++i < philo->total) 
+		sem_post(philo->shared->stop_sem);
 	return (NULL);
 }
