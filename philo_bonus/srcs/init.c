@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 10:21:56 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/22 14:12:08 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/22 15:32:50 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,7 +91,7 @@ int	init_local_resources(t_philo *philo)
 	if (philo->mutex_local_sem == SEM_FAILED)
 	{
 		free(philo->mutex_sem_name);
-		return (write(2, "Error creating forks semaphore.\n", 32), ERROR);
+		return (write(2, "Error creating mutex semaphore.\n", 32), ERROR);
 	}
 	pthread_create(&philo->stop_sim_checker, NULL, &stop_routine, philo);
 	pthread_create(&philo->death_checker, NULL, &death_routine, philo);

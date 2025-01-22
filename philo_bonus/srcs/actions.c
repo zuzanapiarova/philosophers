@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 09:28:58 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/22 14:07:27 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/22 17:01:33 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,9 +79,7 @@ int	p_think(t_philo *philo)
 
 	if (check_stop_sim(philo))
 		return (ERROR);
-	sem_wait(philo->mutex_local_sem);
 	time_passed = get_time_in_micros() - philo->last_eaten;
-	sem_post(philo->mutex_local_sem);
 	time_left = (philo->die * 1000) - time_passed;
 	time_for_thinking = (philo->die - philo->eat - philo->sleep) * 1000;
 	log_msg(philo, THINKS);

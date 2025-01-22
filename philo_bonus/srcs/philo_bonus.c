@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/15 16:05:45 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/22 14:25:58 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/22 17:09:28 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ int	child_routine(t_philo *philo)
 		if ((int)philo->times_eaten == philo->times_to_eat)
 		{
 			sem_post(philo->shared->fullness_sem);
-			log_msg(philo, FULL); // do not print in final version 
+			//usleep(500);
 		}
 		if (check_stop_sim(philo) == true)
 			return (ERROR);
@@ -101,8 +101,6 @@ int	main(int argc, char **argv)
 	while (--total > -1)
 		waitpid(pids[total], NULL, 0);
 	// TODO: function to collect exit status from exited processes
-	log_msg(&philos[0],FINISH); // remove afterwards 
-	printf("Resources destroyed. Parent exiting.\n");
 	destroy_global_resources_parent(philos, &shared, pids);
 	return (exit_status);
 }
