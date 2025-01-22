@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 10:20:07 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/22 12:32:21 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/22 15:27:49 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@ void	*stop_routine(void	*arg)
 	log_msg(philo, RECEIVED); // remove later 
 	sem_wait(philo->mutex_local_sem);
 	philo->stop_simulation = true;
+	log_msg(philo, CHANGE);
 	sem_post(philo->mutex_local_sem);
 	return (NULL);
 }
@@ -33,7 +34,7 @@ void	*stop_routine(void	*arg)
 // runs for each philo constantly until he dies
 // if he dies, prints DEATH msg and sends signal to all processes (incl. this one) which are caught by stop_routine thread
 // can finish if philo dies or if it receives stop_simulation == true
-void	*death_routine(void *arg)
+/* void	*death_routine(void *arg)
 {
 	t_philo	*philo;
 	int		i;
@@ -48,7 +49,7 @@ void	*death_routine(void *arg)
 		sem_post(philo->mutex_local_sem);
 		if (get_time_in_micros() - philo->last_eaten > (philo->die * 1000) && stopped == false)
 		{
-			sem_post(philo->shared->fork_sem);
+			log_msg(philo, STOP_STATUS);
 			sem_wait(philo->mutex_local_sem);
 			philo->stop_simulation = true;
 			sem_post(philo->mutex_local_sem);
@@ -69,6 +70,57 @@ void	*death_routine(void *arg)
 				sem_post(philo->shared->fullness_sem);
 			return (NULL);
 		}
+		usleep(100);
+	}
+} */
+
+void	*death_routine(void *arg)
+{
+	t_philo	*philo;
+	bool	dead = false;
+	bool	stopped;
+
+	philo = (t_philo *)arg;
+	while (1)
+	{
+		// Check stop_simulation once per loop iteration
+		sem_wait(philo->mutex_local_sem);
+		stopped = philo->stop_simulation;
+		sem_post(philo->mutex_local_sem);
+
+		if (!stopped)
+		{
+			// Check if the philosopher has died
+			if (get_time_in_micros() - philo->last_eaten > (philo->die * 1000))
+			{
+				log_msg(philo, STOP_STATUS);
+				sem_wait(philo->mutex_local_sem);
+				stopped = philo->stop_simulation;
+				sem_post(philo->mutex_local_sem);
+				// Mark philosopher as dead and signal simulation stop
+				sem_wait(philo->mutex_local_sem);
+				philo->stop_simulation = true;
+				sem_post(philo->mutex_local_sem);
+				dead = true;
+				// Signal other processes about simulation stop
+				for (int i = 0; i < philo->total; i++)
+					sem_post(philo->shared->stop_sem);
+				if (!stopped)
+					log_msg(philo, DEATH);
+			}
+		}
+
+		// If stop_simulation is set, clean up and exit
+		if (stopped || dead)
+		{
+			// Signal main process to continue (fullness_sem)
+			for (int i = 0; i < philo->total; i++)
+				sem_post(philo->shared->fullness_sem);
+
+			return (NULL);
+		}
+
+		// Sleep briefly before rechecking
 		usleep(100);
 	}
 }

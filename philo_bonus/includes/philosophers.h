@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/13 17:26:55 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/22 12:32:30 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/22 15:23:29 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,8 @@ typedef enum e_action
 	STOP, // TEST - SIMULATION IS STOPPED
 	LAST, // TEST - SEMAPHORE SIGNAL FOR DEATH WA SSENT
 	RECEIVED, // TEST - CHECKS IF STOP SIGNAL WAS RECEIVED
-	STOP_STATUS // TEST - shows value of stop_simulation at each check
+	STOP_STATUS, // TEST - shows value of stop_simulation at each check
+	CHANGE // test - stop_simulaiton changed to true
 }				t_action;
 
 typedef struct s_shared

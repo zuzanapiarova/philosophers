@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 08:40:37 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/21 19:50:54 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/22 15:20:40 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,7 @@ bool	check_stop_sim(t_philo *philo)
 	return (stopped);
 }
 
+// gets specific name for local philo mutex-representing semaphore
 char	*get_mutex_sem_name(t_philo *philo)
 {
 	char	*name;
