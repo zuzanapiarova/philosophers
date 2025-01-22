@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/15 16:05:45 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/22 12:43:49 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/22 14:25:58 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,8 @@
 // each philo has 2 monitoring threads - one for its death, other for stop_sim
 int	child_routine(t_philo *philo)
 {
+	if (philo->id % 2 == 0)
+		usleep(100);
 	while (1)
 	{
 		if (check_stop_sim(philo))
@@ -31,9 +33,9 @@ int	child_routine(t_philo *philo)
 		{
 			sem_post(philo->shared->fullness_sem);
 			log_msg(philo, FULL); // do not print in final version 
-			// if (check_stop_sim(philo) == true)
-			// 	return (ERROR);
 		}
+		if (check_stop_sim(philo) == true)
+			return (ERROR);
 		if (p_sleep(philo) == ERROR)
 			return (ERROR);
 		if (p_think(philo) == ERROR)
@@ -45,11 +47,12 @@ int	child_routine(t_philo *philo)
 int	start_simulation(t_philo *philos, t_shared *shared, pid_t *pids, int total)
 {
 	int			i;
+	long long	start_time;
 	pthread_t	full_checker;
 
 	if (pthread_create(&full_checker, NULL, &full_routine, &philos[0]) == ERROR)
 		return (write(2, "Error creating full_check thread.\n", 34), ERROR);
-	shared->start_time = get_time_in_micros();
+	start_time = get_time_in_micros();
 	i = -1;
 	while (++i < total)
 	{
@@ -62,6 +65,7 @@ int	start_simulation(t_philo *philos, t_shared *shared, pid_t *pids, int total)
 		}
 		if (pids[i] == 0)
 		{
+			philos[i].start_time = start_time;
 			init_local_resources(&philos[i]);
 			int exit_status = child_routine(&philos[i]);
 			destroy_local_resources(&philos[i]);

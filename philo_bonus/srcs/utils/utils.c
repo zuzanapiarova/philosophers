@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 08:40:37 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/21 19:50:54 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/22 13:57:46 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,12 +37,20 @@ long long	get_time_in_micros(void)
 // if either is true, returns true and caller will stop the specific thread
 bool	check_stop_sim(t_philo *philo)
 {
-	bool	stopped;
+	// bool	stopped;
 
+	// sem_wait(philo->mutex_local_sem);
+	// stopped = philo->stop_simulation;
+	// sem_post(philo->mutex_local_sem);
+	// return (stopped);
 	sem_wait(philo->mutex_local_sem);
-	stopped = philo->stop_simulation;
+	if (philo->stop_simulation)
+	{
+		sem_post(philo->mutex_local_sem);
+		return (true);
+	}
 	sem_post(philo->mutex_local_sem);
-	return (stopped);
+	return (false);
 }
 
 char	*get_mutex_sem_name(t_philo *philo)

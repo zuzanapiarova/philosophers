@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 09:28:58 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/22 12:39:41 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/22 14:07:27 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,10 @@ int	leave_forks(t_philo *philo)
 int	p_eat(t_philo *philo)
 {
 	if (check_stop_sim(philo))
+	{
+		leave_forks(philo);
 		return (ERROR);
+	}
 	if ((int)philo->times_eaten > -1)
 		philo->times_eaten++;
 	sem_wait(philo->mutex_local_sem);
@@ -51,11 +54,11 @@ int	p_eat(t_philo *philo)
 	sem_post(philo->mutex_local_sem);
 	log_msg(philo, EATS);
 	usleep(philo->eat * 1000);
-	// if (check_stop_sim(philo))
-	// {
-	// 	leave_forks(philo);
-	// 	return (ERROR);
-	// }
+	if (check_stop_sim(philo))
+	{
+		leave_forks(philo);
+		return (ERROR);
+	}
 	return (SUCCESS);
 }
 

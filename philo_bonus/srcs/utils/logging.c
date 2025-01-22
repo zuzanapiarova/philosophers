@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/13 16:51:21 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/21 17:53:07 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/22 14:14:44 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,12 +74,12 @@ char	*get_msg(t_action action)
 		msg = "is full\033[37m\n";
 	else if (action == STOP)
 		msg = "simulation stopped\033[37m\n";
-	else if (action == LAST)
-		msg = "SENDING STOP SIGNAL\033[37m\n";
+	else if (action == CHANGE)
+		msg = "changed stop_sim to true\033[37m\n";
 	else if (action == RECEIVED)
 		msg = "stop signal received\033[37m\n";
 	else if (action == STOP_STATUS)
-		msg = "stop_sim status is \033[37m\n";
+		msg = "stop_sim status is \033[37m";
 	else
 		msg = "";
 	return (msg);
@@ -97,7 +97,7 @@ int	log_msg(t_philo *philo, t_action action)
 	char	*color_time;
 
 	msg = get_msg(action);
-	time = ft_utoa(((get_time_in_micros() - philo->shared->start_time)));
+	time = ft_utoa(((get_time_in_micros() - philo->start_time)));
 	color_time = ft_strjoin(get_color(action), time);
 	free(time);
 	sem_wait(philo->shared->msg_sem);
@@ -117,9 +117,9 @@ int	log_msg(t_philo *philo, t_action action)
 	if (action == STOP_STATUS)
 	{
 		if (philo->stop_simulation)
-			ft_putchar('a');
+			write(1, " 1\n", 3);
 		else
-			ft_putchar('b');
+			write(1, " 0\n", 3);
 	}
 	sem_post(philo->shared->msg_sem);
 	free(color_time);
