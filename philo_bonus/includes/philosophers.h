@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/13 17:26:55 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/22 15:23:29 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/22 14:11:40 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,7 @@
 # define FORK_SEM "/fork_sem69"
 # define MSG_SEM "/msg_sem69"
 # define STOP_SEM "/stop_sem69"
+# define START_SEM "/start_sem69"
 # define FULLNESS_SEM "/fullness_sem69"
 
 typedef enum e_action
@@ -49,7 +50,7 @@ typedef enum e_action
 	FINISH, // SIMULATION IS FINISHED
 	FULL, // PHILO ATE FOR THE LAST TIME
 	STOP, // TEST - SIMULATION IS STOPPED
-	LAST, // TEST - SEMAPHORE SIGNAL FOR DEATH WA SSENT
+	CHANGE, // TEST - changed stop_sim to true
 	RECEIVED, // TEST - CHECKS IF STOP SIGNAL WAS RECEIVED
 	STOP_STATUS, // TEST - shows value of stop_simulation at each check
 	CHANGE // test - stop_simulaiton changed to true
@@ -57,11 +58,11 @@ typedef enum e_action
 
 typedef struct s_shared
 {
-	long long		start_time;
 	sem_t			*fork_sem;
 	sem_t			*msg_sem;
 	sem_t			*fullness_sem;
 	sem_t			*stop_sem;
+	sem_t			*start_sem;
 }					t_shared;
 
 typedef struct s_philo
@@ -86,6 +87,7 @@ typedef struct s_philo
 	// only shared resources available to all threads for both read/write
 	t_shared		*shared;
 	int				exit_status;
+	long long		start_time;
 }					t_philo;
 
 typedef struct s_resources

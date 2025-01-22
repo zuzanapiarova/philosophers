@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 10:43:17 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/22 12:06:03 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/22 14:10:22 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,7 @@ int	close_global_semaphores(t_shared *shared)
 	sem_close(shared->fork_sem);
 	sem_close(shared->msg_sem);
 	sem_close(shared->stop_sem);
+	sem_close(shared->start_sem);
 	sem_close(shared->fullness_sem);
 	return (SUCCESS);
 }
@@ -62,5 +63,7 @@ int	destroy_global_semaphores(t_shared *shared)
 	sem_unlink(FULLNESS_SEM);
 	sem_close(shared->stop_sem);
 	sem_unlink(STOP_SEM);
+	sem_close(shared->start_sem);
+	sem_unlink(START_SEM);
 	return (SUCCESS);
 }

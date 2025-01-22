@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 10:20:07 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/22 15:27:49 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/22 17:01:08 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,13 +17,14 @@
 // stop_sem is a semaphore signalling that the simulation is over
 // stop_sem is triggered by death or by all being full
 // then it sets stop_simulation for this process to true and returns
+	//log_msg(philo, RECEIVED); // remove later 
+	//log_msg(philo, CHANGE);
 void	*stop_routine(void	*arg)
 {
 	t_philo	*philo;
 
 	philo = (t_philo *)arg;
 	sem_wait(philo->shared->stop_sem);
-	log_msg(philo, RECEIVED); // remove later 
 	sem_wait(philo->mutex_local_sem);
 	philo->stop_simulation = true;
 	log_msg(philo, CHANGE);
@@ -49,7 +50,6 @@ void	*stop_routine(void	*arg)
 		sem_post(philo->mutex_local_sem);
 		if (get_time_in_micros() - philo->last_eaten > (philo->die * 1000) && stopped == false)
 		{
-			log_msg(philo, STOP_STATUS);
 			sem_wait(philo->mutex_local_sem);
 			philo->stop_simulation = true;
 			sem_post(philo->mutex_local_sem);
@@ -77,7 +77,7 @@ void	*stop_routine(void	*arg)
 void	*death_routine(void *arg)
 {
 	t_philo	*philo;
-	bool	dead = false;
+	bool	dead;
 	bool	stopped;
 
 	philo = (t_philo *)arg;
@@ -86,41 +86,24 @@ void	*death_routine(void *arg)
 		// Check stop_simulation once per loop iteration
 		sem_wait(philo->mutex_local_sem);
 		stopped = philo->stop_simulation;
+		dead = get_time_in_micros() - philo->last_eaten > (philo->die * 1000);
+		if (dead)
+			philo->stop_simulation = true;
 		sem_post(philo->mutex_local_sem);
-
-		if (!stopped)
+		if (dead && !stopped)
 		{
-			// Check if the philosopher has died
-			if (get_time_in_micros() - philo->last_eaten > (philo->die * 1000))
-			{
-				log_msg(philo, STOP_STATUS);
-				sem_wait(philo->mutex_local_sem);
-				stopped = philo->stop_simulation;
-				sem_post(philo->mutex_local_sem);
-				// Mark philosopher as dead and signal simulation stop
-				sem_wait(philo->mutex_local_sem);
-				philo->stop_simulation = true;
-				sem_post(philo->mutex_local_sem);
-				dead = true;
-				// Signal other processes about simulation stop
-				for (int i = 0; i < philo->total; i++)
-					sem_post(philo->shared->stop_sem);
-				if (!stopped)
-					log_msg(philo, DEATH);
-			}
+			// Signal other processes about simulation stop
+			for (int i = 0; i < philo->total; i++)
+				sem_post(philo->shared->stop_sem);
+			log_msg(philo, DEATH);
 		}
-
-		// If stop_simulation is set, clean up and exit
 		if (stopped || dead)
 		{
 			// Signal main process to continue (fullness_sem)
 			for (int i = 0; i < philo->total; i++)
 				sem_post(philo->shared->fullness_sem);
-
 			return (NULL);
 		}
-
-		// Sleep briefly before rechecking
 		usleep(100);
 	}
 }
