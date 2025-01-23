@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 10:00:49 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/16 19:08:55 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/23 14:19:06 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 // if yes, returns error and breaks out of the loop
 // first if() checks if times_to_eat is not 0 
 // returns ERROR if loop should stop, SUCCESS to continue
+// testing:		// log_msg(p, FULL);
 int	perform_actions(t_philo *p)
 {
 	if (p->times_to_eat == 0)
@@ -32,7 +33,6 @@ int	perform_actions(t_philo *p)
 		return (ERROR);
 	if ((int)p->times_eaten == p->times_to_eat)
 	{
-		log_msg(p, FULL);
 		pthread_mutex_lock(p->stop_lock);
 		*(p->stop_simulation) += 1;
 		pthread_mutex_unlock(p->stop_lock);
@@ -66,9 +66,9 @@ void	unlock_two_mutexes(pthread_mutex_t *one, pthread_mutex_t *two)
 	pthread_mutex_unlock(two);
 }
 
+// testing: //	log_msg(philo, FINISH);
 void	finish_simulation(t_philo *philo)
 {
-	log_msg(philo, FINISH);
 	unlock_two_mutexes(&philo->lock, philo->stop_lock);
 }
 

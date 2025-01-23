@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/15 16:05:45 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/23 12:46:35 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/23 14:08:30 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,11 +81,11 @@ int	main(int argc, char **argv)
 	t_philo		*philos;
 	t_shared	shared;
 
-	total = ft_atou(argv[1]);
 	pids = NULL;
 	philos = NULL;
 	if (handle_error_input(argc, argv) == ERROR)
 		return (ERROR);
+	total = ft_atou(argv[1]);
 	if (init_glob_res(&philos, &pids, &shared, argv) == ERROR)
 		return (ERROR);
 	if (start_simulation(philos, &shared, pids, total) == ERROR)
