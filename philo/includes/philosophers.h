@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 19:00:40 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/16 19:09:01 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/23 11:00:10 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,14 +29,14 @@
 
 typedef enum e_action
 {
-	FORK_L, // TOOK LEFT FORK
-	FORK_R, // TOOK RIGHT FORK
-	EATS, // STARTED EATING
-	SLEEPS, // STARTED SLEEPING
-	THINKS, // STARTED THINKING
-	DEATH, // DIED
-	FINISH, // FINISHED SIMULATION
-	FULL // PHILO ATE FOR THE LAST TIME
+	FORK_L,
+	FORK_R,
+	EATS,
+	SLEEPS,
+	THINKS,
+	DEATH,
+	FINISH,
+	FULL
 }			t_action;
 
 typedef struct s_shared

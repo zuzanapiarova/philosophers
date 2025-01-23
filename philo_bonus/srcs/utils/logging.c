@@ -6,12 +6,13 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/13 16:51:21 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/22 19:20:14 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/23 11:45:17 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/philosophers.h"
 
+// some colors 
 // "\033[31m" red
 // "\033[33m" yellow
 // "\033[34m" blue

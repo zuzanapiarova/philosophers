@@ -6,19 +6,12 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/13 17:26:55 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/22 19:29:56 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/23 13:04:39 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-// valgrind error: 
-// Bug in libpthread: sem_wait succeeded on semaphore without prior sem_post
-// https://valgrind-users.narkive.com/5U7vfz8J/helgrind-sem-wait-succeeded-on-
-// semaphore-without-prior-sem-post
-// it says the sepaphore did not wait for post action
-// but this happens for semaphores innitialized with 0
-
-#ifndef PHILOSOPHERS_BONUS_H
-# define PHILOSOPHERS_BONUS_H
+#ifndef PHILOSOPHERS_H
+# define PHILOSOPHERS_H
 
 # include <unistd.h>
 # include <stdlib.h>
@@ -50,19 +43,19 @@
 /* STRUCTS & OTHER DT */
 typedef enum e_action
 {
-	FORK_L, // TOOK LEFT FORK
-	FORK_R, // TOOK RIGHT FORK
-	EATS, // STARTED EATING
-	SLEEPS, // STARTED SLEEPING
-	THINKS, // STARTED THINKING
-	DEATH, // DIED
-	FINISH, // SIMULATION IS FINISHED
-	FULL, // PHILO ATE FOR THE LAST TIME
-	STOP, // TEST - SIMULATION IS STOPPED
-	RECEIVED, // TEST - CHECKS IF STOP SIGNAL WAS RECEIVED
-	STOP_STATUS, // TEST - shows value of stop_simulation at each check
-	CHANGE // test - stop_simulaiton changed to true
-}				t_action;
+	FORK_L,
+	FORK_R,
+	EATS,
+	SLEEPS,
+	THINKS,
+	DEATH,
+	FINISH,
+	FULL,
+	STOP,
+	RECEIVED,
+	STOP_STATUS,
+	CHANGE
+}	t_action;
 
 typedef struct s_shared
 {
@@ -81,7 +74,7 @@ typedef struct s_philo
 	unsigned int	sleep;
 	unsigned int	die;
 	int				times_to_eat; // int because is -1 if not assigned
-	// variables that change but belong to one thread at all times
+	// variables that are set in program and belong to one philo at all times
 	unsigned int	times_eaten;
 	long long		last_eaten;
 	bool			stop_simulation;
@@ -91,10 +84,10 @@ typedef struct s_philo
 	pthread_t		full_checker;
 	pthread_t		stop_sim_checker;
 	pthread_mutex_t	lock;
-	// only shared resources available to all threads for both read/write
-	t_shared		*shared;
 	int				exit_status;
 	long long		start_time;
+	// only shared resources available to all threads for both read/write
+	t_shared		*shared;
 }					t_philo;
 
 typedef struct s_resources
@@ -107,7 +100,7 @@ typedef struct s_resources
 
 /*  FUNCTIONS */
 
-/* actions.c + actions_forks.c */
+/* actions.c */
 int				p_eat(t_philo *philo);
 int				p_sleep(t_philo *philo);
 int				p_think(t_philo *philo);
@@ -115,21 +108,22 @@ int				take_forks(t_philo *philo);
 int				leave_forks(t_philo *philo);
 
 /* philo_bonus.c */
-int				start_simulation(t_philo *philos, t_shared *shared, pid_t *pids, int total);
+void			child_routine(t_philo *philo);
+int				start_simulation(t_philo *p, t_shared *s, pid_t *pids, int n);
 int				main(int argc, char **argv);
 
 /* cleanup.c */
 int				close_global_semaphores(t_shared *shared);
 int				destroy_global_semaphores(t_shared *shared);
-int				destroy_local_resources(t_philo *philo);
-int				destroy_global_resources_child(t_philo *ph, t_shared *shared, pid_t *pids);
-int				destroy_global_resources_parent(t_philo *ph, t_shared *shared, pid_t *pids);
+int				destroy_local_res(t_philo *philo);
+int				destroy_glob_res_child(t_philo *ph, t_shared *s, pid_t *pids);
+int				destroy_glob_res_parent(t_philo *ph, t_shared *s, pid_t *pids);
 
 /* init.c */
 int				init_global_semaphores(t_shared *shared, int total);
-int				init_philo_data(t_philo *p, int i, char **argv, t_shared *shared);
-int				init_global_resources(t_philo **philos, pid_t **pids, t_shared *shared, char **argv);
-int				init_local_resources(t_philo *philo);
+int				init_philo_data(t_philo *p, int i, char **argv, t_shared *s);
+int				init_glob_res(t_philo **p, pid_t **pid, t_shared *s, char **a);
+int				init_local_res(t_philo *philo);
 
 /* input_val.c */
 int				handle_error_input(int argc, char **argv);
@@ -146,6 +140,8 @@ long long		get_time_in_micros(void);
 bool			check_stop_sim(t_philo *philo);
 int				log_msg(t_philo *philo, t_action action);
 int				handle_fork_error(pid_t *pids, int i);
+int				sem_close_helper(sem_t *sem1, sem_t *sem2, sem_t *sem3);
+int				sem_unlink_helper(char *sem_n1, char *sem_n2, char *sem_n3);
 
 /* utils_libft.c */
 unsigned int	ft_atou(const char *nptr);

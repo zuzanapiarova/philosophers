@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 10:21:56 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/22 19:21:37 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/23 12:14:27 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,28 +20,22 @@ int	init_global_semaphores(t_shared *shared, int total)
 	shared->msg_sem = sem_open(MSG_SEM, O_CREAT | O_EXCL, 0644, 1);
 	if (shared->msg_sem == SEM_FAILED)
 	{
-		sem_close(shared->fork_sem);
-		sem_unlink(FORK_SEM);
+		sem_close_helper(shared->fork_sem, NULL, NULL);
+		sem_unlink_helper(FORK_SEM, NULL, NULL);
 		return (write(2, "Error creating message semaphore.\n", 34), ERROR);
 	}
 	shared->stop_sem = sem_open(STOP_SEM, O_CREAT | O_EXCL, 0644, 0);
 	if (shared->msg_sem == SEM_FAILED)
 	{
-		sem_close(shared->fork_sem);
-		sem_unlink(FORK_SEM);
-		sem_close(shared->msg_sem);
-		sem_unlink(MSG_SEM);
+		sem_close_helper(shared->fork_sem, shared->msg_sem, NULL);
+		sem_unlink_helper(FORK_SEM, MSG_SEM, NULL);
 		return (write(2, "Error creating stop semaphore.\n", 31), ERROR);
 	}
 	shared->fullness_sem = sem_open(FULLNESS_SEM, O_CREAT | O_EXCL, 0644, 0);
 	if (shared->fullness_sem == SEM_FAILED)
 	{
-		sem_close(shared->fork_sem);
-		sem_unlink(FORK_SEM);
-		sem_close(shared->msg_sem);
-		sem_unlink(MSG_SEM);
-		sem_close(shared->stop_sem);
-		sem_unlink(STOP_SEM);
+		sem_close_helper(shared->fork_sem, shared->msg_sem, shared->stop_sem);
+		sem_unlink_helper(FORK_SEM, MSG_SEM, STOP_SEM);
 		return (write(2, "Error creating monitoring semaphore.\n", 37), ERROR);
 	}
 	return (SUCCESS);
@@ -72,7 +66,7 @@ int	init_philo_data(t_philo *p, int i, char **argv, t_shared *shared)
 }
 
 // allocated pids array, philo array, shared resources and each philo structure
-int	init_global_resources(t_philo **ph, pid_t **pids, t_shared *sh, char **agv)
+int	init_glob_res(t_philo **philos, pid_t **pids, t_shared *shared, char **agv)
 {
 	int	i;
 	int	total;
@@ -81,26 +75,26 @@ int	init_global_resources(t_philo **ph, pid_t **pids, t_shared *sh, char **agv)
 	*pids = (pid_t *)malloc(sizeof(pid_t) * total);
 	if (!(*pids))
 		return (write(2, "Memory allocation problem. Exiting.\n", 36), ERROR);
-	*ph = (t_philo *)malloc(sizeof(t_philo) * total);
-	if (!(*ph))
+	*philos = (t_philo *)malloc(sizeof(t_philo) * total);
+	if (!(*philos))
 	{
 		free(*pids);
 		return (write(2, "Memory allocation problem. Exiting.\n", 36), ERROR);
 	}
-	if (init_global_semaphores(sh, total) == ERROR)
+	if (init_global_semaphores(shared, total) == ERROR)
 	{
 		free(*pids);
-		free(*ph);
+		free(*philos);
 		return (ERROR);
 	}
 	i = -1;
 	while (++i < total)
-		init_philo_data(&(*ph)[i], i, agv, sh);
+		init_philo_data(&(*philos)[i], i, agv, shared);
 	return (SUCCESS);
 }
 
 // initializes local resources - local threads, local semaphore
-int	init_local_resources(t_philo *philo)
+int	init_local_res(t_philo *philo)
 {
 	philo->mutex_sem_name = get_mutex_sem_name(philo);
 	philo->mutex_local_sem

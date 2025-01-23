@@ -6,11 +6,21 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/13 16:52:30 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/17 16:32:05 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/23 11:32:28 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/philosophers.h"
+
+// retusns time in microseconds
+long long	get_time_in_micros(void)
+{
+	struct timeval	tv;
+
+	if (gettimeofday(&tv, NULL) == 0)
+		return ((tv.tv_sec * 1000000) + (tv.tv_usec) + TIMEZONE_MICRO);
+	return (ERROR);
+}
 
 size_t	get_uint_size(unsigned long n)
 {

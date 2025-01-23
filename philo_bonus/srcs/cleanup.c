@@ -6,14 +6,14 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 10:43:17 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/22 17:38:19 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/23 11:11:02 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/philosophers.h"
 
 // destorys local resources - localy created threads, semaphore, local sem name
-int	destroy_local_resources(t_philo *philo)
+int	destroy_local_res(t_philo *philo)
 {
 	pthread_join(philo->death_checker, NULL);
 	pthread_join(philo->stop_sim_checker, NULL);
@@ -24,7 +24,7 @@ int	destroy_local_resources(t_philo *philo)
 }
 
 // destroys global resources in parent = both closes and unlinks semaphores
-int	destroy_global_resources_parent(t_philo *ph, t_shared *shared, pid_t *pids)
+int	destroy_glob_res_parent(t_philo *ph, t_shared *shared, pid_t *pids)
 {
 	destroy_global_semaphores(shared);
 	free(ph);
@@ -33,7 +33,7 @@ int	destroy_global_resources_parent(t_philo *ph, t_shared *shared, pid_t *pids)
 }
 
 // destroys global resources in child = only closes semaphores, does not unlink
-int	destroy_global_resources_child(t_philo *ph, t_shared *shared, pid_t *pids)
+int	destroy_glob_res_child(t_philo *ph, t_shared *shared, pid_t *pids)
 {
 	close_global_semaphores(shared);
 	free(ph);

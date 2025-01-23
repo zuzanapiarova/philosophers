@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 10:15:48 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/15 14:39:19 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/23 12:51:36 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,8 @@
 // checks for philo death between fork grabbing
 int	fork_r(t_philo *philo, pthread_mutex_t *right_f, pthread_mutex_t *left_f)
 {
+	if (check_stop_sim(philo) == ERROR)
+		return (ERROR);
 	pthread_mutex_lock(right_f);
 	if (check_stop_sim(philo))
 	{
@@ -40,6 +42,8 @@ int	fork_r(t_philo *philo, pthread_mutex_t *right_f, pthread_mutex_t *left_f)
 // checks for philo death between fork grabbing
 int	fork_l(t_philo *philo, pthread_mutex_t *left_f, pthread_mutex_t *right_f)
 {
+	if (check_stop_sim(philo) == ERROR)
+		return (ERROR);
 	pthread_mutex_lock(left_f);
 	if (check_stop_sim(philo))
 	{

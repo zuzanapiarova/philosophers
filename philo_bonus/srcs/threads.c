@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 10:20:07 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/22 19:16:16 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/23 13:08:54 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,18 @@ void	*stop_routine(void	*arg)
 	return (NULL);
 }
 
+// sets stopped and dead variables 
+int	get_stopped_and_dead(t_philo *philo, bool *stopped, bool *dead)
+{
+	sem_wait(philo->mutex_local_sem);
+	*stopped = philo->stop_simulation;
+	*dead = get_time_in_micros() - philo->last_eaten > (philo->die * 1000);
+	if (*dead)
+		philo->stop_simulation = true;
+	sem_post(philo->mutex_local_sem);
+	return (SUCCESS);
+}
+
 void	*death_routine(void *arg)
 {
 	t_philo	*philo;
@@ -39,12 +51,7 @@ void	*death_routine(void *arg)
 	philo = (t_philo *)arg;
 	while (1)
 	{
-		sem_wait(philo->mutex_local_sem);
-		stopped = philo->stop_simulation;
-		dead = get_time_in_micros() - philo->last_eaten > (philo->die * 1000);
-		if (dead)
-			philo->stop_simulation = true;
-		sem_post(philo->mutex_local_sem);
+		get_stopped_and_dead(philo, &stopped, &dead);
 		if (dead && !stopped)
 		{
 			i = -1;

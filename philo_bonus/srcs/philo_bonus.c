@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/15 16:05:45 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/22 19:16:30 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/23 12:46:35 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 // each philo has 2 monitoring threads - one for its death, other for stop_sim
 // sleep after it is full lets the last full thread have enough time to
 // get memo that simulation ended
+// no return DT because it can only exit when thread signals it death/fullness
 void	child_routine(t_philo *philo)
 {
 	while (1)
@@ -60,11 +61,11 @@ int	start_simulation(t_philo *philos, t_shared *shared, pid_t *pids, int total)
 		if (pids[i] == 0)
 		{
 			philos[i].start_time = start_time;
-			if (init_local_resources(&philos[i]) == ERROR)
+			if (init_local_res(&philos[i]) == ERROR)
 				return (ERROR);
 			child_routine(&philos[i]);
-			destroy_local_resources(&philos[i]);
-			destroy_global_resources_child(philos, shared, pids);
+			destroy_local_res(&philos[i]);
+			destroy_glob_res_child(philos, shared, pids);
 			exit(SUCCESS);
 		}
 	}
@@ -85,15 +86,15 @@ int	main(int argc, char **argv)
 	philos = NULL;
 	if (handle_error_input(argc, argv) == ERROR)
 		return (ERROR);
-	if (init_global_resources(&philos, &pids, &shared, argv) == ERROR)
+	if (init_glob_res(&philos, &pids, &shared, argv) == ERROR)
 		return (ERROR);
 	if (start_simulation(philos, &shared, pids, total) == ERROR)
 	{
-		destroy_global_resources_parent(philos, &shared, pids);
+		destroy_glob_res_parent(philos, &shared, pids);
 		return (ERROR);
 	}
 	while (--total > -1)
 		waitpid(pids[total], NULL, 0);
-	destroy_global_resources_parent(philos, &shared, pids);
+	destroy_glob_res_parent(philos, &shared, pids);
 	return (SUCCESS);
 }

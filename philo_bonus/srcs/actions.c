@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 09:28:58 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/22 19:32:26 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/23 13:04:26 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,10 +70,19 @@ int	p_eat(t_philo *philo)
 
 int	p_sleep(t_philo *philo)
 {
+	long long	time_passed;
+	long long	time_left;
+
 	if (check_stop_sim(philo))
 		return (ERROR);
 	log_msg(philo, SLEEPS);
 	usleep(philo->sleep * 1000);
+	if (philo->sleep < 80)
+	{
+		time_passed = get_time_in_micros() - philo->last_eaten;
+		time_left = (philo->die * 1000) - time_passed;
+		usleep(time_left / 2);
+	}
 	return (SUCCESS);
 }
 

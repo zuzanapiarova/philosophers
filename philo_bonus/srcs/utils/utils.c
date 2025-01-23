@@ -6,31 +6,11 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 08:40:37 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/22 19:13:23 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/23 13:04:12 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/philosophers.h"
-
-// returns time in miliseconds
-long long	get_time_in_ms(void)
-{
-	struct timeval	tv;
-
-	if (gettimeofday(&tv, NULL) == 0)
-		return ((tv.tv_sec * 1000) + (tv.tv_usec / 1000) + TIMEZONE_MILI);
-	return (ERROR);
-}
-
-// retusns time in microseconds
-long long	get_time_in_micros(void)
-{
-	struct timeval	tv;
-
-	if (gettimeofday(&tv, NULL) == 0)
-		return ((tv.tv_sec * 1000000) + (tv.tv_usec) + TIMEZONE_MICRO);
-	return (ERROR);
-}
 
 // checks if stop_simulation is true meaning one of them died
 // or checks if the specific philo finished eating
@@ -55,6 +35,30 @@ char	*get_mutex_sem_name(t_philo *philo)
 	name = ft_strjoin("mutex_sem", number);
 	free(number);
 	return (name);
+}
+
+// closes semaphores from arguments, if exist
+int	sem_close_helper(sem_t *sem1, sem_t *sem2, sem_t *sem3)
+{
+	if (sem1)
+		sem_close(sem1);
+	if (sem2)
+		sem_close(sem2);
+	if (sem3)
+		sem_close(sem3);
+	return (SUCCESS);
+}
+
+// unlinks semaphores by their name from arguments, if exist
+int	sem_unlink_helper(char *sem_name1, char *sem_name2, char *sem_name3)
+{
+	if (sem_name1)
+		sem_unlink(sem_name1);
+	if (sem_name2)
+		sem_unlink(sem_name2);
+	if (sem_name3)
+		sem_unlink(sem_name3);
+	return (SUCCESS);
 }
 
 // terminates processes forked so far if fork error is encountered
