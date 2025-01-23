@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/13 16:51:21 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/23 11:45:17 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/23 15:50:07 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,7 +116,7 @@ int	log_msg(t_philo *philo, t_action action)
 	free(time);
 	sem_wait(philo->shared->msg_sem);
 	write(1, color_time, ft_strlen(color_time));
-	write(1, "\t  ", 3);
+	write(1, "\t", 2);
 	ft_putnbr(philo->id);
 	write(1, " ", 1);
 	write(1, msg, ft_strlen(msg));

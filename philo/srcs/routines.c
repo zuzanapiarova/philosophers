@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 10:00:49 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/23 14:19:06 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/23 15:58:39 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,9 @@ int	perform_actions(t_philo *p)
 		*(p->stop_simulation) += 1;
 		pthread_mutex_unlock(p->stop_lock);
 	}
-	if ((p_sleep(p) == ERROR) || p_think(p) == ERROR)
+	if (p_sleep(p) == ERROR)
+		return (ERROR);
+	if (p_think(p) == ERROR)
 		return (ERROR);
 	return (SUCCESS);
 }
@@ -51,7 +53,7 @@ void	*routine(void *arg)
 
 	philo = (t_philo *)arg;
 	if (philo->id % 2 == 0)
-		usleep(10);
+		usleep((philo->eat / 2) * 1000);
 	while (1)
 	{
 		if (perform_actions(philo) == ERROR)

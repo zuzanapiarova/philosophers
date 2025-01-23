@@ -6,7 +6,7 @@
 /*   By: zpiarova <zpiarova@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/15 16:05:45 by zpiarova          #+#    #+#             */
-/*   Updated: 2025/01/23 14:08:30 by zpiarova         ###   ########.fr       */
+/*   Updated: 2025/01/23 16:18:44 by zpiarova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,10 +19,10 @@
 // no return DT because it can only exit when thread signals it death/fullness
 void	child_routine(t_philo *philo)
 {
+	if (philo->id > philo->total / 2 && philo->total > 1)
+		usleep((philo->eat / 2) * 1000);
 	while (1)
 	{
-		if (philo->id % 2 == 0)
-			usleep(10);
 		if (check_stop_sim(philo))
 			break ;
 		if (philo->times_to_eat == 0)
